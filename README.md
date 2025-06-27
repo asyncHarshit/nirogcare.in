@@ -1,10 +1,77 @@
-# 🏥 Hospital Management System (HMS)
+# 🏥 Hospital Management System
+## *Revolutionizing Healthcare in India*
+### 🚀 Eliminating Long Queues with Smart Digital Solutions
 
-> *Revolutionizing Healthcare in India - Eliminating Long Queues with Smart Digital Solutions*
+<div align="center">
 
-[![Team](https://img.shields.io/badge/Team-27-blue?style=flat-square)](https://github.com/team27)
-[![Status](https://img.shields.io/badge/Status-In%20Development-orange?style=flat-square)](https://github.com/team27/hms)
-[![Version](https://img.shields.io/badge/Version-1.0.0-green?style=flat-square)](https://github.com/team27/hms)
+[![Team](https://img.shields.io/badge/👥_Team-27-4f46e5?style=for-the-badge&logo=github&logoColor=white)](https://github.com/team27)
+[![Status](https://img.shields.io/badge/🔥_Status-In%20Development-f59e0b?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/team27/hms)
+[![Version](https://img.shields.io/badge/📦_Version-1.0.0-10b981?style=for-the-badge&logo=tag&logoColor=white)](https://github.com/team27/hms)
+[![License](https://img.shields.io/badge/📄_License-MIT-8b5cf6?style=for-the-badge&logo=balance-scale&logoColor=white)](#license)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🌟 **Transforming Healthcare Experience**
+*Building the future of medical management with cutting-edge technology*
+
+</div>
+
+<br>
+
+<div align="center">
+
+```ascii
+    ╔══════════════════════════════════════════╗
+    ║           🏥 HMS FEATURES 🏥            ║
+    ║                                          ║
+    ║  ⚡ Lightning Fast Queue Management      ║
+    ║  📱 Mobile-First Design                 ║
+    ║  🔒 Secure Patient Data                 ║
+    ║  📊 Real-time Analytics                 ║
+    ║  🤖 AI-Powered Scheduling               ║
+    ╚══════════════════════════════════════════╝
+```
+
+</div>
+
+---
+
+<div align="center">
+
+### 🎯 **Mission Statement**
+*"Digitizing healthcare infrastructure across India, one hospital at a time"*
+
+[![Made with ❤️](https://img.shields.io/badge/Made%20with-❤️-red?style=flat-square&logo=heart&logoColor=white)]()
+[![For India](https://img.shields.io/badge/Built%20for-🇮🇳%20India-ff6b35?style=flat-square&logo=flag&logoColor=white)]()
+
+</div>
+
+<br>
+
+<table align="center">
+<tr>
+<td align="center">🚀<br><b>Performance</b><br><i>Blazing Fast</i></td>
+<td align="center">📱<br><b>Responsive</b><br><i>All Devices</i></td>
+<td align="center">🔐<br><b>Secure</b><br><i>HIPAA Compliant</i></td>
+<td align="center">🌐<br><b>Scalable</b><br><i>Cloud Ready</i></td>
+</tr>
+</table>
+
+---
+
+<div align="center">
+  
+### 📞 **Get In Touch**
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/team27/hms)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](#)
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](#)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](#)
+
+</div>
 
 
 ## 📋 **Table of Contents**
@@ -234,23 +301,6 @@ graph TB
 | `GET` | `/api/hospital/analytics` | Performance metrics |
 | `GET` | `/api/hospital/reports` | Monthly reports |
 
-#### **Staff Management**
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/hospital/doctors` | Add doctor | `{name, specialization, schedule, contact}` |
-| `GET` | `/api/hospital/doctors` | List all doctors | - |
-| `PUT` | `/api/hospital/doctors/:id` | Update doctor info | `{schedule, contact, status}` |
-| `POST` | `/api/hospital/staff` | Add staff member | `{name, role, contact, shift}` |
-| `GET` | `/api/hospital/staff` | List all staff | - |
-
-#### **Facility Management**
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/hospital/departments` | Add department | `{name, headDoctor, capacity}` |
-| `GET` | `/api/hospital/departments` | List departments | - |
-| `POST` | `/api/hospital/rooms` | Add room | `{number, type, department, status}` |
-| `GET` | `/api/hospital/rooms` | List rooms | - |
-
 ---
 
 ### 🧪 **Lab Module**
@@ -312,7 +362,7 @@ graph TB
   "stateManagement": "Redux Toolkit",
   "routing": "React Router v6",
   "httpClient": "Axios",
-  "uiComponents": "Headless UI",
+  "uiComponents": "ShadCn + magic + acertinity UI",
   "charts": "Chart.js / Recharts",
   "notifications": "React Hot Toast"
 }
@@ -336,7 +386,7 @@ graph TB
 {
   "primaryDB": "MongoDB Atlas",
   "realtimeDB": "Firebase Realtime Database",
-  "fileStorage": "Cloudinary / AWS S3",
+  "fileStorage": "Cloudinary",
   "caching": "Redis",
   "search": "MongoDB Atlas Search"
 }
@@ -458,26 +508,11 @@ graph TB
 | **No-show Rate** | 30% | 10% |
 
 
-## 📞 **Support & Contact**
-
-For support, feedback, or contributions, please contact:
-
-- **Team Leader**: Harshit Kumar
-- **Email**: team27.hms@gmail.com
-- **GitHub**: [github.com/team27/hms](https://github.com/team27/hms)
-
----
-
-## 📄 **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 <div align="center">
 
 **🏥 Building a Healthier Tomorrow, One Queue at a Time 🏥**
 
-*Made with ❤️ by Team 27*
+*Made with ❤️ by *
 
 </div>
