@@ -1,0 +1,40 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
+
+    phone: {
+      type: String,
+      match: [/^[6-9]\d{9}$/, "Invalid Indian phone number"],
+    },
+
+    password: { type: String, required: true, minlength: 6 },
+
+    role: {
+      type: String,
+      enum: [
+        "doctor",
+        "patient",
+        "hospitalAdmin",
+        "labAdmin",
+        "assistant",
+        null,
+      ],
+      default: null,
+    },
+
+    isVerified: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("User", userSchema);

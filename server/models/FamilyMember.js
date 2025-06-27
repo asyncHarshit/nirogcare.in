@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 const familyMemberSchema = new mongoose.Schema(
   {
     patientId: {
@@ -35,4 +33,4 @@ const familyMemberSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("FamilyMember", familyMemberSchema);
+export const FamilyMember = mongoose.model("FamilyMember", familyMemberSchema);

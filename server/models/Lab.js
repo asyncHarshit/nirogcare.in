@@ -1,23 +1,20 @@
-import mongoose from "mongoose";
-
 const labSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
     name: {
       type: String,
       required: true,
       trim: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
-    },
     phone: {
       type: String,
       required: true,
-      match: [/^[6-9]\d{9}$/, "Invalid Indian phone number"],
+      match: [/^[6-9]\d{9}$/],
     },
     address: {
       type: String,
@@ -27,7 +24,6 @@ const labSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-    //   match: [/^[A-Z0-9\-]{8,20}$/, "Invalid license format"],
     },
     isVerified: {
       type: Boolean,
@@ -37,4 +33,4 @@ const labSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Lab", labSchema);
+export const Lab = mongoose.model("Lab", labSchema);

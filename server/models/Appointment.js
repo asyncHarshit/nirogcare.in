@@ -45,4 +45,4 @@ const appointmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Appointment", appointmentSchema);
+export const Appointment = mongoose.model("Appointment", appointmentSchema);

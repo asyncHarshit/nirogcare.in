@@ -17,7 +17,6 @@ const labReportSchema = new mongoose.Schema(
       ref: "Lab",
       required: true,
     },
-
     testName: {
       type: String,
       required: true,
@@ -37,7 +36,6 @@ const labReportSchema = new mongoose.Schema(
     unit: {
       type: String,
     },
-
     diagnosis: {
       type: String,
     },
@@ -53,4 +51,4 @@ const labReportSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("LabReport", labReportSchema);
+export const LabReport = mongoose.model("LabReport", labReportSchema);
