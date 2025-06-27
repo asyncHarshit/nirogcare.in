@@ -39,8 +39,7 @@
 - [🔌 API Routes & Endpoints](#-api-routes--endpoints)
 - [📱 Technology Stack](#-technology-stack)
 - [📂 Project Structure](#-project-structure)
-- [🔔 Real-time Features](#-real-time-features)
-- [🚀 Getting Started](#-getting-started)
+- [🔔 Real-time Features & Notification](#-real-time-features)
 - [📊 Impact & Analytics](#-impact--analytics)
 
 ---
@@ -362,7 +361,7 @@ graph TB
 
 ---
 
-## 📂 **Enhanced Project Structure**
+## 📂 **Project Structure**
 
 ```
 📦 hospital-management-system/
@@ -435,7 +434,7 @@ graph TB
 └── package.json
 ```
 
-## 🔔 **Real-time Features & Notifications**
+## 🔔 **Real-time Features & Notification**
 
 ### **Firebase Cloud Messaging (FCM) Events**
 
