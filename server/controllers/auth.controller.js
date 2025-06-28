@@ -8,12 +8,13 @@ const generateToken = (id) => {
   });
 };
 
-// ====================
+
 // Register
-// ====================
+
+
 const registerUser = async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password} = req.body;
 
     const existing = await User.findOne({ email });
     if (existing) {
@@ -27,7 +28,7 @@ const registerUser = async (req, res) => {
       email,
       phone,
       password: hashedPassword,
-      role: null, // role selected after registration
+      role : null, // role selected after registration
     });
 
     await newUser.save();
@@ -46,6 +47,7 @@ const registerUser = async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
+        token
       },
     });
   } catch (err) {
@@ -54,9 +56,10 @@ const registerUser = async (req, res) => {
   }
 };
 
-// ====================
+
 // Login
-// ====================
+
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -81,7 +84,8 @@ const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        // role: user.role,
+        token
       },
     });
   } catch (err) {
@@ -90,4 +94,49 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser };
+// Select Role
+
+const selectRole = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { role } = req.body;
+
+    if (!role) {
+      return res.status(400).json({ message: "Role is required" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = generateToken(updatedUser._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Role selected successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        token
+      },
+    });
+  } catch (err) {
+    console.error("Select Role Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export { registerUser, loginUser , selectRole};

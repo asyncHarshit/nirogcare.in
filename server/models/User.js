@@ -27,9 +27,7 @@ const userSchema = new mongoose.Schema(
         "hospitalAdmin",
         "labAdmin",
         "assistant",
-        null,
       ],
-      default: null,
     },
 
     isVerified: { type: Boolean, default: false },
