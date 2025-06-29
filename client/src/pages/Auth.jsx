@@ -3,6 +3,7 @@ import {callAuthLoginApi, callAuthRegisterApi } from '../api/authServices';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+
 const Auth = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,6 +35,7 @@ const Auth = () => {
         if(response){
           console.log(response)
           toast.message("Logged in sucesssfully !!")
+         
           navigate("/select-role")
         }
         else{
@@ -50,15 +52,15 @@ const Auth = () => {
         const response = await callAuthLoginApi(formData.email , formData.password);
         if(response){
           console.log(response)
+          toast.message("Logged in sucesssfully !!")
+          navigate(`/${response.user.role}/dashboard`)
         }
-        toast.message("Logged in sucesssfully !!")
+        
         
       } catch (error) {
         console.log("Error in callAuthLoginApi !!")
         
       }
-      
-      // Call login API
     }
   };
 

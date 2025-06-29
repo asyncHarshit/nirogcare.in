@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // Corrected import
+import { callRoleApi } from "../api/authServices.js";
+import { toast } from 'sonner'; // or 'react-hot-toast' if you're using that
 
 const roles = [
   "doctor",
@@ -10,21 +13,26 @@ const roles = [
 
 const SelectRole = () => {
   const [selectedRole, setSelectedRole] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedRole) {
-      alert("Please select a role");
+      toast.error("Please select a role");
       return;
     }
 
-    console.log("Selected role:", selectedRole);
-
-    // Call API to submit role here, for example:
-    // await axios.patch('/api/auth/select-role', { role: selectedRole }, { withCredentials: true });
-
-    // Redirect or show success message after success
+    try {
+      const response = await callRoleApi(selectedRole);
+      if (response) {
+        toast.success("Role selected successfully");
+        navigate(`/${selectedRole}/dashboard`);
+      }
+    } catch (error) {
+      console.error("Role selection failed:", error);
+      toast.error("Failed to select role. Please try again.");
+    }
   };
 
   return (
@@ -62,3 +70,4 @@ const SelectRole = () => {
 };
 
 export default SelectRole;
+

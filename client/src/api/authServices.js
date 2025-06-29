@@ -27,10 +27,24 @@ export async function callAuthLoginApi(email , password){
         {withCredentials : true}
       )
 
-      console.log(response?.data)
-
+      return response.data;
     
     } catch (error) {
       console.error("Login failed:", error)
     }
+}
+
+export async function callRoleApi(selectedRole){
+  try {
+    const response = await axios.patch(`${baseUrl}/api/auth/select-role`,
+      {role : selectedRole},
+      {withCredentials : true}
+    )
+
+    return response.data;
+    
+  } catch (error) {
+    
+  }
+  
 }

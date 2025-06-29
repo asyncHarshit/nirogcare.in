@@ -2,19 +2,19 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "3d",
-  });
+
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: "3d" }
+  );
 };
 
 
-// Register
-
-
-const registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
-    const { name, email, phone, password} = req.body;
+    const { name, email, phone, password } = req.body;
 
     const existing = await User.findOne({ email });
     if (existing) {
@@ -23,17 +23,19 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+
     const newUser = new User({
       name,
       email,
       phone,
       password: hashedPassword,
-      role : null, // role selected after registration
+      role: null,
     });
 
     await newUser.save();
 
-    const token = generateToken(newUser._id);
+
+    const token = generateToken(newUser);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
@@ -47,7 +49,7 @@ const registerUser = async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
-        token
+        token,
       },
     });
   } catch (err) {
@@ -57,21 +59,19 @@ const registerUser = async (req, res) => {
 };
 
 
-// Login
-
-
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
@@ -84,8 +84,8 @@ const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        // role: user.role,
-        token
+        role: user.role,
+        token,
       },
     });
   } catch (err) {
@@ -94,9 +94,8 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Select Role
 
-const selectRole = async (req, res) => {
+export const selectRole = async (req, res) => {
   try {
     const userId = req.user.id;
     const { role } = req.body;
@@ -115,7 +114,7 @@ const selectRole = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const token = generateToken(updatedUser._id);
+    const token = generateToken(updatedUser);
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
@@ -129,7 +128,7 @@ const selectRole = async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
-        token
+        token,
       },
     });
   } catch (err) {
@@ -139,4 +138,14 @@ const selectRole = async (req, res) => {
 };
 
 
-export { registerUser, loginUser , selectRole};
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ user });
+  } catch (err) {
+    console.error("GetMe Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
