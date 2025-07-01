@@ -15,7 +15,7 @@ export const patientProfile = async (req, res) => {
       return res.status(400).json({ error: "All fields are required!" });
     }
 
-    let patient = await Patient.findOne({ userId });
+    const patient = await Patient.findOne({ userId });
 
     if (!patient) {
       patient = new Patient({ userId, age, gender, address });

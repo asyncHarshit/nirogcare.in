@@ -27,6 +27,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/hospital',hospitalRoute);
 app.use('/api/patient',patientRoute)
+app.use('api/doctor',)
 
 
 

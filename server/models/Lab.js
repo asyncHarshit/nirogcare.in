@@ -2,21 +2,11 @@ import mongoose from "mongoose";
 
 const labSchema = new mongoose.Schema(
   {
-    // userId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    //   required: true,
-    //   unique: true,
-    // },
-    name: {
-      type: String,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      trim: true,
-    },
-    phone: {
-      type: String,
-      required: true,
-      match: [/^[6-9]\d{9}$/],
+      unique: true,
     },
     address: {
       type: String,
