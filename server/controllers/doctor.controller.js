@@ -1,6 +1,7 @@
 import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
 import { Patient } from "../models/Patient.js";
+import { MedicineRecord } from "../models/MedicineRecord.js";
 
 // Create or Update Doctor Profile
 export const doctorProfile = async (req, res) => {
@@ -64,7 +65,6 @@ export const todaysPatients = async (req, res) => {
     const doctorId = req.user.id;
     const hospitalId = req.user.hospitalId;
     const now = new Date();
-
     // Convert to IST (UTC + 5.5 hours)
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istNow = new Date(now.getTime() + istOffset);
@@ -100,7 +100,71 @@ export const todaysPatients = async (req, res) => {
 };
 
 
-// patient details 
+export const addMedicineRecord = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const doctor = await Doctor.findOne({ userId });
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor profile not found." });
+    }
+
+    const {
+      patientId,
+      forPatientType,
+      hospitalId,
+      medicines,
+      notes,
+    } = req.body;
+
+    if (!patientId || !forPatientType || !hospitalId || !medicines || medicines.length === 0) {
+      return res.status(400).json({ error: "All required fields must be provided." });
+    }
+
+    const record = new MedicineRecord({
+      patientId,
+      forPatientType,
+      doctorId: doctor._id,
+      hospitalId,
+      medicines,
+      notes,
+    });
+
+    await record.save();
+
+    res.status(201).json({
+      message: "Medicine record saved successfully.",
+      record,
+    });
+  } catch (error) {
+    console.error("Error saving medicine record:", error);
+    res.status(500).json({ error: "Failed to save medicine record." });
+  }
+};
+
+export const getMedicineRecords = async (req, res) => {
+  try {
+    const { patientId, forPatientType } = req.params;
+
+    if (!patientId || !forPatientType) {
+      return res.status(400).json({ error: "Patient ID and type are required." });
+    }
+
+    const records = await MedicineRecord.find({ patientId, forPatientType })
+      .populate("doctorId", "specialization")
+      .sort({ prescribedAt: -1 });
+
+    res.status(200).json({
+      message: "Medicine records fetched.",
+      total: records.length,
+      records,
+    });
+  } catch (error) {
+    console.error("Error fetching medicine records:", error);
+    res.status(500).json({ error: "Failed to fetch medicine records." });
+  }
+};
+
 
 
 

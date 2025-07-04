@@ -14,8 +14,12 @@ router.get("/near-labs",protect,getNearbylabs)
 
 router.post("/book-appointment",protect,createAppointment)
 router.get("/appointments",protect,getMyAppointments)
-router.patch("/cancel-appointment",protect,cancelAppointment)
-router.get("/this-appointment",protect,getAppointmentById)
+router.get("/appointments/:id",protect,getAppointmentById)
+router.patch("/appointments/:id/cancel",protect,cancelAppointment)
+
+
+
+
 
 
 

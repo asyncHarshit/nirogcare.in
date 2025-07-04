@@ -1,11 +1,19 @@
-import express from "express"
-import { hospitalProfile } from "../controllers/hospital.controller.js";
+import express from "express";
+import {
+  registerHospital,
+  getMyHospitalProfile,
+  getPatientStats,
+} from "../controllers/hospital.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/profile",protect,hospitalProfile);
+router.use(protect);
 
+router.post("/register", registerHospital);
 
-export default router
+router.get("/profile", getMyHospitalProfile);
 
+router.get("/stats", getPatientStats);
+
+export default router;

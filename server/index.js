@@ -7,6 +7,7 @@ import cors from "cors"
 import hospitalRoute from "./routes/hospitalRoutes.js"
 import patientRoute from "./routes/patientRoutes.js"
 
+
 dotenv.config();
 const app = express();
 

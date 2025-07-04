@@ -105,6 +105,11 @@ export const getNearbylabs = async (req, res) => {
 
 
 
+// get lab reports
+
+
+
+
 
 
 

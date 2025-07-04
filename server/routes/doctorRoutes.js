@@ -1,9 +1,27 @@
-import { doctorProfile , todaysPatients } from "../controllers/doctor.controller";
-import express from "express"
-import { protect } from "../middlewares/auth.middleware";
+import express from "express";
+import {
+  doctorProfile,
+  todaysPatients,
+  addMedicineRecord,
+  getMedicineRecords,
+} from "../controllers/doctor.controller.js";
+import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 
-router.post("/profile",protect,doctorProfile);
-router.get("/patients",protect,todaysPatients)
+router.use(protect);
+
+
+router.post("/profile", doctorProfile);
+
+
+router.get("/patients", todaysPatients);
+
+
+router.post("/medicine", addMedicineRecord);
+
+
+router.get("/medicine/:patientId/:forPatientType", getMedicineRecords);
+
+export default router;
