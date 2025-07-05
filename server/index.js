@@ -10,6 +10,7 @@ import doctorRoute from "./routes/doctorRoutes.js"
 import labRoute from "./routes/labRoutes.js"
 
 
+
 dotenv.config();
 const app = express();
 
