@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import hospitalRoute from "./routes/hospitalRoutes.js"
 import patientRoute from "./routes/patientRoutes.js"
+import doctorRoute from "./routes/doctorRoutes.js"
+import labRoute from "./routes/labRoutes.js"
 
 
 dotenv.config();
@@ -28,7 +30,8 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/hospital',hospitalRoute);
 app.use('/api/patient',patientRoute)
-app.use('api/doctor',)
+app.use('api/doctor',doctorRoute);
+app.use('api/lab',labRoute)
 
 
 
