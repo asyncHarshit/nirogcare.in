@@ -1,7 +1,7 @@
 import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
 import { Patient } from "../models/Patient.js";
-import { MedicineRecord } from "../models/MedicineRecord.js";
+// import { MedicineRecord } from "../models/MedicineRecord.js"; error
 
 // Create or Update Doctor Profile
 export const doctorProfile = async (req, res) => {
