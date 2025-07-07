@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllNearbyHospitals, getAllNearbyLabs } from '../services/patientServices';
+import HospitalAppointmentBooking from '../component/HospitalAppointmentBooking';
+import { LabAppointmentBooking } from '../component/LabsAppointmentBooking';
+import { logoutUser } from '../services/logoutService';
 import { 
   Home, 
   Calendar, 
   FlaskConical, 
   FileText, 
   BarChart3, 
+  Stethoscope,
   LogOut, 
   User, 
   Bell,
@@ -13,6 +18,7 @@ import {
   Thermometer,
   Weight,
   Clock,
+  Menu,
   Plus,
   Search,
   Filter
@@ -21,6 +27,52 @@ import {
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
+  const [hospitals, setHospitals] = useState([]);
+  const [labs, setLabs] = useState([]);
+
+
+
+
+    const handleLogout = async()=>{
+    const response = await logoutUser();
+    if(response){
+      console.log("Logout successfully !!")
+      
+    }
+  }
+
+
+
+  const getHospital = async()=>{
+    const response = await getAllNearbyHospitals();
+          if(response){
+            console.log(response)
+            setHospitals(response?.hospitals || []);}
+  }
+
+  useEffect(() => {
+          if (activeTab === 'appointment') {
+            getHospital();
+          }
+        }, [activeTab]);
+
+
+  const getLabs = async()=>{
+    const response = await getAllNearbyLabs();
+    if(response){
+      console.log(response)
+      setLabs(response?.labs || [])
+    }
+  }   
+  
+  useEffect(()=>{
+    if(activeTab === 'lab'){
+      getLabs();
+    }
+  },[activeTab])
+        
+
+        
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -31,10 +83,10 @@ const PatientDashboard = () => {
   ];
 
   const vitalStats = [
-    { icon: Heart, label: 'Heart Rate', value: '72 bpm', status: 'normal', color: 'text-green-400' },
-    { icon: Thermometer, label: 'Temperature', value: '98.6°F', status: 'normal', color: 'text-blue-400' },
+    { icon: Heart, label: 'Heart Rate', value: '78 bpm', status: 'normal', color: 'text-rose-500' },
+    { icon: Thermometer, label: 'Temperature', value: '98.6°F', status: 'normal', color: 'text-cyan-400' },
     { icon: Weight, label: 'Blood Pressure', value: '120/80', status: 'normal', color: 'text-purple-400' },
-    { icon: Activity, label: 'Oxygen Level', value: '98%', status: 'normal', color: 'text-cyan-400' },
+    { icon: Activity, label: 'Oxygen Level', value: '98%', status: 'normal', color: 'text-blue-400' },
   ];
 
   const upcomingAppointments = [
@@ -56,7 +108,7 @@ const PatientDashboard = () => {
           <div className="space-y-6">
             {/* Welcome Section */}
             <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
-              <h2 className="text-2xl font-bold text-white mb-2">Welcome back, John!</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Welcome back, Harshit!</h2>
               <p className="text-gray-300">Here's your health overview for today</p>
             </div>
 
@@ -77,7 +129,7 @@ const PatientDashboard = () => {
             </div>
 
             {/* Upcoming Appointments */}
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+            <div className="bg-gray-800/30 p-6 rounded-xl border  border-gray-700/50">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold text-white">Upcoming Appointments</h3>
                 <button className="text-green-400 hover:text-green-300 transition-colors">
@@ -134,51 +186,7 @@ const PatientDashboard = () => {
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Book an Appointment</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-300 mb-2">Select Doctor</label>
-                  <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none">
-                    <option>Choose a doctor...</option>
-                    <option>Dr. Sarah Johnson - Cardiology</option>
-                    <option>Dr. Michael Chen - Dermatology</option>
-                    <option>Dr. Emily Davis - Orthopedics</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Preferred Date</label>
-                  <input type="date" className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Preferred Time</label>
-                  <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none">
-                    <option>Select time...</option>
-                    <option>9:00 AM</option>
-                    <option>10:00 AM</option>
-                    <option>11:00 AM</option>
-                    <option>2:00 PM</option>
-                    <option>3:00 PM</option>
-                    <option>4:00 PM</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Reason for Visit</label>
-                  <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none">
-                    <option>Select reason...</option>
-                    <option>Routine Checkup</option>
-                    <option>Follow-up</option>
-                    <option>Consultation</option>
-                    <option>Emergency</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mt-6">
-                <label className="block text-gray-300 mb-2">Additional Notes</label>
-                <textarea className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none" rows="3" placeholder="Any additional information..."></textarea>
-              </div>
-              <button className="mt-6 bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-600 hover:to-blue-600 transition-all duration-300">
-                Book Appointment
-              </button>
+            <HospitalAppointmentBooking hospitals={hospitals} />
             </div>
           </div>
         );
@@ -186,36 +194,7 @@ const PatientDashboard = () => {
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Book Lab Test</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {['Complete Blood Count', 'Lipid Panel', 'Thyroid Function', 'Diabetes Panel', 'Liver Function', 'Kidney Function'].map((test, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 transition-all duration-300 cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white font-medium">{test}</span>
-                      <input type="checkbox" className="w-4 h-4 text-green-500 bg-gray-700 border-gray-600 rounded focus:ring-green-500" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-300 mb-2">Preferred Date</label>
-                  <input type="date" className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Preferred Time</label>
-                  <select className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none">
-                    <option>Select time...</option>
-                    <option>8:00 AM</option>
-                    <option>9:00 AM</option>
-                    <option>10:00 AM</option>
-                    <option>11:00 AM</option>
-                  </select>
-                </div>
-              </div>
-              <button className="mt-6 bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-600 hover:to-blue-600 transition-all duration-300">
-                Book Lab Tests
-              </button>
+             <LabAppointmentBooking labs={labs} />
             </div>
           </div>
         );
@@ -303,8 +282,17 @@ const PatientDashboard = () => {
       {/* Sidebar */}
       <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-700/50">
-          <h1 className="text-2xl font-bold text-green-400">Patient DashBoard</h1>
+        <div className="p-3 border-b border-gray-700/50">
+          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 group">
+            <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+                <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300 transition-colors duration-300" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                NirogCare
+              </h1> 
+</div>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -314,7 +302,7 @@ const PatientDashboard = () => {
               <li key={item.id}>
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg ${
                     activeTab === item.id
                       ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
@@ -330,9 +318,10 @@ const PatientDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
+          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
+            
           </button>
         </div>
       </div>
@@ -340,14 +329,14 @@ const PatientDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-900/30 border-b border-gray-700/50 p-4 backdrop-blur-sm">
+        <header className="bg-gray-900/30 border-b border-gray-700/50 p-3 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white capitalize">
                 {activeTab === 'home' ? 'Dashboard' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
               </h2>
               <p className="text-gray-400 text-sm">
-                {new Date().toLocaleDateString('en-US', { 
+                {new Date().toLocaleDateString('en', { 
                   weekday: 'long', 
                   year: 'numeric', 
                   month: 'long', 
@@ -368,7 +357,7 @@ const PatientDashboard = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-medium">John Doe</span>
+                <span className="text-white font-medium">Harshit</span>
               </div>
             </div>
           </div>

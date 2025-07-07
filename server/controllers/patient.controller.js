@@ -42,25 +42,26 @@ export const patientProfile = async (req, res) => {
 // Fetch nearby hospitals within 10km
 export const getNearbyHospitals = async (req, res) => {
   try {
-    // const { latitude, longitude } = req.query;
-    const latitude =  "25.5548739"
-    const longitude = "84.6702418"
+    const latitude = "25.5548739";
+    const longitude = "84.6702418";
 
     if (!latitude || !longitude) {
       return res.status(400).json({ error: "Latitude and longitude are required" });
     }
 
-    const nearbyHospitals = await Hospital.find({
-      location: {
-        $near: {
-          $geometry: {
+    const nearbyHospitals = await Hospital.aggregate([
+      {
+        $geoNear: {
+          near: {
             type: "Point",
-            coordinates: [parseFloat(longitude), parseFloat(latitude)]
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
           },
-          $maxDistance: 10000 // 10 km in meters
-        }
-      }
-    });
+          distanceField: "distance", // field added to each doc
+          spherical: true,
+          maxDistance: 10000, // 10km in meters
+        },
+      },
+    ]);
 
     res.status(200).json({ hospitals: nearbyHospitals });
   } catch (error) {
@@ -70,37 +71,41 @@ export const getNearbyHospitals = async (req, res) => {
 };
 
 
+
 // fetch nearby labs within 10 km
 
 
 export const getNearbylabs = async (req, res) => {
   try {
-    // const { latitude, longitude } = req.query;
-    const latitude =  "25.5548739"
-    const longitude = "84.6702418"
+    // For production, use actual req.query values
+    const latitude = "25.5548739";
+    const longitude = "84.6702418";
 
     if (!latitude || !longitude) {
       return res.status(400).json({ error: "Latitude and longitude are required" });
     }
 
-    const getNearbylabs = await Lab.find({
-      location: {
-        $near: {
-          $geometry: {
+    const nearbyLabs = await Lab.aggregate([
+      {
+        $geoNear: {
+          near: {
             type: "Point",
-            coordinates: [parseFloat(longitude), parseFloat(latitude)]
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
           },
-          $maxDistance: 10000 // 10 km in meters
-        }
-      }
-    });
+          distanceField: "distance", // Distance in meters
+          spherical: true,
+          maxDistance: 10000, // 10 km in meters
+        },
+      },
+    ]);
 
-    res.status(200).json({ labs: getNearbylabs });
+    res.status(200).json({ labs: nearbyLabs });
   } catch (error) {
     console.error("Error fetching nearby labs:", error);
     res.status(500).json({ error: "Failed to fetch nearby labs" });
   }
 };
+
 
 
 
