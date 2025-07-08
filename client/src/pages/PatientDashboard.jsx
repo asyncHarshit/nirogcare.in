@@ -3,6 +3,9 @@ import { getAllNearbyHospitals, getAllNearbyLabs } from '../services/patientServ
 import HospitalAppointmentBooking from '../component/HospitalAppointmentBooking';
 import { LabAppointmentBooking } from '../component/LabsAppointmentBooking';
 import { logoutUser } from '../services/logoutService';
+import {toast} from "sonner"
+import {useNavigate} from "react-router-dom"
+
 import { 
   Home, 
   Calendar, 
@@ -30,15 +33,22 @@ const PatientDashboard = () => {
   const [hospitals, setHospitals] = useState([]);
   const [labs, setLabs] = useState([]);
 
+  const navigate = useNavigate();
+
 
 
 
     const handleLogout = async()=>{
     const response = await logoutUser();
-    if(response){
-      console.log("Logout successfully !!")
-      
-    }
+    if (response?.status === 200) {
+      console.log("Logout successfully !!");
+
+      toast.success('Logout successful!', {
+        
+  });
+
+  navigate("/auth");
+}
   }
 
 
@@ -105,9 +115,9 @@ const PatientDashboard = () => {
     switch(activeTab) {
       case 'home':
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 ">
             {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
+            <div className="bg-gradient-to-r  from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
               <h2 className="text-2xl font-bold text-white mb-2">Welcome back, Harshit!</h2>
               <p className="text-gray-300">Here's your health overview for today</p>
             </div>
@@ -280,7 +290,7 @@ const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
+      <div className="w-64 bg-gray-900/50  border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
         <div className="p-3 border-b border-gray-700/50">
           <div className="flex items-center space-x-3">
@@ -302,7 +312,7 @@ const PatientDashboard = () => {
               <li key={item.id}>
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg ${
+                  className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
                     activeTab === item.id
                       ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
@@ -318,7 +328,7 @@ const PatientDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
+          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-800 cursor-pointer hover:text-black transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
             

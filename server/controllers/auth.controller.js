@@ -153,10 +153,12 @@ export const getMe = async (req, res) => {
 
 export const logoutUser = async (req, res) => {
   try {
-
+  
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production", 
+      path: "/",
     });
 
     return res.status(200).json({ message: "Logged out successfully" });
@@ -165,4 +167,5 @@ export const logoutUser = async (req, res) => {
     return res.status(500).json({ error: "Logout failed" });
   }
 };
+
 

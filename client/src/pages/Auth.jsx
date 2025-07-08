@@ -52,7 +52,7 @@ const Auth = () => {
         const response = await callAuthLoginApi(formData.email , formData.password);
         if(response){
           console.log(response)
-          toast.message("Logged in sucesssfully !!")
+          toast.success("Logged in sucesssfully !!")
           navigate(`/${response.user.role}/dashboard`)
         }
         
@@ -65,7 +65,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 p-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">
           {isSignup ? 'Create Account' : 'Login to Your Account'}

@@ -1,7 +1,7 @@
 import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
-import { Patient } from "../models/Patient.js";
-// import { MedicineRecord } from "../models/MedicineRecord.js"; error
+// import { Patient } from "../models/Patient.js";
+
 
 // Create or Update Doctor Profile
 export const doctorProfile = async (req, res) => {
@@ -164,6 +164,40 @@ export const getMedicineRecords = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch medicine records." });
   }
 };
+
+
+export const getDoctorsByHospital = async (req, res) => {
+  try {
+    const { hospitalId } = req.query;
+
+    if (!hospitalId) {
+      return res.status(400).json({ error: "Hospital ID is required." });
+    }
+
+    const doctors = await Doctor.find({ hospitalId })
+      .populate({
+        path: "userId",
+        select: "name email",
+      })
+      .select("specialization experience userId"); 
+    const formattedDoctors = doctors.map((doc) => ({
+      name: doc.userId?.name || "unknown",
+      email: doc.userId?.email || "unknown",
+      specialization: doc.specialization,
+      experience: doc.experience,
+    }));
+
+    return res.status(200).json({
+      message: "Doctors fetched successfully.",
+      total: formattedDoctors.length,
+      doctors: formattedDoctors,
+    });
+  } catch (error) {
+    console.error("Error fetching doctors for hospital:", error);
+    return res.status(500).json({ error: "Server error while fetching doctors." });
+  }
+};
+
 
 
 

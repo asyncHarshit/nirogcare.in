@@ -311,7 +311,7 @@ const HospitalDashboard = () => {
               <li key={item.id}>
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg  ${
                     activeTab === item.id
                       ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
