@@ -4,6 +4,8 @@ import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
 
 const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+
   const [bookingData, setBookingData] = useState({
     forPatient: '',
     doctorId: '',
@@ -12,11 +14,24 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   });
 
 
-  const handleHospitalSelect = (hospital) => {
-    setSelectedHospital(hospital);
-    // console.log("🧪 selectedHospital:", hospital._id);
+  const handleHospitalSelect = async (hospital) => {
+  setSelectedHospital(hospital);
+  setBookingData({
+    forPatient: '',
+    doctorId: '',
+    date: '',
+    timeSlot: ''
+  });
 
-  };
+  try {
+    const res = await getAllDoctorsbyHospitals(hospital._id);
+    setDoctors(res.doctors);
+
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+  }
+};
+
 
   const handleBackToList = () => {
     setSelectedHospital(null);
@@ -56,11 +71,8 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         status: 'booked'
       };
 
-      // console.log('Booking appointment:', appointmentData);
+      console.log('Booking appointment:', appointmentData);
 
-      const hospitalId = selectedHospital._id
-      const response = await getAllDoctorsbyHospitals(hospitalId);
-      console.log(response);
 
       // alert('Appointment booked successfully!');
       
@@ -265,16 +277,18 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                     Select Doctor *
                   </label>
                   <select 
-                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                    className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.doctorId}
                     onChange={(e) => handleInputChange('doctorId', e.target.value)}
                   >
                     <option value="">Choose a doctor...</option>
-                    <option value="dr_sarah_johnson">Dr. Sarah Johnson - Cardiology</option>
-                    <option value="dr_michael_chen">Dr. Michael Chen - Dermatology</option>
-                    <option value="dr_emily_davis">Dr. Emily Davis - Orthopedics</option>
-                    <option value="dr_robert_wilson">Dr. Robert Wilson - Neurology</option>
+                    {doctors.map((doctor) => (
+                      <option key={doctor._id} value={doctor._id}>
+                        Dr. {doctor.name} - {doctor.specialization}
+                      </option>
+                    ))}
                   </select>
+
                 </div>
                 
                 <div>

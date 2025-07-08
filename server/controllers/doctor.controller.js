@@ -1,5 +1,6 @@
 import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
+import User from "../models/User.js";
 // import { Patient } from "../models/Patient.js";
 
 
