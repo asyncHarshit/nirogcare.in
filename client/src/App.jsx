@@ -69,7 +69,7 @@ const App = () => {
       <Route
         path="/unauthorized"
         element={
-          <div className="text-center mt-10 text-red-600 text-xl">
+          <div className="text-center mt-10 text-red-600 text-2xl">
             Unauthorized Access
           </div>
         }

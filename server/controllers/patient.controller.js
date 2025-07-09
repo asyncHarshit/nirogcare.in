@@ -5,20 +5,21 @@ import {Lab} from "../models/Lab.js"
 
 
 
-// Update or create patient profile
+
 export const patientProfile = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id; 
     const { age, gender, address } = req.body;
 
-    if (!age || !gender || !address) {
-      return res.status(400).json({ error: "All fields are required!" });
+    // Basic validation
+    if (!age || !gender || !address ) {
+      return res.status(400).json({ error: "All fields (age, gender, address) are required." });
     }
 
-    const patient = await Patient.findOne({ userId });
+    let patient = await Patient.findOne({ userId });
 
     if (!patient) {
-      patient = new Patient({ userId, age, gender, address });
+      patient = new Patient({ userId, age, gender, address});
     } else {
       patient.age = age;
       patient.gender = gender;
@@ -28,14 +29,15 @@ export const patientProfile = async (req, res) => {
     await patient.save();
 
     res.status(200).json({
-      message: "Patient profile saved successfully.",
+      message: "Patient profile updated successfully.",
       patient,
     });
   } catch (error) {
-    console.error("Error saving patient profile:", error);
-    res.status(500).json({ error: "Failed to save patient profile." });
+    console.error("Error updating patient profile:", error);
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
   }
 };
+
 
 
 
@@ -137,7 +139,6 @@ export const getNearbylabs = async (req, res) => {
 
 
 
-// fetch nearby labs
 
 
 

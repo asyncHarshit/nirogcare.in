@@ -26,30 +26,26 @@ import {
   Search,
   Filter
 } from 'lucide-react';
+import { getMe } from '../services/getMeServices';
+import UpdatePatientProfile from '../component/UpdateProfile';
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
   const [hospitals, setHospitals] = useState([]);
   const [labs, setLabs] = useState([]);
+  const [userData , setUserData] = useState([]);
 
   const navigate = useNavigate();
-
-
-
 
     const handleLogout = async()=>{
     const response = await logoutUser();
     if (response?.status === 200) {
       console.log("Logout successfully !!");
 
-      toast.success('Logout successful!', {
-        
-  });
-
-  navigate("/auth");
-}
-  }
+      toast.success('Logout successful!');
+      navigate("/auth");
+    }}
 
 
 
@@ -80,12 +76,31 @@ const PatientDashboard = () => {
       getLabs();
     }
   },[activeTab])
-        
+
+
+
+  const getUserData = async()=>{
+    const response = await getMe();
+    if(response){
+      setUserData(response);
+    }
+  } 
+
+  useEffect(()=>{
+    getUserData();
+   
+  },[])
+
+
+
+  //  console.log(userData)
+
 
         
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
+    { id: 'profile' , label : 'My Profile', icon : User},
     { id: 'appointment', label: 'Book Appointment', icon: Calendar },
     { id: 'lab', label: 'Book Lab', icon: FlaskConical },
     { id: 'records', label: 'Medical Record', icon: FileText },
@@ -118,7 +133,9 @@ const PatientDashboard = () => {
           <div className="space-y-6 ">
             {/* Welcome Section */}
             <div className="bg-gradient-to-r  from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
-              <h2 className="text-2xl font-bold text-white mb-2">Welcome back, Harshit!</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Welcome back, {userData?.user?.name}
+              </h2>
               <p className="text-gray-300">Here's your health overview for today</p>
             </div>
 
@@ -205,6 +222,14 @@ const PatientDashboard = () => {
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
              <LabAppointmentBooking labs={labs} />
+            </div>
+          </div>
+        );
+      case 'profile':
+        return (
+          <div className="space-y-6">
+            <div className="rounded-xl border ">
+             <UpdatePatientProfile userData = {userData}/>
             </div>
           </div>
         );
@@ -314,6 +339,7 @@ const PatientDashboard = () => {
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
                     activeTab === item.id
+                      
                       ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
                   }`}
@@ -328,7 +354,7 @@ const PatientDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-800 cursor-pointer hover:text-black transition-all duration-300">
+          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-600  cursor-pointer hover:text-black transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
             
@@ -342,9 +368,11 @@ const PatientDashboard = () => {
         <header className="bg-gray-900/30 border-b border-gray-700/50 p-3 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white capitalize">
-                {activeTab === 'home' ? 'Dashboard' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
-              </h2>
+             <h2 className="text-xl font-semibold text-white capitalize flex items-center">
+              {activeTab === 'home' ? 'Dashboard' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
+              <span className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
+            </h2>
+
               <p className="text-gray-400 text-sm">
                 {new Date().toLocaleDateString('en', { 
                   weekday: 'long', 
@@ -367,7 +395,7 @@ const PatientDashboard = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-medium">Harshit</span>
+                <span className="text-white font-medium">{userData?.user?.name}</span>
               </div>
             </div>
           </div>
