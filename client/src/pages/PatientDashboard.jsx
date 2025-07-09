@@ -393,7 +393,10 @@ const PatientDashboard = () => {
               </button>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
+                  <button className="cursor-pointer" onClick={() => setActiveTab("profile")}>
+                    <User className="w-4 h-4 text-white" />
+                  </button>
+
                 </div>
                 <span className="text-white font-medium">{userData?.user?.name}</span>
               </div>
