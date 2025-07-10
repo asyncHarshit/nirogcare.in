@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, Clock, Phone, Star, Calendar, User, ChevronLeft, Compass, UserCheck } from 'lucide-react';
 import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
+import { createAppointment } from '../services/patientServices';
+import { toast } from 'sonner';
 
 const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
@@ -25,6 +27,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
 
   try {
     const res = await getAllDoctorsbyHospitals(hospital._id);
+    console.log(res)
     setDoctors(res.doctors);
 
   } catch (error) {
@@ -51,30 +54,37 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     }));
   };
 
+
+
+
   const handleBookAppointment = async () => {
     try {
-      // Validate form
+
       if (!bookingData.forPatient || !bookingData.doctorId || !bookingData.date || !bookingData.timeSlot) {
         alert('Please fill in all required fields');
         return;
       }
 
-      // Here you would typically send the booking data to your API
+
+
+
       const appointmentData = {
         forPatient: {
           type: bookingData.forPatient
         },
-        doctorId: bookingData.doctorId,
+        doctorId: bookingData.doctorId ,
         hospitalId: selectedHospital._id,
         date: bookingData.date,
         timeSlot: bookingData.timeSlot,
         status: 'booked'
       };
 
-      console.log('Booking appointment:', appointmentData);
+      const response = await createAppointment(appointmentData);
+      if(response){
+        console.log(response)
+      }
 
-
-      // alert('Appointment booked successfully!');
+      toast.success("Appointment Booked Successfully 🩺")
       
       // Reset form
       setBookingData({
@@ -84,8 +94,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         timeSlot: ''
       });
       
-      // Optionally go back to hospital list
-      // handleBackToList();
+      handleBackToList();
       
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -283,11 +292,13 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                   >
                     <option value="">Choose a doctor...</option>
                     {doctors.map((doctor) => (
-                      <option key={doctor._id} value={doctor._id}>
+                      <option key={doctor.doctorId} value={doctor.doctorId}>
                         Dr. {doctor.name} - {doctor.specialization}
                       </option>
                     ))}
                   </select>
+
+
 
                 </div>
                 
@@ -329,14 +340,18 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
               <div className="flex gap-4 mt-6">
                 <button 
                   onClick={handleBookAppointment}
-                  className="bg-gradient-to-r from-green-500 to-blue-500 text-black font-bold px-6 py-3 rounded-lg hover:from-green-600 hover:to-blue-600 transition-all duration-300 flex items-center"
+                  className="mt-6 flex flex-row bg-gradient-to-r from-green-600 to-green-500 text-black font-bold 
+            px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 border border-green-500/30
+             transition-all duration-300 hover:shadow-green-500/30 hover:scale-105"
                 >
-                  <Calendar className="w-4 h-4 mr-2 text-black font-bold" />
+                  <Calendar className="w-4 h-4 mr-2 mt-1 text-black font-bold" />
                   Book Appointment
                 </button>
                 <button 
                   onClick={handleBackToList}
-                  className="bg-gray-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300"
+                  className="mt-6  text-black font-bold bg-neutral-600
+            px-6 py-3 rounded-lg
+             transition-all duration-300 hover:shadow-green-500/30 hover:scale-105"
                 >
                   Cancel
                 </button>

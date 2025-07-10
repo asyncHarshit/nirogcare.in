@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllNearbyHospitals, getAllNearbyLabs } from '../services/patientServices';
+import { getAllNearbyHospitals, getAllNearbyLabs, getMyAppointment } from '../services/patientServices';
 import HospitalAppointmentBooking from '../component/HospitalAppointmentBooking';
 import { LabAppointmentBooking } from '../component/LabsAppointmentBooking';
 import { logoutUser } from '../services/logoutService';
@@ -8,11 +8,10 @@ import {useNavigate} from "react-router-dom"
 
 import { 
   Home, 
-  Calendar, 
+  MapPin,
   FlaskConical, 
   FileText, 
   BarChart3, 
-  Stethoscope,
   LogOut, 
   User, 
   Bell,
@@ -21,10 +20,12 @@ import {
   Thermometer,
   Weight,
   Clock,
-  Menu,
   Plus,
   Search,
-  Filter
+  Filter,
+  Calendar,
+  Stethoscope,
+
 } from 'lucide-react';
 import { getMe } from '../services/getMeServices';
 import UpdatePatientProfile from '../component/UpdateProfile';
@@ -35,6 +36,7 @@ const PatientDashboard = () => {
   const [hospitals, setHospitals] = useState([]);
   const [labs, setLabs] = useState([]);
   const [userData , setUserData] = useState([]);
+  const [appointment , setAppointment] = useState([]);
 
   const navigate = useNavigate();
 
@@ -79,6 +81,24 @@ const PatientDashboard = () => {
 
 
 
+  const getAppointment = async()=>{
+    const response = await getMyAppointment();
+    if(response){
+      setAppointment(response?.appointments);
+      // console.log(response)
+    }
+  }   
+  
+  useEffect(()=>{
+    if(activeTab === 'home'){
+      getAppointment();
+    }
+  },[activeTab])
+
+  console.log(appointment);
+
+
+
   const getUserData = async()=>{
     const response = await getMe();
     if(response){
@@ -114,11 +134,7 @@ const PatientDashboard = () => {
     { icon: Activity, label: 'Oxygen Level', value: '98%', status: 'normal', color: 'text-blue-400' },
   ];
 
-  const upcomingAppointments = [
-    { doctor: 'Dr. Sarah Johnson', specialty: 'Cardiology', date: '2025-07-08', time: '10:00 AM' },
-    { doctor: 'Dr. Michael Chen', specialty: 'Dermatology', date: '2025-07-10', time: '2:30 PM' },
-    { doctor: 'Dr. Emily Davis', specialty: 'Orthopedics', date: '2025-07-12', time: '11:15 AM' },
-  ];
+
 
   const recentLabResults = [
     { test: 'Complete Blood Count', date: '2025-07-01', status: 'Normal', doctor: 'Dr. Johnson' },
@@ -156,33 +172,69 @@ const PatientDashboard = () => {
             </div>
 
             {/* Upcoming Appointments */}
-            <div className="bg-gray-800/30 p-6 rounded-xl border  border-gray-700/50">
+            <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-6 rounded-xl border border-slate-700/40 backdrop-blur-sm">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-white">Upcoming Appointments</h3>
-                <button className="text-green-400 hover:text-green-300 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-400" />
+                  <h3 className="text-xl font-semibold text-slate-100">Upcoming Appointments</h3>
+                </div>
+                <button className="text-blue-400 cursor-pointer hover:text-blue-300 transition-colors hover:scale-105 transform duration-200"
+                onClick={() => setActiveTab("appointment")}
+                >
                   <Plus className="w-5 h-5" />
                 </button>
               </div>
               <div className="space-y-3">
-                {upcomingAppointments.map((appointment, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 transition-all duration-300">
+                {appointment.map((appt, index) => (
+                  <div key={index} className="bg-gradient-to-r from-slate-800/40 to-slate-700/20 p-4 rounded-lg border border-slate-600/20 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">{appointment.doctor}</h4>
-                        <p className="text-gray-400 text-sm">{appointment.specialty}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <User className="w-4 h-4 text-blue-400" />
+                          <h4 className="font-medium text-slate-100">
+                            {appt?.doctorId?.userId?.name || "Doctor Name"}
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Stethoscope className="w-4 h-4 text-pink-800" />
+                          <p className="text-slate-300 text-sm">
+                            {appt?.doctorId?.specialization || "Specialization"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-emerald-600" />
+                          <p className="text-slate-400 text-xs">
+                            {appt?.hospitalId?.name || "Hospital"}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-green-400 font-medium">{appointment.date}</p>
-                        <p className="text-gray-400 text-sm">{appointment.time}</p>
+                        <div className="flex items-center gap-2 justify-end mb-1">
+                          <Calendar className="w-4 h-4 text-blue-400" />
+                          <p className="text-blue-400 font-medium">
+                            {appt.date ? new Date(appt.date).toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            }) : "Date"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 justify-end">
+                          <Clock className="w-4 h-4 text-slate-400" />
+                          <p className="text-slate-300 text-sm">
+                            {appt.timeSlot || "Time"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+             
 
             {/* Recent Lab Results */}
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+            {/* <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
               <h3 className="text-xl font-semibold text-white mb-4">Recent Lab Results</h3>
               <div className="space-y-3">
                 {recentLabResults.map((result, index) => (
@@ -206,7 +258,7 @@ const PatientDashboard = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
         );
       case 'appointment':
@@ -331,26 +383,31 @@ const PatientDashboard = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
-                    activeTab === item.id
-                      
-                      ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+       <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {navItems.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
+                  activeTab === item.id
+                    ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+
+                {/* ✅ Show pulsing dot only when active */}
+                {activeTab === item.id && (
+                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
@@ -370,7 +427,7 @@ const PatientDashboard = () => {
             <div>
              <h2 className="text-xl font-semibold text-white capitalize flex items-center">
               {activeTab === 'home' ? 'Dashboard' : activeTab.replace(/([A-Z])/g, ' $1').trim()}
-              <span className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
+              
             </h2>
 
               <p className="text-gray-400 text-sm">

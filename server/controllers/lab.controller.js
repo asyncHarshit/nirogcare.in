@@ -39,9 +39,9 @@ export const registerLab = async (req, res) => {
 // Get the lab profile of the current user
 export const getMyLabProfile = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const labId = req.query;
 
-    const lab = await Lab.findOne({ userId });
+    const lab = await Lab.findOne({ labId });
     if (!lab) {
       return res.status(404).json({ error: "Lab profile not found." });
     }
@@ -89,3 +89,7 @@ export const verifyLab = async (req, res) => {
     res.status(500).json({ error: "Failed to verify lab." });
   }
 };
+
+
+
+

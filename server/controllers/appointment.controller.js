@@ -31,14 +31,22 @@ export const createAppointment = async (req, res) => {
   }
 };
 
-// Get all appointments
+
 
 export const getMyAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({ bookedBy: req.user.id })
-      .populate("doctorId", "name specialization")
-      .populate("hospitalId", "name address")
-      .sort({ date: -1 });
+    .populate({
+      path: "doctorId",
+      populate: {
+        path: "userId",
+        select: "name email",
+      },
+      select: "specialization userId",
+    })
+    .populate("hospitalId", "name address")
+    .sort({ date: -1 });
+
 
     return res.status(200).json({ appointments });
   } catch (error) {

@@ -181,9 +181,11 @@ export const getDoctorsByHospital = async (req, res) => {
         select: "name email",
       })
       .select("specialization experience userId"); 
+
     const formattedDoctors = doctors.map((doc) => ({
-      name: doc.userId?.name || "unknown",
-      email: doc.userId?.email || "unknown",
+      doctorId: doc._id,
+      name: doc.userId?.name || "Unknown",
+      email: doc.userId?.email || "Unknown",
       specialization: doc.specialization,
       experience: doc.experience,
     }));

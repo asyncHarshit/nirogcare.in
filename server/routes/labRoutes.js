@@ -6,6 +6,7 @@ import {
   verifyLab,
 } from "../controllers/lab.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
+import { bookLabAppointment } from "../controllers/labAppointment.controller.js";
 
 const router = express.Router();
 
@@ -15,5 +16,10 @@ router.post("/register", registerLab);
 router.get("/profile", getMyLabProfile);
 router.put("/profile", updateLabProfile);
 router.patch("/verify/:labId", verifyLab);
+
+// ------------------------------------------------------------
+
+
+router.post("/book-appointment",bookLabAppointment);
 
 export default router;
