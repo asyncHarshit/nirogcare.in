@@ -95,20 +95,25 @@ export const loginUser = async (req, res) => {
 };
 
 
+
 export const selectRole = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { role } = req.body;
+    const { role, fcmToken } = req.body;
 
     if (!role) {
       return res.status(400).json({ message: "Role is required" });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true }
-    );
+    const updateData = { role };
+
+    if (role === "patient" && fcmToken) {
+      updateData.fcmToken = fcmToken;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -136,6 +141,7 @@ export const selectRole = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 export const getMe = async (req, res) => {

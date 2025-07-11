@@ -16,11 +16,16 @@ import {
   Plus,
   Send
 } from 'lucide-react';
+import { logoutUser } from '../services/logoutService';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const AssistantDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
   const [draggedPatient, setDraggedPatient] = useState(null);
+
+  const navigate = useNavigate();
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -47,6 +52,15 @@ const AssistantDashboard = () => {
       { id: 'P009', name: 'James Miller', age: 67, condition: 'Routine Checkup', doctor: 'Dr. Miller', time: '09:00 AM', priority: 'low' },
     ]
   });
+
+  const handleLogout = async()=>{
+    const response = await logoutUser();
+    if (response?.status === 200) {
+      console.log("Logout successfully !!");
+
+      toast.success('Logout successful!');
+      navigate("/auth");
+    }}
 
   const handleDragStart = (e, patient) => {
     setDraggedPatient(patient);
@@ -293,9 +307,18 @@ const AssistantDashboard = () => {
       {/* Sidebar */}
       <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-700/50">
-          <h1 className="text-2xl font-bold text-green-400">Assistant Dashboard</h1>
-        </div>
+        <div className="p-3 border-b border-gray-700/50">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 group">
+                      <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+                        <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300 transition-colors duration-300" />
+                      </div>
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                        NirogCare
+                      </h1> 
+                  </div>
+                  </div>
+                </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4">
@@ -303,16 +326,21 @@ const AssistantDashboard = () => {
             {navItems.map((item) => (
               <li key={item.id}>
                 <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${
-                    activeTab === item.id
-                      ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </button>
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
+                  activeTab === item.id
+                    ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+
+              
+                {activeTab === item.id && (
+                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
+                )}
+              </button>
               </li>
             ))}
           </ul>
@@ -320,7 +348,7 @@ const AssistantDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
+          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-600  cursor-pointer hover:text-black transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
           </button>

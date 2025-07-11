@@ -78,6 +78,27 @@ export async function createAppointmentLab(appointmentData){
 
 
 
+export async function getMyLabAppointment(){
+    try {
+        const response = await axios.get("http://localhost:3000/api/lab/appointments",
+        {
+            withCredentials: true,
+        });
+      return response.data;
+        
+    } catch (error) {
+        console.log("Error in fetching all labs apointments !!",error)
+    }
+
+}
+
+
+
+
+
+
+
+
 
 
 

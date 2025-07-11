@@ -1,11 +1,12 @@
-import  { useState } from 'react';
-import {callAuthLoginApi, callAuthRegisterApi } from '../api/authServices';
+import { useState } from 'react';
+import { Eye, EyeOff, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
+import {callAuthLoginApi , callAuthRegisterApi} from '../api/authServices'
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-
+import {useNavigate} from "react-router-dom"
 
 const Auth = () => {
   const [isSignup, setIsSignup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,7 +28,7 @@ const Auth = () => {
     }));
   };
 
-  const handleSubmit = async(e) => {
+    const handleSubmit = async(e) => {
     e.preventDefault();
     if (isSignup) {
       try {
@@ -58,81 +59,149 @@ const Auth = () => {
         
         
       } catch (error) {
-        console.log("Error in callAuthLoginApi !!")
+        console.log("Error in callAuthLoginApi !!",error)
         
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          {isSignup ? 'Create Account' : 'Login to Your Account'}
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 p-4">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="relative bg-gray-900/80 backdrop-blur-xl border border-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl mb-4 shadow-lg">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-2">
+            {isSignup ? 'Create Account' : 'Welcome Back'}
+          </h2>
+          <p className="text-gray-400 text-sm">
+            {isSignup ? 'Join us and start your journey' : 'Sign in to continue your journey'}
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-6">
           {isSignup && (
             <>
-              <input
-                type="text"
-                name="name"
-                placeholder="name"
-                value={formData.username}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md"
-                required
-              />
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md"
-                required
-              />
+              {/* Name Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Phone Number</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200"
+                    required
+                  />
+                </div>
+              </div>
             </>
           )}
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md"
-            required
-          />
+          {/* Email Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200"
+                required
+              />
+            </div>
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md"
-            required
-          />
+          {/* Password Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full pl-12 pr-12 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-green-400 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-medium py-2 rounded-md hover:bg-blue-700 transition"
+            onClick={handleSubmit}
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/20 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg flex items-center justify-center group"
           >
-            {isSignup ? 'Sign Up' : 'Log In'}
+            {isSignup ? 'Create Account' : 'Sign In'}
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </button>
-        </form>
+        </div>
 
-        <p className="text-center mt-4 text-sm">
-          {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
+        {/* Toggle Mode */}
+        <div className="mt-8 text-center">
+          <p className="text-gray-400 text-sm">
+            {isSignup ? 'Already have an account?' : "Don't have an account?"}
+          </p>
           <button
             type="button"
             onClick={toggleMode}
-            className="text-blue-600 font-semibold hover:underline"
+            className="mt-2 text-green-400 font-semibold hover:text-green-300 transition-colors duration-200 relative group"
           >
-            {isSignup ? 'Login here' : 'Sign up'}
+            {isSignup ? 'Sign in here' : 'Create account'}
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-400 transition-all duration-200 group-hover:w-full"></span>
           </button>
-        </p>
+        </div>
+
+        {/* Decorative line */}
+        <div className="mt-8 flex items-center">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+          <div className="px-4">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          </div>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+        </div>
       </div>
     </div>
   );

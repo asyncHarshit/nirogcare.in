@@ -34,17 +34,22 @@ export async function callAuthLoginApi(email , password){
     }
 }
 
-export async function callRoleApi(selectedRole){
+export async function callRoleApi(selectedRole, fcmToken) {
   try {
-    const response = await axios.patch(`${baseUrl}/api/auth/select-role`,
-      {role : selectedRole},
-      {withCredentials : true}
-    )
+    const response = await axios.patch(
+      `${baseUrl}/api/auth/select-role`,
+      {
+        role: selectedRole,
+        fcmToken: fcmToken,
+      },
+      {
+        withCredentials: true,
+      }
+    );
 
     return response.data;
-    
   } catch (error) {
-    
+    console.error("Error calling role API", error);
+    throw error;
   }
-  
 }

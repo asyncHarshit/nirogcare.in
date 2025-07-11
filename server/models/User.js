@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
         "assistant",
       ],
     },
+    fcmToken: {
+      type: String,
+      default: null,
+    },
 
     isVerified: { type: Boolean, default: false },
   },

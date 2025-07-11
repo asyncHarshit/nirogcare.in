@@ -56,7 +56,7 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
 
 
       const response = await createAppointmentLab(appointmentData);
-      if(response){
+      if(response?.success){
         toast.success("Lab Book Successfully 🧪")
         console.log(response)
       }

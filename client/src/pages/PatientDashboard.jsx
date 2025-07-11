@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getAllNearbyHospitals, getAllNearbyLabs, getMyAppointment } from '../services/patientServices';
+import React, {  useEffect, useState } from 'react';
+import { getAllNearbyHospitals, getAllNearbyLabs, getMyAppointment , getMyLabAppointment } from '../services/patientServices';
 import HospitalAppointmentBooking from '../component/HospitalAppointmentBooking';
 import { LabAppointmentBooking } from '../component/LabsAppointmentBooking';
 import { logoutUser } from '../services/logoutService';
@@ -8,10 +8,12 @@ import {useNavigate} from "react-router-dom"
 
 import { 
   Home, 
+  TestTube,
   MapPin,
   FlaskConical, 
   FileText, 
   BarChart3, 
+  Building2,
   LogOut, 
   User, 
   Bell,
@@ -37,6 +39,7 @@ const PatientDashboard = () => {
   const [labs, setLabs] = useState([]);
   const [userData , setUserData] = useState([]);
   const [appointment , setAppointment] = useState([]);
+  const [labAppointments , setLabAppointment] = useState([]);
 
   const navigate = useNavigate();
 
@@ -88,14 +91,21 @@ const PatientDashboard = () => {
       // console.log(response)
     }
   }   
+
+  const getLabAppointment = async()=>{
+    const response = await getMyLabAppointment();
+    if(response){
+      setLabAppointment(response)
+    }
+  }
   
   useEffect(()=>{
     if(activeTab === 'home'){
       getAppointment();
+      getLabAppointment();
     }
   },[activeTab])
 
-  console.log(appointment);
 
 
 
@@ -110,6 +120,7 @@ const PatientDashboard = () => {
     getUserData();
    
   },[])
+
 
 
 
@@ -135,12 +146,16 @@ const PatientDashboard = () => {
   ];
 
 
-
-  const recentLabResults = [
+   const recentLabResults = [
     { test: 'Complete Blood Count', date: '2025-07-01', status: 'Normal', doctor: 'Dr. Johnson' },
     { test: 'Lipid Panel', date: '2025-06-28', status: 'Normal', doctor: 'Dr. Smith' },
     { test: 'Thyroid Function', date: '2025-06-25', status: 'Pending', doctor: 'Dr. Brown' },
   ];
+
+
+
+
+ 
 
   const renderContent = () => {
     switch(activeTab) {
@@ -233,32 +248,90 @@ const PatientDashboard = () => {
             </div>
              
 
-            {/* Recent Lab Results */}
-            {/* <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h3 className="text-xl font-semibold text-white mb-4">Recent Lab Results</h3>
-              <div className="space-y-3">
-                {recentLabResults.map((result, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">{result.test}</h4>
-                        <p className="text-gray-400 text-sm">by {result.doctor}</p>
+           
+         <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-6 rounded-xl border border-slate-700/40 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <TestTube className="w-5 h-5 text-blue-400" />
+              <h3 className="text-xl font-semibold text-slate-100">Upcoming Lab Appointments</h3>
+            </div>
+            <button className="text-blue-400 cursor-pointer hover:text-blue-300 transition-colors hover:scale-105 transform duration-200"
+            onClick={() => setActiveTab("lab")}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+                </div>
+          <div className="space-y-3">
+            {labAppointments.map((appointment, index) => (
+              <div key={appointment._id} className="bg-gradient-to-r from-slate-800/40 to-slate-700/20 p-4 rounded-lg border border-slate-600/20 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <FlaskConical className="w-4 h-4 text-emerald-400" />
+                      <h4 className="font-medium text-slate-100">
+                        {appointment?.testDetails?.testName || "Test Name"}
+                      </h4>
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Activity className="w-4 h-4 text-purple-400" />
+                      <p className="text-slate-300 text-sm">
+                        {appointment?.testDetails?.testType || "Test Type"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Building2 className="w-4 h-4 text-blue-400" />
+                      <p className="text-slate-400 text-xs">
+                        {appointment?.labId?.name || "Lab Name"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-orange-500" />
+                      <p className="text-slate-400 text-xs">
+                        {appointment?.labId?.address || "Lab Address"}
+                      </p>
+                    </div>
+                    {appointment?.notes && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <FileText className="w-4 h-4 text-yellow-400" />
+                        <p className="text-slate-400 text-xs">
+                          Note: {appointment.notes}
+                        </p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-gray-300">{result.date}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          result.status === 'Normal' ? 'bg-green-400/20 text-green-400' :
-                          result.status === 'Pending' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-red-400/20 text-red-400'
-                        }`}>
-                          {result.status}
-                        </span>
-                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 justify-end mb-1">
+                      <Calendar className="w-4 h-4 text-blue-400" />
+                      <p className="text-blue-400 font-medium">
+                        {appointment.scheduledDate ? new Date(appointment.scheduledDate).toLocaleDateString('en-US', { 
+                          weekday: 'short', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        }) : "Date"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 justify-end mb-2">
+                      <Clock className="w-4 h-4 text-slate-400" />
+                      <p className="text-slate-300 text-sm">
+                        {appointment.timeSlot || "Time"}
+                      </p>
+                    </div>
+                    <div className="flex justify-end">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        appointment.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
+                        appointment.status === 'Pending' ? 'bg-yellow-400/20 text-yellow-400' :
+                        appointment.status === 'Cancelled' ? 'bg-red-400/20 text-red-400' :
+                        'bg-blue-400/20 text-blue-400'
+                      }`}>
+                        {appointment.status}
+                      </span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div> */}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
           </div>
         );
       case 'appointment':
@@ -308,7 +381,7 @@ const PatientDashboard = () => {
                   { date: '2025-06-01', type: 'Prescription', doctor: 'Dr. Brown', diagnosis: 'Hypertension Management' },
                   { date: '2025-05-20', type: 'Imaging', doctor: 'Dr. Wilson', diagnosis: 'X-Ray Chest' },
                 ].map((record, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 transition-all duration-300">
+                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 ">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-medium text-white">{record.type}</h4>
@@ -371,14 +444,14 @@ const PatientDashboard = () => {
         {/* Logo */}
         <div className="p-3 border-b border-gray-700/50">
           <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-3 group">
-            <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+            <div className="flex items-center space-x-3 group">
+              <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
                 <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300 transition-colors duration-300" />
               </div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
                 NirogCare
               </h1> 
-</div>
+          </div>
           </div>
         </div>
 
@@ -398,7 +471,7 @@ const PatientDashboard = () => {
                 <item.icon className="w-5 h-5" />
                 <span>{item.label}</span>
 
-                {/* ✅ Show pulsing dot only when active */}
+              
                 {activeTab === item.id && (
                   <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
                 )}
