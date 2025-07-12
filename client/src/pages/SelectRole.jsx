@@ -58,25 +58,11 @@ const SelectRole = () => {
   const navigate = useNavigate();
 
   const toast = {
-    success: (msg) => alert(`✅ ${msg}`),
     error: (msg) => alert(`❌ ${msg}`),
   };
 
   const handleRoleSelect = async (roleId) => {
     setSelectedRole(roleId);
-
-    if (roleId === 'patient') {
-      try {
-        const token = await requestFCMToken();
-        setFCMToken(token);
-        console.log("FCM token:", token);
-      } catch (error) {
-        console.error("FCM Token Error:", error);
-        toast.error("Notification permission denied or blocked.");
-      }
-    } else {
-      setFCMToken(null); // Clear token for non-patients
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -88,6 +74,20 @@ const SelectRole = () => {
     }
 
     setIsSubmitting(true);
+
+
+    if (selectedRole === 'patient') {
+      try {
+        const token = await requestFCMToken();
+        setFCMToken(token);
+        console.log("FCM token:", token);
+      } catch (error) {
+        console.error("FCM Token Error:", error);
+        toast.error("Notification permission denied or blocked.");
+      }
+    } else {
+      setFCMToken(null); // Clear token for non-patients
+    }
 
     try {
       const response = await callRoleApi(selectedRole, fcmToken);

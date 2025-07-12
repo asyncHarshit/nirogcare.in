@@ -3,16 +3,19 @@ import {getMessaging,getToken} from "firebase/messaging"
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCtGocvbP6NMxTT8LK5VJFAJaZXD0PLsFk",
-  authDomain: "nirogcare-in.firebaseapp.com",
-  projectId: "nirogcare-in",
-  storageBucket: "nirogcare-in.firebasestorage.app",
-  messagingSenderId: "1039659631079",
-  appId: "1:1039659631079:web:590680cbc51d97b00e3d42",
-  measurementId: "G-SEZFH495VL"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const vapidKey = "BM9_Jjx1yPWPzhnaQDtmTwnArR4anc4TFXRsxVkrdjkvZkjAtOkXL_WB-cXTNclZYxeFdpEjej4CbBIO7MhGqWA"
+export default firebaseConfig;
+
+
+const vapidKey = import.meta.env.VAPID_KEY;
 
 const app = initializeApp(firebaseConfig);
 
