@@ -58,8 +58,8 @@ const UpdatePatientProfile = ({ userData = {} }) => {
   };
 
   return (
-    <div className=" bg-black flex items-center justify-center ">
-      <div className="w-full max-w-lg">
+    <div className="flex items-center justify-center ">
+      <div className="w-full max-w-lg border-none">
         {/* Main Card */}
         <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl shadow-2xl p-7 border border-green-500/20 backdrop-blur-sm">
           

@@ -1,6 +1,7 @@
 import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
 import User from "../models/User.js";
+import { Assistant } from "../models/Assistant.js";
 // import { Patient } from "../models/Patient.js";
 
 
@@ -200,6 +201,55 @@ export const getDoctorsByHospital = async (req, res) => {
     return res.status(500).json({ error: "Server error while fetching doctors." });
   }
 };
+
+
+export const allAppointments = async (req, res) => {
+  try {
+    const assistant = await Assistant.findOne({ userId: req.user.id });
+
+    if (!assistant) {
+      return res.status(404).json({
+        success: false,
+        message: "Assistant profile not found",
+      });
+    }
+
+    const doctorId = assistant.doctorId;
+    const hospitalId = assistant.hospitalId;
+
+    const appointments = await Appointment.find({
+      doctorId,
+      hospitalId,
+      status: "booked",
+    })
+      .populate({
+        path: "bookedBy",
+        select: "name email",
+      })
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
+      })
+      .sort({ date: -1, timeSlot: 1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "All appointments fetched successfully.",
+      total: appointments.length,
+      appointments,
+    });
+
+  } catch (error) {
+    console.error("Error fetching all appointments:", error);
+    return res.status(500).json({
+      error: "Server error while fetching all appointments."
+    });
+  }
+};
+
 
 
 

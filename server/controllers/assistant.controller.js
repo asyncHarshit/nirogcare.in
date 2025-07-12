@@ -1,10 +1,10 @@
 // controllers/assistantController.js
-import { Assistant } from "../models/assistantModel.js";
-import { Hospital } from "../models/hospitalModel.js";
-import { Doctor } from "../models/doctorModel.js";
+import { Assistant } from "../models/Assistant.js";
+import { Hospital } from "../models/Hospital.js";
+import { Doctor } from "../models/Doctor.js";
 
 export const registerAssistant = async (req, res) => {
-  const userId = req.user?._id;
+  const userId = req.user?.id;
 
   if (!userId) {
     return res
@@ -71,3 +71,54 @@ export const registerAssistant = async (req, res) => {
     });
   }
 };
+
+
+export const getAssistantProfile = async (req, res) => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: user ID not found",
+    });
+  }
+
+  try {
+    const assistant = await Assistant.findOne({ userId })
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId", // <-- nested population
+          model: "User",
+          select: "name email"
+        },
+        select: "specialization gender userId" // needed to keep userId for nested population
+      })
+      .populate({
+        path: "hospitalId",
+        select: "name address phone"
+      });
+
+    if (!assistant) {
+      return res.status(404).json({
+        success: false,
+        message: "Assistant profile not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      assistant,
+    });
+  } catch (error) {
+    console.error("Error fetching assistant profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching assistant profile",
+      error: error.message,
+    });
+  }
+};
+
+
+

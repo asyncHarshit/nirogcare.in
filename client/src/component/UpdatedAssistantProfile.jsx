@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { User, Building2, UserPlus, CheckCircle, AlertCircle, Stethoscope, Save } from 'lucide-react';
+import { updateAssistantProfile } from '../services/assistantServices';
+import { toast } from 'sonner';
+
 
 const AssistantForm = () => {
   const [formData, setFormData] = useState({
     doctorId: '',
-    hospitalId: '',
-    userId: ''
+    hospitalId: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -25,18 +27,12 @@ const AssistantForm = () => {
     setSubmitStatus(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate success
-      setSubmitStatus('success');
-      console.log('Assistant created:', formData);
-      
-      // Reset form after success
-      setTimeout(() => {
-        setFormData({ doctorId: '', hospitalId: '', userId: '' });
-        setSubmitStatus(null);
-      }, 2000);
+      const response = await updateAssistantProfile(formData);
+      if(response?.success){
+        toast.success("Profile Updated Successfully !!")
+        console.log(response)
+
+      }
     } catch (error) {
       setSubmitStatus('error');
       console.error('Error creating assistant:', error);
@@ -84,25 +80,7 @@ const AssistantForm = () => {
 
           {/* Form */}
           <div className="space-y-6">
-            {/* User ID Field */}
-            {/* <div className="group">
-              <label className="flex items-center text-sm font-medium text-gray-300 mb-2 group-hover:text-green-400 transition-colors">
-                <User className="w-4 h-4 mr-2 text-green-400" />
-                User ID
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="userId"
-                  value={formData.userId}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 text-white placeholder-gray-400 transition-all duration-300 hover:border-green-500/30 backdrop-blur-sm"
-                  placeholder="Enter user ID"
-                  required
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </div> */}
+            
 
             {/* Doctor ID Field */}
             <div className="group  mb-10">

@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const assistantSchema = new mongoose.Schema(
   {
     userId: {

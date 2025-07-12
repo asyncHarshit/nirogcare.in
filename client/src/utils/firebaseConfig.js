@@ -22,16 +22,26 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
 
-export const requestFCMToken = async()=>{
-    return Notification.requestPermission()
-    .then((permission)=>{
-        if(permission === "granted"){
-            return getToken(messaging,{vapidKey})
-        }else{
-            alert("Permission Not granted ")
-        }
-    }).catch((err)=>{
-        console.log("Error getting FCM Token",err);
-        
-    })
-}
+export const requestFCMToken = async () => {
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      alert("Notification permission not granted.");
+      return null;
+    }
+
+    const token = await getToken(messaging, { vapidKey });
+    console.log("FCM Token:", token);
+
+    if (!token) {
+      console.warn("Failed to get FCM token. Token is null.");
+      return null;
+    }
+
+    return token;
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
+    return null;
+  }
+};

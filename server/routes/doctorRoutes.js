@@ -5,6 +5,7 @@ import {
   addMedicineRecord,
   getMedicineRecords,
   getDoctorsByHospital,
+  allAppointments,
 } from "../controllers/doctor.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
@@ -26,5 +27,7 @@ router.post("/medicine", addMedicineRecord);
 router.get("/medicine/:patientId/:forPatientType", getMedicineRecords);
 
 router.get("/getAllDoctors",getDoctorsByHospital)
+
+router.get("/all-Appointments" , allAppointments)
 
 export default router;
