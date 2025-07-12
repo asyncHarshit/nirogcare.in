@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, MapPin, Calendar, Users, Save, AlertCircle, CheckCircle, Phone, Mail } from 'lucide-react';
+import { User, MapPin, Calendar, Users, Save, AlertCircle, CheckCircle, Phone, Mail, IdCard } from 'lucide-react';
 
 import { updatePatient } from '../services/updateProfileService';
 const UpdatePatientProfile = ({ userData = {} }) => {
@@ -8,6 +8,9 @@ const UpdatePatientProfile = ({ userData = {} }) => {
     gender: '',
     address: ''
   });
+
+
+  console.log(userData);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -94,6 +97,11 @@ const UpdatePatientProfile = ({ userData = {} }) => {
                 <Mail className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
                 <span className="text-gray-300 text-sm min-w-[60px]">Email:</span>
                 <span className="text-white ml-2 font-medium">{userData?.user?.email || 'N/A'}</span>
+              </div>
+              <div className="flex items-center group">
+                <IdCard className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                <span className="text-gray-300 text-sm min-w-[60px]">Id:</span>
+                <span className="text-white ml-2 font-medium">{userData?.user?._id || 'N/A'}</span>
               </div>
             </div>
           </div>

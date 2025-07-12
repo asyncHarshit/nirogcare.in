@@ -11,6 +11,11 @@ const assistantSchema = new mongoose.Schema(
       ref: "Hospital",
       required: true,
     },
+    doctorId : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Doctor",
+      required: true,
+    },
     isVerified: {
       type: Boolean,
       default: false,

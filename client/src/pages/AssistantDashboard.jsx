@@ -19,6 +19,7 @@ import {
 import { logoutUser } from '../services/logoutService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import AssistantForm from '../component/UpdatedAssistantProfile';
 
 const AssistantDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -29,6 +30,7 @@ const AssistantDashboard = () => {
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
+    { id: 'profile', label: 'My Profile', icon: User },
     { id: 'patients', label: 'Todays Patients', icon: Users },
     { id: 'queue', label: 'Queue Map', icon: MapPin },
   ];
@@ -251,6 +253,12 @@ const AssistantDashboard = () => {
             </div>
           </div>
         );
+      case 'profile':
+        return (
+          <div className="space-y-6">
+              <AssistantForm />
+          </div>
+        );
 
       case 'queue':
         return (
@@ -338,7 +346,7 @@ const AssistantDashboard = () => {
 
               
                 {activeTab === item.id && (
-                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
+                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full "></span>
                 )}
               </button>
               </li>
