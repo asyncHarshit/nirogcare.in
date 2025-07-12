@@ -8,6 +8,7 @@ import hospitalRoute from "./routes/hospitalRoutes.js"
 import patientRoute from "./routes/patientRoutes.js"
 import doctorRoute from "./routes/doctorRoutes.js"
 import labRoute from "./routes/labRoutes.js"
+import firebaseRoute from "./routes/firebaseRoutes.js"
 
 
 
@@ -33,6 +34,7 @@ app.use('/api/hospital',hospitalRoute);
 app.use('/api/patient',patientRoute)
 app.use('/api/doctor',doctorRoute);
 app.use('/api/lab',labRoute)
+app.use('/api/firebase',firebaseRoute)
 
 
 

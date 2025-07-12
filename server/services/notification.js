@@ -1,9 +1,9 @@
 import admin from "./firebaseAdmin.js";
 import User from "../models/User.js";
 
-export const sendNotificationToUser = async ({ userId, title, body }) => {
+export const notificationService = async ({ userId, title, body }) => {
   try {
-    // Get the user from DB
+
     const user = await User.findById(userId);
     if (!user || !user.fcmToken) {
       throw new Error("FCM token not found for user");
