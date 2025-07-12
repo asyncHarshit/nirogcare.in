@@ -1,4 +1,4 @@
-<h1 align="center">🏥 Hospital Management System</h1>
+<h1 align="center">🏥 HealthCare Platform</h1>
 
 ## *Revolutionizing Healthcare in India*
   
