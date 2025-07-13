@@ -309,7 +309,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                     <option value="">Choose a doctor...</option>
                     {doctors.map((doctor) => (
                       <option key={doctor.doctorId} value={doctor.doctorId}>
-                        Dr. {doctor.name} - {doctor.specialization}
+                        {doctor.name} - {doctor.specialization}
                       </option>
                     ))}
                   </select>

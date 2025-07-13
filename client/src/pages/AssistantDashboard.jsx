@@ -24,6 +24,8 @@ import { getMe } from '../services/getMeServices';
 import { getAssistantProfile } from '../services/assistantServices';
 import AssistantData from '../component/assistantData';
 import { getAllApointments } from '../services/doctorServices';
+import { notifyViaFCM } from '../services/firebaseServices';
+import LoaderOnly from '../component/Loader';
 
 const AssistantDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -34,12 +36,21 @@ const AssistantDashboard = () => {
   const [assistantData, setAssistantData] = useState([]);
   const [toggle, setToggle] = useState(false);
   const [appointments, setAllAppointments] = useState([]);
+  const [dragId , setDragId] = useState(null)
+  const [loading , setLoading] = useState(true)
   const [queueData, setQueueData] = useState({
     upcoming: [],
     inProgress: [],
     completed: [],
     cancelled: []
   });
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }, []);
 
   const navigate = useNavigate();
 
@@ -93,6 +104,7 @@ const AssistantDashboard = () => {
 
       appointments.forEach(appointment => {
         const queueItem = {
+          patientId : appointment.bookedBy._id,
           id: appointment._id,
           name: appointment?.bookedBy?.name || 'Unknown Patient',
           age: appointment.age || 'N/A',
@@ -143,6 +155,8 @@ const AssistantDashboard = () => {
     }
   };
 
+  console.log(appointments)
+
 
   const handleLogout = async () => {
     const response = await logoutUser();
@@ -159,7 +173,7 @@ const AssistantDashboard = () => {
     e.dataTransfer.setData('text/plain', patient.id);
     
     // Add visual feedback
-    e.currentTarget.style.opacity = '0.5';
+    e.currentTarget.style.opacity = '1';
     e.currentTarget.style.transform = 'scale(0.95)';
   };
 
@@ -240,10 +254,22 @@ const handleDrop = (e, targetColumn) => {
 };
 
 
-  const sendNotification = (patient) => {
-    toast.info(`Notification sent to ${patient.name}`);
+  const sendNotification = async(patient) => {
+
+    const userId = patient.patientId;
     
 
+
+    try {
+      const response = await notifyViaFCM(userId);
+      if(response.success){
+        toast.info(`Notification sent to ${patient.name}`);
+      }
+      
+    } catch (error) {
+      console.log("Error in sending notificattion in Assistant dashboard")
+      
+    }
   };
 
   const PatientCard = ({ patient, columnType }) => (
@@ -324,7 +350,7 @@ const handleDrop = (e, targetColumn) => {
         return (
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
-              <h2 className="text-2xl font-bold text-white mb-2">Assistant Dashboard</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Welcome Back ,{userData?.user?.name}</h2>
               <p className="text-gray-300">Manage patient queues and send notifications</p>
             </div>
 
@@ -546,6 +572,7 @@ const handleDrop = (e, targetColumn) => {
         return null;
     }
   };
+    if (loading) return <LoaderOnly />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
@@ -631,7 +658,7 @@ const handleDrop = (e, targetColumn) => {
                 )}
               </button>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-white font-medium">{userData?.user?.name}</span>

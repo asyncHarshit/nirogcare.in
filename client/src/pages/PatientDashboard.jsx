@@ -26,13 +26,16 @@ import {
   Search,
   Filter,
   Calendar,
-  Stethoscope,
+  Stethoscope
 
 } from 'lucide-react';
 import { getMe } from '../services/getMeServices';
 import UpdatePatientProfile from '../component/UpdateProfile';
+import LoaderOnly from '../component/Loader';
 
 const PatientDashboard = () => {
+
+
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
   const [hospitals, setHospitals] = useState([]);
@@ -40,6 +43,19 @@ const PatientDashboard = () => {
   const [userData , setUserData] = useState([]);
   const [appointment , setAppointment] = useState([]);
   const [labAppointments , setLabAppointment] = useState([]);
+  const [loading , setLoading] = useState(true)
+
+
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  
 
   const navigate = useNavigate();
 
@@ -138,8 +154,10 @@ const PatientDashboard = () => {
     { id: 'reports', label: 'Lab Report', icon: BarChart3 },
   ];
 
+  const temp = "57 bpm"
+
   const vitalStats = [
-    { icon: Heart, label: 'Heart Rate', value: '78 bpm', status: 'normal', color: 'text-rose-500' },
+    { icon: Heart, label: 'Heart Rate', value: temp, status: 'normal', color: 'text-rose-500' },
     { icon: Thermometer, label: 'Temperature', value: '98.6°F', status: 'normal', color: 'text-cyan-400' },
     { icon: Weight, label: 'Blood Pressure', value: '120/80', status: 'normal', color: 'text-purple-400' },
     { icon: Activity, label: 'Oxygen Level', value: '98%', status: 'normal', color: 'text-blue-400' },
@@ -437,6 +455,8 @@ const PatientDashboard = () => {
     }
   };
 
+  if (loading) return <LoaderOnly />;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
@@ -473,7 +493,7 @@ const PatientDashboard = () => {
 
               
                 {activeTab === item.id && (
-                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
+                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full"></span>
                 )}
               </button>
             </li>
@@ -484,7 +504,7 @@ const PatientDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-600  cursor-pointer hover:text-black transition-all duration-300">
+          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300  hover:bg-red-600  cursor-pointer  transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
             
@@ -522,7 +542,7 @@ const PatientDashboard = () => {
                 )}
               </button>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">
                   <button className="cursor-pointer" onClick={() => setActiveTab("profile")}>
                     <User className="w-4 h-4 text-white" />
                   </button>
