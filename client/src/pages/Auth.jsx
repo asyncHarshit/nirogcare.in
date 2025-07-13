@@ -121,6 +121,7 @@ const Auth = () => {
                     onChange={handleChange}
                     className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200"
                     required
+                    maxLength={10}
                   />
                 </div>
               </div>

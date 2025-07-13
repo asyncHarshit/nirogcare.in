@@ -1,13 +1,22 @@
 import { Appointment } from "../models/Appointment.js";
+import {Patient} from "../models/Patient.js"
 
 // Create a new appointment
 export const createAppointment = async (req, res) => {
   try {
     const { type } = req.body.forPatient;
-    const { doctorId, hospitalId, date, timeSlot } = req.body;
+    const { doctorId, hospitalId, date, timeSlot ,contact , age , gender } = req.body;
 
-    if (!type || !doctorId || !hospitalId || !date || !timeSlot) {
+    if (!doctorId || !hospitalId || !date || !timeSlot || !contact || !age || !gender) {
       return res.status(400).json({ error: "All fields are required." });
+    }
+
+    
+
+    const patient = await Patient.findOne({ userId: req.user.id });
+
+    if (!patient) {
+      return res.status(404).json({ error: "Patient profile not found." });
     }
 
     const newAppointment = await Appointment.create({
@@ -15,8 +24,12 @@ export const createAppointment = async (req, res) => {
       forPatient: { type },
       doctorId,
       hospitalId,
+      contact,
       date,
       timeSlot,
+      patientId: patient._id,
+      age,
+      gender
     });
 
     return res.status(201).json({
@@ -32,21 +45,20 @@ export const createAppointment = async (req, res) => {
 };
 
 
-
 export const getMyAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({ bookedBy: req.user.id })
-    .populate({
-      path: "doctorId",
-      populate: {
-        path: "userId",
-        select: "name email",
-      },
-      select: "specialization userId",
-    })
-    .populate("hospitalId", "name address")
-    .sort({ date: -1 });
-
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
+        select: "specialization userId",
+      })
+      .populate("hospitalId", "name address")
+      .populate("gender age")
+      .sort({ date: -1 });
 
     return res.status(200).json({ appointments });
   } catch (error) {
@@ -56,6 +68,8 @@ export const getMyAppointments = async (req, res) => {
       .json({ error: "Server error while fetching appointments." });
   }
 };
+
+
 
 // Get a specific appointment by ID
 export const getAppointmentById = async (req, res) => {

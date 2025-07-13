@@ -12,7 +12,19 @@ const appointmentSchema = new mongoose.Schema(
         type: String,
         enum: ["self", "family"],
         required: true,
-      }
+      },
+    },
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+    },
+    age : {
+      type : String,
+      required : true
+    },
+    gender : {
+      type : String,
+      required : true
     },
     doctorId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,6 +39,10 @@ const appointmentSchema = new mongoose.Schema(
     date: {
       type: Date,
       required: true,
+    },
+    contact:{
+      type : String,
+      required : true
     },
     timeSlot: {
       type: String,

@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   Users, 
@@ -29,10 +29,17 @@ const AssistantDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
   const [draggedPatient, setDraggedPatient] = useState(null);
-  const [userData , setUserData] = useState([]);
-  const [assistantData , setAssistantData] = useState([]);
-  const [toggle , setToggle] = useState(false);
-  const [appointments , setAllAppointments] = useState([]);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [userData, setUserData] = useState([]);
+  const [assistantData, setAssistantData] = useState([]);
+  const [toggle, setToggle] = useState(false);
+  const [appointments, setAllAppointments] = useState([]);
+  const [queueData, setQueueData] = useState({
+    upcoming: [],
+    inProgress: [],
+    completed: [],
+    cancelled: []
+  });
 
   const navigate = useNavigate();
 
@@ -43,76 +50,85 @@ const AssistantDashboard = () => {
     { id: 'queue', label: 'Queue Map', icon: MapPin },
   ];
 
-  const [kanbanData, setKanbanData] = useState({
-    upcoming: [
-      { id: 'P001', name: 'John Smith', age: 45, condition: 'Cardiac Checkup', doctor: 'Dr. Johnson', time: '09:00 AM', priority: 'medium' },
-      { id: 'P002', name: 'Mary Wilson', age: 62, condition: 'Diabetes Follow-up', doctor: 'Dr. Brown', time: '09:30 AM', priority: 'high' },
-      { id: 'P005', name: 'David Chen', age: 34, condition: 'Annual Physical', doctor: 'Dr. Johnson', time: '11:00 AM', priority: 'low' },
-      { id: 'P006', name: 'Emma Taylor', age: 28, condition: 'Vaccination', doctor: 'Dr. Garcia', time: '11:30 AM', priority: 'low' },
-    ],
-    inProgress: [
-      { id: 'P003', name: 'Robert Davis', age: 38, condition: 'Orthopedic Consultation', doctor: 'Dr. Miller', time: '10:00 AM', priority: 'medium' },
-      { id: 'P004', name: 'Lisa Anderson', age: 29, condition: 'Prenatal Checkup', doctor: 'Dr. Garcia', time: '10:30 AM', priority: 'high' },
-    ],
-    completed: [
-      { id: 'P007', name: 'Michael Brown', age: 55, condition: 'Blood Pressure Check', doctor: 'Dr. Johnson', time: '08:00 AM', priority: 'medium' },
-      { id: 'P008', name: 'Sarah Wilson', age: 42, condition: 'Allergy Test', doctor: 'Dr. Brown', time: '08:30 AM', priority: 'low' },
-    ],
-    cancelled: [
-      { id: 'P009', name: 'James Miller', age: 67, condition: 'Routine Checkup', doctor: 'Dr. Miller', time: '09:00 AM', priority: 'low' },
-    ]
-  });
-
-    const getUserData = async()=>{
-      const response = await getMe();
-      if(response){
-        setUserData(response);
-      }
-    } 
-
-    const getAllApointmentsData = async()=>{
-      const response = await getAllApointments();
-      if(response.success){
-        setAllAppointments(response?.appointments)
-      }
-    }
-  
-    useEffect(()=>{
-      getUserData();
-      getAllApointmentsData();
-     
-    },[])
-
-    const getProfile =async()=>{
-      const response = await getAssistantProfile();
-      setAssistantData(response);
-      if(response.success){
-        console.log(response)
-        setToggle(true);
-      }
-
-    }
-    useEffect(()=>{
-      getProfile();
-
-    },[]) 
-
-  // Helper function to format appointment time
-  const formatTime = (timeString) => {
-    if (!timeString) return 'N/A';
-    try {
-      const date = new Date(timeString);
-      return date.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      });
-    } catch (error) {
-      return timeString;
+  const getUserData = async () => {
+    const response = await getMe();
+    if (response) {
+      setUserData(response);
     }
   };
 
-  // Helper function to format appointment date
+  const getAllApointmentsData = async () => {
+    const response = await getAllApointments();
+    if (response.success) {
+      setAllAppointments(response?.appointments);
+    }
+  };
+
+  useEffect(() => {
+    getUserData();
+    getAllApointmentsData();
+  }, []);
+
+  const getProfile = async () => {
+    const response = await getAssistantProfile();
+    setAssistantData(response);
+    if (response.success) {
+      setToggle(true);
+    }
+  };
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  // Convert appointments to queue format
+  useEffect(() => {
+    if (appointments.length > 0) {
+      const categorizedAppointments = {
+        upcoming: [],
+        inProgress: [],
+        completed: [],
+        cancelled: []
+      };
+
+      appointments.forEach(appointment => {
+        const queueItem = {
+          id: appointment._id,
+          name: appointment?.bookedBy?.name || 'Unknown Patient',
+          age: appointment.age || 'N/A',
+          condition: appointment.reason || 'General Consultation',
+          doctor: appointment?.doctorId?.userId?.name || 'N/A',
+          time: appointment.timeSlot || 'N/A',
+          status: appointment.status,
+          appointmentData: appointment // Store full appointment data
+        };
+
+        const status = appointment.status?.toLowerCase();
+        switch (status) {
+          case 'confirmed':
+          case 'scheduled':
+            categorizedAppointments.upcoming.push(queueItem);
+            break;
+          case 'in-progress':
+          case 'ongoing':
+            categorizedAppointments.inProgress.push(queueItem);
+            break;
+          case 'completed':
+            categorizedAppointments.completed.push(queueItem);
+            break;
+          case 'cancelled':
+            categorizedAppointments.cancelled.push(queueItem);
+            break;
+          default:
+            categorizedAppointments.upcoming.push(queueItem);
+        }
+      });
+
+      setQueueData(categorizedAppointments);
+    }
+  }, [appointments]);
+
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -127,42 +143,31 @@ const AssistantDashboard = () => {
     }
   };
 
-  // Helper function to get appointment status color
-  const getStatusColor = (status) => {
-    switch(status?.toLowerCase()) {
-      case 'confirmed':
-      case 'scheduled':
-        return 'bg-green-400/20 text-green-400';
-      case 'pending':
-        return 'bg-yellow-400/20 text-yellow-400';
-      case 'cancelled':
-        return 'bg-red-400/20 text-red-400';
-      case 'completed':
-        return 'bg-blue-400/20 text-blue-400';
-      default:
-        return 'bg-gray-400/20 text-gray-400';
-    }
-  };
 
-  // Helper function to get priority based on appointment type or urgency
-  const getPriorityFromAppointment = (appointment) => {
-    if (appointment.urgent || appointment.priority === 'high') return 'high';
-    if (appointment.followUp || appointment.priority === 'medium') return 'medium';
-    return 'low';
-  };
-
-  const handleLogout = async()=>{
+  const handleLogout = async () => {
     const response = await logoutUser();
     if (response?.status === 200) {
       console.log("Logout successfully !!");
-
       toast.success('Logout successful!');
       navigate("/auth");
-    }}
+    }
+  };
 
   const handleDragStart = (e, patient) => {
     setDraggedPatient(patient);
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', patient.id);
+    
+    // Add visual feedback
+    e.currentTarget.style.opacity = '0.5';
+    e.currentTarget.style.transform = 'scale(0.95)';
+  };
+
+  const handleDragEnd = (e) => {
+    e.currentTarget.style.opacity = '1';
+    e.currentTarget.style.transform = 'scale(1)';
+    setDraggedPatient(null);
+    setDragOverColumn(null);
   };
 
   const handleDragOver = (e) => {
@@ -170,54 +175,92 @@ const AssistantDashboard = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e, targetColumn) => {
+  const handleDragEnter = (e, columnKey) => {
     e.preventDefault();
-    if (!draggedPatient) return;
-
-    const sourceColumn = Object.keys(kanbanData).find(key => 
-      kanbanData[key].some(patient => patient.id === draggedPatient.id)
-    );
-
-    if (sourceColumn === targetColumn) return;
-
-    setKanbanData(prev => {
-      const newData = { ...prev };
-      newData[sourceColumn] = newData[sourceColumn].filter(p => p.id !== draggedPatient.id);
-      newData[targetColumn] = [...newData[targetColumn], draggedPatient];
-      return newData;
-    });
-
-    setDraggedPatient(null);
+    setDragOverColumn(columnKey);
   };
 
-  const sendNotification = (patient, status) => {
-    // Simulate notification sending
-    alert(`Notification sent: ${patient.name} is now ${status}`);
-  };
-
-  const getPriorityColor = (priority) => {
-    switch(priority) {
-      case 'high': return 'border-red-500/50 bg-red-500/10';
-      case 'medium': return 'border-yellow-500/50 bg-yellow-500/10';
-      case 'low': return 'border-green-500/50 bg-green-500/10';
-      default: return 'border-gray-500/50 bg-gray-500/10';
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    // Only clear if we're leaving the column entirely
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverColumn(null);
     }
+  };
+
+const handleDrop = (e, targetColumn) => {
+  e.preventDefault();
+  setDragOverColumn(null);
+  
+  if (!draggedPatient) return;
+
+  const sourceColumn = Object.keys(queueData).find(key => 
+    queueData[key].some(patient => patient.id === draggedPatient.id)
+  );
+
+  if (sourceColumn === targetColumn) {
+    setDraggedPatient(null);
+    return;
+  }
+
+  // Update queue data
+  setQueueData(prev => {
+    const newData = { ...prev };
+    newData[sourceColumn] = newData[sourceColumn].filter(p => p.id !== draggedPatient.id);
+    
+    // Update status based on target column
+    const updatedPatient = { ...draggedPatient };
+    switch (targetColumn) {
+      case 'upcoming':
+        updatedPatient.status = 'confirmed';
+        break;
+      case 'inProgress':
+        updatedPatient.status = 'in-progress';
+        break;
+      case 'completed':
+        updatedPatient.status = 'completed';
+        break;
+      case 'cancelled':
+        updatedPatient.status = 'cancelled';
+        break;
+    }
+    
+    newData[targetColumn] = [...newData[targetColumn], updatedPatient];
+    return newData;
+  });
+
+  // Send notification when patient is moved to "In Progress"
+  if (targetColumn === 'inProgress') {
+    sendNotification(draggedPatient);
+  }else{
+    toast.success(`Patient moved to ${targetColumn.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+
+  }
+  setDraggedPatient(null);
+};
+
+
+  const sendNotification = (patient) => {
+    toast.info(`Notification sent to ${patient.name}`);
+    
+
   };
 
   const PatientCard = ({ patient, columnType }) => (
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, patient)}
-      className={`p-4 rounded-lg border cursor-move transition-all duration-300 hover:shadow-lg ${getPriorityColor(patient.priority)} hover:border-blue-500/50`}
+      onDragEnd={handleDragEnd}
+      className={`p-4 rounded-lg border cursor-move border-green-500/50 bg-green-500/10 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20  hover:border-blue-500/50 hover:scale-105 transform-gpu`}
     >
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-medium text-white">{patient.name}</h4>
-        <span className="text-xs text-gray-400">{patient.id}</span>
+        <h4 className="font-medium text-white truncate">{patient.name}</h4>
+        <span className="text-xs text-gray-400 ml-2">{patient.id.slice(-6)}</span>
       </div>
       <div className="space-y-1 text-sm">
         <p className="text-gray-300">Age: {patient.age}</p>
-        <p className="text-gray-300">{patient.condition}</p>
-        <p className="text-blue-400">{patient.doctor}</p>
+        <p className="text-gray-300 truncate" title={patient.condition}>{patient.condition}</p>
+        <p className="text-blue-400 truncate" title={patient.doctor}>{patient.doctor}</p>
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center space-x-1">
             <Clock className="w-4 h-4 text-gray-400" />
@@ -226,7 +269,7 @@ const AssistantDashboard = () => {
           {columnType !== 'upcoming' && (
             <button
               onClick={() => sendNotification(patient, columnType)}
-              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-1 rounded transition-colors"
+              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-1 cursor-pointer rounded transition-all duration-200 hover:scale-110"
               title="Send Notification"
             >
               <Send className="w-4 h-4" />
@@ -239,8 +282,14 @@ const AssistantDashboard = () => {
 
   const KanbanColumn = ({ title, patients, columnKey, icon: Icon, color }) => (
     <div 
-      className="bg-gray-800/30 p-4 rounded-xl border border-gray-700/50 min-h-[600px]"
+      className={`bg-gray-800/30 p-4 rounded-xl border transition-all duration-300 min-h-[600px] ${
+        dragOverColumn === columnKey 
+          ? 'border-blue-500/70 bg-blue-500/10 shadow-lg shadow-blue-500/20' 
+          : 'border-gray-700/50'
+      }`}
       onDragOver={handleDragOver}
+      onDragEnter={(e) => handleDragEnter(e, columnKey)}
+      onDragLeave={handleDragLeave}
       onDrop={(e) => handleDrop(e, columnKey)}
     >
       <div className="flex items-center justify-between mb-4">
@@ -253,9 +302,18 @@ const AssistantDashboard = () => {
         </div>
       </div>
       <div className="space-y-3">
-        {patients.map((patient) => (
-          <PatientCard key={patient.id} patient={patient} columnType={columnKey} />
-        ))}
+        {patients.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="w-12 h-12 bg-gray-700/30 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <Icon className={`w-6 h-6 ${color} opacity-50`} />
+            </div>
+            <p className="text-gray-500 text-sm">No patients in {title.toLowerCase()}</p>
+          </div>
+        ) : (
+          patients.map((patient) => (
+            <PatientCard key={patient.id} patient={patient} columnType={columnKey} />
+          ))
+        )}
       </div>
     </div>
   );
@@ -286,18 +344,18 @@ const AssistantDashboard = () => {
                 <div className="flex items-center justify-between mb-2">
                   <Activity className="w-8 h-8 text-blue-400" />
                   <span className="text-xs text-blue-400 bg-blue-400/20 px-2 py-1 rounded-full">
-                    {appointments.filter(apt => apt.status?.toLowerCase() === 'confirmed').length}
+                    {queueData.inProgress.length}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-white">Confirmed</h3>
-                <p className="text-gray-400 text-sm">Confirmed appointments</p>
+                <h3 className="text-lg font-semibold text-white">In Progress</h3>
+                <p className="text-gray-400 text-sm">Currently being treated</p>
               </div>
 
               <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700/50">
                 <div className="flex items-center justify-between mb-2">
                   <CheckCircle className="w-8 h-8 text-green-400" />
                   <span className="text-xs text-green-400 bg-green-400/20 px-2 py-1 rounded-full">
-                    {appointments.filter(apt => apt.status?.toLowerCase() === 'completed').length}
+                    {queueData.completed.length}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-white">Completed</h3>
@@ -308,7 +366,7 @@ const AssistantDashboard = () => {
                 <div className="flex items-center justify-between mb-2">
                   <XCircle className="w-8 h-8 text-red-400" />
                   <span className="text-xs text-red-400 bg-red-400/20 px-2 py-1 rounded-full">
-                    {appointments.filter(apt => apt.status?.toLowerCase() === 'cancelled').length}
+                    {queueData.cancelled.length}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-white">Cancelled</h3>
@@ -317,6 +375,7 @@ const AssistantDashboard = () => {
             </div>
           </div>
         );  
+     
       case 'patients':
         return (
           <div className="space-y-6">
@@ -341,16 +400,16 @@ const AssistantDashboard = () => {
                 <div className="space-y-4">
                   {appointments.map((appointment, index) => (
                     <div 
-                      key={appointment._id || index} 
+                      key={index} 
                       className="p-4 rounded-lg border border-gray-700/50 bg-gray-800/20 hover:bg-gray-800/40 transition-all duration-300"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <h4 className="font-medium text-white text-lg">
-                              {appointment.patientName || appointment.patient?.name || 'Unknown Patient'}
+                              {appointment?.bookedBy?.name || 'Unknown Patient'}
                             </h4>
-                            <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(appointment.status)}`}>
+                            <span className={`text-xs px-2 py-1 rounded-full bg-green-800`}>
                               {appointment.status || 'Pending'}
                             </span>
                           </div>
@@ -358,25 +417,25 @@ const AssistantDashboard = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                             <div className="space-y-1">
                               <p className="text-gray-400">
-                                <span className="font-medium">Patient ID:</span> {appointment.patientId || 'N/A'}
+                                <span className="font-medium">Patient ID:</span> {appointment.bookedBy._id || 'N/A'}
                               </p>
                               <p className="text-gray-400">
-                                <span className="font-medium">Age:</span> {appointment.patientAge || appointment.patient?.age || 'N/A'}
+                                <span className="font-medium">Age:</span> {appointment.age || 'N/A'}
                               </p>
                               <p className="text-gray-400">
-                                <span className="font-medium">Gender:</span> {appointment.patientGender || appointment.patient?.gender || 'N/A'}
+                                <span className="font-medium">Gender:</span> {appointment.gender || 'N/A'}
                               </p>
                             </div>
                             
                             <div className="space-y-1">
                               <p className="text-gray-300">
-                                <span className="font-medium">Doctor:</span> {appointment.doctorName || appointment.doctor?.name || 'N/A'}
+                                <span className="font-medium">Doctor:</span> {appointment?.doctorId?.userId?.name || 'N/A'}
                               </p>
                               <p className="text-gray-300">
-                                <span className="font-medium">Specialization:</span> {appointment.doctorSpecialization || appointment.doctor?.specialization || 'N/A'}
+                                <span className="font-medium">Specialization:</span> {appointment?.doctorId?.specialization || 'N/A'}
                               </p>
                               <p className="text-gray-300">
-                                <span className="font-medium">Reason:</span> {appointment.reason || appointment.condition || 'General Consultation'}
+                                <span className="font-medium">Reason:</span> {appointment.reason || 'General Consultation'}
                               </p>
                             </div>
                             
@@ -384,17 +443,17 @@ const AssistantDashboard = () => {
                               <div className="flex items-center space-x-2">
                                 <Calendar className="w-4 h-4 text-blue-400" />
                                 <span className="text-blue-400 font-medium">
-                                  {formatDate(appointment.date || appointment.appointmentDate)}
+                                  {formatDate(appointment.date)}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Clock className="w-4 h-4 text-blue-400" />
                                 <span className="text-blue-400 font-medium">
-                                  {formatTime(appointment.time || appointment.appointmentTime)}
+                                  {appointment.timeSlot}
                                 </span>
                               </div>
                               <p className="text-gray-400">
-                                <span className="font-medium">Contact:</span> {appointment.patientPhone || appointment.patient?.phone || 'N/A'}
+                                <span className="font-medium">Contact:</span> {appointment.contact || 'N/A'}
                               </p>
                             </div>
                           </div>
@@ -415,6 +474,7 @@ const AssistantDashboard = () => {
                             </span>
                           )}
                           <button
+                          
                             onClick={() => console.log('View appointment details:', appointment)}
                             className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md text-sm transition-colors"
                           >
@@ -430,11 +490,10 @@ const AssistantDashboard = () => {
           </div>
         );
       
-        case 'profile':
+      case 'profile':
         return (
           <div className="space-y-6">
-            {toggle ? <AssistantData assistantData={assistantData} /> : <AssistantForm />}
-
+            {toggle ? <AssistantData assistantData={assistantData} userData={userData} /> : <AssistantForm />}
           </div>
         );
 
@@ -452,28 +511,28 @@ const AssistantDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <KanbanColumn 
                   title="Upcoming" 
-                  patients={kanbanData.upcoming} 
+                  patients={queueData.upcoming} 
                   columnKey="upcoming"
                   icon={Clock}
                   color="text-yellow-400"
                 />
                 <KanbanColumn 
                   title="In Progress" 
-                  patients={kanbanData.inProgress} 
+                  patients={queueData.inProgress} 
                   columnKey="inProgress"
                   icon={Activity}
                   color="text-blue-400"
                 />
                 <KanbanColumn 
                   title="Completed" 
-                  patients={kanbanData.completed} 
+                  patients={queueData.completed} 
                   columnKey="completed"
                   icon={CheckCircle}
                   color="text-green-400"
                 />
                 <KanbanColumn 
                   title="Cancelled" 
-                  patients={kanbanData.cancelled} 
+                  patients={queueData.cancelled} 
                   columnKey="cancelled"
                   icon={XCircle}
                   color="text-red-400"
@@ -494,17 +553,17 @@ const AssistantDashboard = () => {
       <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
         <div className="p-3 border-b border-gray-700/50">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-3 group">
-                      <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
-                        <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300 transition-colors duration-300" />
-                      </div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
-                        NirogCare
-                      </h1> 
-                  </div>
-                  </div>
-                </div>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 group">
+              <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+                <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300 transition-colors duration-300" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                NirogCare
+              </h1> 
+            </div>
+          </div>
+        </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4">
@@ -512,21 +571,19 @@ const AssistantDashboard = () => {
             {navItems.map((item) => (
               <li key={item.id}>
                 <button
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg ${
-                  activeTab === item.id
-                    ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
-
-              
-                {activeTab === item.id && (
-                  <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full "></span>
-                )}
-              </button>
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg  ${
+                    activeTab === item.id
+                      ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                  {activeTab === item.id && (
+                    <span className="ml-auto w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></span>
+                  )}
+                </button>
               </li>
             ))}
           </ul>
@@ -534,7 +591,10 @@ const AssistantDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:font-bold hover:bg-red-600  cursor-pointer hover:text-black transition-all duration-300">
+          <button 
+            onClick={handleLogout} 
+            className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300"
+          >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
           </button>
@@ -565,7 +625,7 @@ const AssistantDashboard = () => {
               <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
                 <Bell className="w-5 h-5" />
                 {notifications > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                     {notifications}
                   </span>
                 )}

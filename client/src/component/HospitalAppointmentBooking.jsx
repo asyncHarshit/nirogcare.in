@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Star, Calendar, User, ChevronLeft, Compass, UserCheck } from 'lucide-react';
+import { MapPin, Clock, Phone, Star, Calendar, User, ChevronLeft, Compass, UserCheck, Contact } from 'lucide-react';
 import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
 import { createAppointment } from '../services/patientServices';
 import { toast } from 'sonner';
@@ -12,7 +12,10 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     forPatient: '',
     doctorId: '',
     date: '',
-    timeSlot: ''
+    timeSlot: '',
+    contact: '',
+    age : '',
+    gender : '',
   });
 
 
@@ -22,7 +25,10 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     forPatient: '',
     doctorId: '',
     date: '',
-    timeSlot: ''
+    timeSlot: '',
+    contact: '',
+    age : '',
+    gender : '',
   });
 
   try {
@@ -42,7 +48,10 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
       forPatient: '',
       doctorId: '',
       date: '',
-      timeSlot: ''
+      timeSlot: '',
+      contact: '',
+      age : '',
+      gender : '',
     });
   };
 
@@ -60,7 +69,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const handleBookAppointment = async () => {
     try {
 
-      if (!bookingData.forPatient || !bookingData.doctorId || !bookingData.date || !bookingData.timeSlot) {
+      if (!bookingData.doctorId || !bookingData.date || !bookingData.timeSlot || !bookingData.contact) {
         alert('Please fill in all required fields');
         return;
       }
@@ -76,7 +85,10 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         hospitalId: selectedHospital._id,
         date: bookingData.date,
         timeSlot: bookingData.timeSlot,
-        status: 'booked'
+        status: 'booked',
+        contact: bookingData.contact,
+        age : bookingData.age,
+        gender : bookingData.gender
       };
 
       const response = await createAppointment(appointmentData);
@@ -91,7 +103,10 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         forPatient: '',
         doctorId: '',
         date: '',
-        timeSlot: ''
+        timeSlot: '',
+        contact : '',
+        age : '',
+        gender : '',
       });
       
       handleBackToList();
@@ -267,14 +282,15 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <UserCheck className="w-4 h-4 inline mr-1" />
-                    Appointment For *
+                    Appointment For
                   </label>
                   <select 
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.forPatient}
                     onChange={(e) => handleInputChange('forPatient', e.target.value)}
                   >
-                    <option value="">Select patient...</option>
+
+                    <option value="">Type</option>
                     <option value="self">Self</option>
                     <option value="family">Family Member</option>
                   </select>
@@ -283,7 +299,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <User className="w-4 h-4 inline mr-1" />
-                    Select Doctor *
+                    Select Doctor
                   </label>
                   <select 
                     className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
@@ -297,15 +313,47 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                       </option>
                     ))}
                   </select>
-
-
-
                 </div>
+
+                <div>
+
+  {/* Patient Gender */}
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Gender
+                  </label>
+                  <select
+                    className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                    value={bookingData.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                  >
+                    <option value="">Select gender...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+                <div>
+                <label className="block text-gray-300 mb-2">
+                  Age
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                  placeholder="Enter age"
+                  value={bookingData.age}
+                  onChange={(e) => handleInputChange('age', e.target.value)}
+                />
+              </div>
+                            
                 
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <Calendar className="w-4 h-4 inline mr-1" />
-                    Preferred Date *
+                    Preferred Date
                   </label>
                   <input 
                     type="date" 
@@ -315,11 +363,32 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                     min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    <Contact className="w-4 h-4 inline mr-1" />
+                    Contact
+                  </label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                    value={bookingData.contact}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Allow only digits and max 10
+                      if (/^\d{0,10}$/.test(value)) {
+                        handleInputChange('contact', value);
+                      }
+                    }}
+                    placeholder="Enter 10-digit number"
+                  />
+                </div>
+
                 
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <Clock className="w-4 h-4 inline mr-1" />
-                    Time Slot *
+                    Time Slot
                   </label>
                   <select 
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
