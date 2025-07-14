@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import AssistantForm from '../component/UpdatedAssistantProfile';
 import { getMe } from '../services/getMeServices';
 import { getAssistantProfile } from '../services/assistantServices';
-import AssistantData from '../component/assistantData';
+import AssistantData from '../component/AssistantData';
 import { getAllApointments } from '../services/appointmentServices';
 import { notifyViaFCM } from '../services/firebaseServices';
 import LoaderOnly from '../component/Loader';
