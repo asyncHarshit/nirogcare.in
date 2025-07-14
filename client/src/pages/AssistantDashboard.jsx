@@ -278,7 +278,7 @@ const handleDrop = (e, targetColumn) => {
       draggable
       onDragStart={(e) => handleDragStart(e, patient)}
       onDragEnd={handleDragEnd}
-      className={`p-4 rounded-lg border cursor-move border-green-500/50 bg-green-500/10 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20  hover:border-blue-500/50 hover:scale-105 transform-gpu`}
+      className={`p-4 rounded-lg border cursor-move border-green-500/50 bg-green-500/10 hover:shadow-lg hover:shadow-blue-500/20  hover:border-blue-500/50 `}
     >
       <div className="flex items-center justify-between mb-2">
         <h4 className="font-medium text-white truncate">{patient.name}</h4>

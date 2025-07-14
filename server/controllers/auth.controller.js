@@ -38,7 +38,7 @@ export const registerUser = async (req, res) => {
     const token = generateToken(newUser);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
 
@@ -74,7 +74,7 @@ export const loginUser = async (req, res) => {
     const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
 
@@ -122,7 +122,7 @@ export const selectRole = async (req, res) => {
     const token = generateToken(updatedUser);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
 
@@ -162,8 +162,7 @@ export const logoutUser = async (req, res) => {
   
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "Strict",
-      secure: process.env.NODE_ENV === "production", 
+      sameSite: "None",
       path: "/",
     });
 
