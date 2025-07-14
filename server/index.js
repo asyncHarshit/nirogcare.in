@@ -10,6 +10,7 @@ import doctorRoute from "./routes/doctorRoutes.js"
 import labRoute from "./routes/labRoutes.js"
 import firebaseRoute from "./routes/firebaseRoutes.js"
 import assistantRoute from "./routes/assistantRoutes.js"
+import appointmentRoute from "./routes/appointmentRoutes.js"
 
 
 
@@ -38,6 +39,7 @@ app.use('/api/doctor',doctorRoute);
 app.use('/api/lab',labRoute)
 app.use('/api/firebase',firebaseRoute)
 app.use('/api/assistant',assistantRoute)
+app.use('/api/appointment',appointmentRoute)
 
 
 

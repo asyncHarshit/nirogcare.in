@@ -23,7 +23,7 @@ import AssistantForm from '../component/UpdatedAssistantProfile';
 import { getMe } from '../services/getMeServices';
 import { getAssistantProfile } from '../services/assistantServices';
 import AssistantData from '../component/assistantData';
-import { getAllApointments } from '../services/doctorServices';
+import { getAllApointments } from '../services/appointmentServices';
 import { notifyViaFCM } from '../services/firebaseServices';
 import LoaderOnly from '../component/Loader';
 
@@ -44,6 +44,7 @@ const AssistantDashboard = () => {
     completed: [],
     cancelled: []
   });
+  const navigate = useNavigate();
 
     useEffect(() => {
       const timer = setTimeout(() => {
@@ -52,7 +53,6 @@ const AssistantDashboard = () => {
       return () => clearTimeout(timer);
     }, []);
 
-  const navigate = useNavigate();
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -70,8 +70,9 @@ const AssistantDashboard = () => {
 
   const getAllApointmentsData = async () => {
     const response = await getAllApointments();
-    if (response.success) {
+    if (response) {
       setAllAppointments(response?.appointments);
+      console.log(response)
     }
   };
 

@@ -1,105 +1,84 @@
-import axios from "axios"
+import axios from "axios";
 
-export async function getAllNearbyHospitals(){
-    try {
-        const response = await axios.get("http://localhost:3000/api/patient/near-hospitals", {
+const baseUrl = import.meta.env.VITE_API_URL;
+
+export async function getAllNearbyHospitals() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/patient/near-hospitals`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error in fetching all Nearby hospitals !!", error);
+  }
+}
+
+export async function getAllNearbyLabs() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/patient/near-labs`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error in fetching all Nearby labs !!", error);
+  }
+}
+
+
+export async function createAppointment(appointmentData) {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/patient/book-appointment`,
+      appointmentData,
+      {
         withCredentials: true,
-      });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all hospitals !!",error)
-    }
-
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in creating appointment !!", error);
+  }
 }
 
 
-export async function getAllNearbyLabs(){
-    try {
-        const response = await axios.get("http://localhost:3000/api/patient/near-labs", {
+export async function getMyAppointment() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/patient/appointments`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error in fetching my appointments !!", error);
+  }
+}
+
+
+export async function createAppointmentLab(appointmentData) {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/lab/book-appointment`,
+      appointmentData,
+      {
         withCredentials: true,
-      });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all labs !!",error)
-    }
-
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in creating lab appointment !!", error);
+  }
 }
 
 
-
-export async function createAppointment(appointmentData){
-    try {
-        const response = await axios.post("http://localhost:3000/api/patient/book-appointment",
-        appointmentData,
-        {
-            withCredentials: true,
-        });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all labs !!",error)
-    }
-
+export async function getMyLabAppointment() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/lab/appointments`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error in fetching lab appointments !!", error);
+  }
 }
-
-
-export async function getMyAppointment(){
-    try {
-        const response = await axios.get("http://localhost:3000/api/patient/appointments",
-        {
-            withCredentials: true,
-        });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all labs !!",error)
-    }
-
-}
-
-
-
-export async function createAppointmentLab(appointmentData){
-    try {
-        const response = await axios.post("http://localhost:3000/api/lab/book-appointment",
-        appointmentData,
-        {
-            withCredentials: true,
-        });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all labs !!",error)
-    }
-
-}
-
-
-
-export async function getMyLabAppointment(){
-    try {
-        const response = await axios.get("http://localhost:3000/api/lab/appointments",
-        {
-            withCredentials: true,
-        });
-      return response.data;
-        
-    } catch (error) {
-        console.log("Error in fetching all labs apointments !!",error)
-    }
-
-}
-
-
-
-
-
-
-
-
-
 
 
 

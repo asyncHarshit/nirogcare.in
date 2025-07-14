@@ -1,9 +1,10 @@
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_API_URL;
 
 export async function updatePatient(formData) {
   try {
     const response = await axios.post(
-      "http://localhost:3000/api/patient/profile",
+      `${baseUrl}/api/patient/profile`,
       formData,
       {
         withCredentials: true,

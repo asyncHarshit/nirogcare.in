@@ -1,8 +1,11 @@
 import axios from "axios"
 
+const baseUrl = import.meta.env.VITE_API_URL;
+
+
 export async function updateAssistantProfile(formData){
     try {
-        const response = await axios.post("http://localhost:3000/api/assistant/update-profile",
+        const response = await axios.post(`${baseUrl}/api/assistant/update-profile`,
             {
                 doctorId: formData.doctorId,
                 hospitalId: formData.hospitalId
@@ -20,7 +23,7 @@ export async function updateAssistantProfile(formData){
 export async function getAssistantProfile() {
   try {
     const response = await axios.get(
-      "http://localhost:3000/api/assistant/get-profile",
+      `${baseUrl}/api/assistant/get-profile`,
       {
         withCredentials: true,
       }
