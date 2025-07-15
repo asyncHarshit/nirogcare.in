@@ -52,9 +52,9 @@ const Auth = () => {
       try {
         const response = await callAuthLoginApi(formData.email , formData.password);
         if(response){
-          console.log(response)
-          toast.success("Logged in sucesssfully !!")
           navigate(`/${response.user.role}/dashboard`)
+          toast.success("Logged in sucesssfully !!")
+          console.log(response)
         }
         
         
