@@ -4,6 +4,7 @@ import {
   getAllNearbyLabs,
   getMyAppointment,
   getMyLabAppointment,
+  getVitalsForUser,
 } from "../services/patientServices";
 import HospitalAppointmentBooking from "../component/HospitalAppointmentBooking";
 import { LabAppointmentBooking } from "../component/LabsAppointmentBooking";
@@ -51,6 +52,7 @@ const PatientDashboard = () => {
   const [labAppointments, setLabAppointment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggleSideBar, setToggleSideBar] = useState(false);
+  const [vital , setVital] = useState(null);
 
 
 
@@ -75,15 +77,18 @@ const PatientDashboard = () => {
     const fetchAllData = async () => {
       setLoading(true);
       try {
-        const [userRes, appointmentRes, labAppointmentRes] = await Promise.all([
+        const [userRes, appointmentRes, labAppointmentRes,vitalData] = await Promise.all([
           getMe(),
           getMyAppointment(),
           getMyLabAppointment(),
+          getVitalsForUser(),
+
         ]);
 
         if (userRes) setUserData(userRes);
         if (appointmentRes) setAppointment(appointmentRes?.appointments || []);
         if (labAppointmentRes) setLabAppointment(labAppointmentRes || []);
+        if(vitalData) setVital(vitalData);
       } catch (error) {
         console.log("Error fetching dashboard data", error);
       } finally {
@@ -94,7 +99,7 @@ const PatientDashboard = () => {
     if (activeTab === "home") {
       fetchAllData();
     }
-  }, []);
+  }, [activeTab]);
 
   const handleLogout = async () => {
     const response = await logoutUser();
@@ -105,6 +110,7 @@ const PatientDashboard = () => {
       navigate("/auth");
     }
   };
+
   const getHospital = async () => {
     const response = await getAllNearbyHospitals();
     if (response) {
@@ -142,34 +148,33 @@ const PatientDashboard = () => {
     { id: "reports", label: "Lab Report", icon: BarChart3 },
   ];
 
-  const temp = "57 bpm";
 
   const vitalStats = [
     {
       icon: Heart,
       label: "Heart Rate",
-      value: temp,
+      value: userData?.user?.heartRate + " bpm",
       status: "normal",
       color: "text-rose-500",
     },
     {
       icon: Thermometer,
       label: "Temperature",
-      value: "98.6°F",
+      value: userData?.user?.tempture + " °F",
       status: "normal",
       color: "text-cyan-400",
     },
     {
       icon: Weight,
       label: "Blood Pressure",
-      value: "120/80",
+      value: userData?.user?.bloodPressure,
       status: "normal",
       color: "text-purple-400",
     },
     {
       icon: Activity,
       label: "Oxygen Level",
-      value: "98%",
+      value: userData?.user?.oxygenLevel + "%",
       status: "normal",
       color: "text-blue-400",
     },

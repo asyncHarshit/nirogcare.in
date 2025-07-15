@@ -52,11 +52,11 @@ export const getMyAppointments = async (req, res) => {
         path: "doctorId",
         populate: {
           path: "userId",
-          select: "name email",
+          select: "name email ",
         },
         select: "specialization userId",
       })
-      .populate("hospitalId", "name address")
+      .populate("hospitalId", "name address vitalUpdated")
       .populate("gender age")
       .sort({ date: -1 });
 

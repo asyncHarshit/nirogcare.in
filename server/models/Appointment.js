@@ -53,6 +53,10 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["booked", "cancelled", "completed"],
       default: "booked",
     },
+    vitalUpdated:{
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true }
 );

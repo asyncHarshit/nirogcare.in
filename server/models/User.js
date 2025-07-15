@@ -34,6 +34,22 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    bloodPressure : {
+      type : String,
+      trim : true
+    },
+    heartRate : {
+      type : String,
+      trim : true
+    },
+    oxygenLevel : {
+      type : String,
+      trim : true
+    },
+    tempture : {
+      type : String,
+      trim : true
+    },
     isVerified: { type: Boolean, default: false },
   },
   { timestamps: true }

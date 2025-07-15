@@ -81,7 +81,34 @@ export async function getMyLabAppointment() {
 }
 
 
+export async function updateVitalsForUser(formData, userId) {
+  try {
+    const response = await axios.patch(
+      `${baseUrl}/api/patient/update-vitals`,
+      { ...formData, userId },
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in updating vitals for user !!", error);
+  }
+}
 
+export async function getVitalsForUser() {
+  try {
+    const response = await axios.get(
+      `${baseUrl}/api/patient/vitals`,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in fetching vitals for user !!", error);
+  }
+}
 
 
 

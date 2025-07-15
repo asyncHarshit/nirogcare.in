@@ -28,9 +28,11 @@ import AssistantData from "../component/AssistantData";
 import { getAllApointments } from "../services/appointmentServices";
 import { notifyViaFCM } from "../services/firebaseServices";
 import LoaderOnly from "../component/Loader";
+import { VitalSignsForm } from "../component/VitalStats";
+import { updateVitalsForUser } from "../services/patientServices";
 
 const AssistantDashboard = () => {
-  const[toggleSideBar , setToggleSideBar] = useState(false);
+  const [toggleSideBar, setToggleSideBar] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [notifications, setNotifications] = useState(3);
   const [draggedPatient, setDraggedPatient] = useState(null);
@@ -41,6 +43,8 @@ const AssistantDashboard = () => {
   const [appointments, setAllAppointments] = useState([]);
   const [dragId, setDragId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showVitalForm, setShowVitalForm] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [queueData, setQueueData] = useState({
     upcoming: [],
     inProgress: [],
@@ -58,6 +62,7 @@ const AssistantDashboard = () => {
             getMe(),
             getAllApointments(),
             getAssistantProfile(),
+
           ]);
 
         if (userResponse) {
@@ -153,6 +158,8 @@ const AssistantDashboard = () => {
 
   console.log(appointments);
 
+
+
   const handleLogout = async () => {
     const response = await logoutUser();
     if (response?.status === 200) {
@@ -161,6 +168,7 @@ const AssistantDashboard = () => {
       navigate("/auth");
     }
   };
+
 
   const handleDragStart = (e, patient) => {
     setDraggedPatient(patient);
@@ -271,31 +279,27 @@ const AssistantDashboard = () => {
       draggable
       onDragStart={(e) => handleDragStart(e, patient)}
       onDragEnd={handleDragEnd}
-      className={`p-4 rounded-lg border cursor-move border-green-500/50 bg-green-500/10 hover:shadow-lg hover:shadow-blue-500/20  hover:border-blue-500/50 `}
+      className="p-4 rounded-xl border border-b-amber-300 bg-green-900/80 shadow-sm hover:shadow-lg hover:shadow-amber-500/30 cursor-grab active:cursor-grabbing transition-all duration-200"
     >
+      {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-medium text-white truncate">{patient.name}</h4>
-        <span className="text-xs text-gray-400 ml-2">
-          {patient.id.slice(-6)}
-        </span>
+        <h4 className="text-white font-semibold truncate">{patient.name}</h4>
+        <span className="text-sm text-gray-300">Age: {patient.age}</span>
       </div>
-      <div className="space-y-1 text-sm">
-        <p className="text-gray-300">Age: {patient.age}</p>
-        <p className="text-gray-300 truncate" title={patient.condition}>
-          {patient.condition}
-        </p>
-        <p className="text-blue-400 truncate" title={patient.doctor}>
-          {patient.doctor}
-        </p>
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center space-x-1">
-            <Clock className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-400 text-xs">{patient.time}</span>
-          </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between text-xs text-gray-300 mt-2">
+        <div className="flex items-center gap-2">
+          <Clock className="w-4 h-4 text-gray-400" />
+          <span>{patient.time}</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-gray-400">{patient.id.slice(-6)}</span>
           {columnType !== "upcoming" && (
             <button
               onClick={() => sendNotification(patient, columnType)}
-              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-1 cursor-pointer rounded transition-all duration-200 hover:scale-110"
+              className="text-cyan-400 hover:text-cyan-300 transition-transform transform hover:scale-110"
               title="Send Notification"
             >
               <Send className="w-4 h-4" />
@@ -430,6 +434,17 @@ const AssistantDashboard = () => {
                 </div>
               </div>
 
+              {showVitalForm && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                  <div className="bg-gray-900 p-6 rounded-xl w-[90%] md:w-[60%] lg:w-[40%] max-h-[90vh] overflow-auto">
+                    <VitalSignsForm
+                      appointment={selectedAppointment}
+                      onClose={() => setShowVitalForm(false)}
+                    />
+                  </div>
+                </div>
+              )}
+
               {appointments.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
@@ -530,15 +545,13 @@ const AssistantDashboard = () => {
                             </span>
                           )}
                           <button
-                            onClick={() =>
-                              console.log(
-                                "View appointment details:",
-                                appointment
-                              )
-                            }
+                            onClick={() => {
+                              setShowVitalForm(true);
+                              setSelectedAppointment(appointment);
+                            }}
                             className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md text-sm transition-colors"
                           >
-                            View Details
+                            Update Vital Stats
                           </button>
                         </div>
                       </div>
@@ -617,85 +630,98 @@ const AssistantDashboard = () => {
   };
   if (loading) return <LoaderOnly />;
 
+  {
+    showVitalForm && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-gray-900 p-6 rounded-xl w-[90%] md:w-[60%] lg:w-[40%] max-h-[90vh] overflow-auto">
+          <VitalSignsForm
+            appointment={selectedAppointment}
+            onClose={() => setShowVitalForm(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
-      
-       <div className={`${
-              toggleSideBar ? 'w-64' : 'w-20'
-            } transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
-          >
-            <div className=" p-3 border-b border-gray-700/50">
-              <div className="flex mt-0.5 items-center justify-between">
-                <div className="flex items-center space-x-3 group">
-                  {toggleSideBar && (
-                    <div className= "p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
-                    <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
-                  </div>
-
-                  )}
-                    
-                  
-                  {toggleSideBar && (
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
-                      NirogCare
-                    </h1>
-                  )}
+      <div
+        className={`${
+          toggleSideBar ? "w-64" : "w-20"
+        } transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
+      >
+        <div className=" p-3 border-b border-gray-700/50">
+          <div className="flex mt-0.5 items-center justify-between">
+            <div className="flex items-center space-x-3 group">
+              {toggleSideBar && (
+                <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
+                  <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
                 </div>
-                <PanelLeft
-                  onClick={() => setToggleSideBar((prev) => !prev)}
-                  className={`${toggleSideBar ? "": "mt-[10px] mb-[10px] mr-[10px]" } text-emerald-700 hover:text-emerald-500 cursor-pointer   transition duration-300`}
-                />
-              </div>
-            </div>
+              )}
 
-            {/* Navigation */}
-            <nav className="flex-1 p-4">
-              <ul className="space-y-2">
-                {navItems.map((item) => (
-                  <li key={item.id}>
-                    <button
-                      onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center ${
-                        toggleSideBar ? 'space-x-3' : 'justify-center'
-                      } cursor-pointer p-3 rounded-lg relative ${
-                        activeTab === item.id
-                          ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50'
-                          : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                      }`}
-                    >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {toggleSideBar && <span className="flex-1 text-left">{item.label}</span>}
-                      {activeTab === item.id && (
-                        <span className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
-                          toggleSideBar ? 'ml-auto' : 'absolute right-1.5 bottom-1.5'
-                        }`}></span>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            {/* Logout */}
-            <div className="p-4 border-t border-gray-700/50">
-              <button
-                onClick={handleLogout}
-                className={`w-full flex items-center ${
-                  toggleSideBar ? 'space-x-3 justify-start' : 'justify-center'
-                } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
-              >
-                <LogOut className="w-5 h-5" />
-                {toggleSideBar && <span>Logout</span>}
-              </button>
+              {toggleSideBar && (
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                  NirogCare
+                </h1>
+              )}
             </div>
+            <PanelLeft
+              onClick={() => setToggleSideBar((prev) => !prev)}
+              className={`${
+                toggleSideBar ? "" : "mt-[10px] mb-[10px] mr-[10px]"
+              } text-emerald-700 hover:text-emerald-500 cursor-pointer   transition duration-300`}
+            />
           </div>
+        </div>
 
+        {/* Navigation */}
+        <nav className="flex-1 p-4">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center ${
+                    toggleSideBar ? "space-x-3" : "justify-center"
+                  } cursor-pointer p-3 rounded-lg relative ${
+                    activeTab === item.id
+                      ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
+                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
+                  }`}
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  {toggleSideBar && (
+                    <span className="flex-1 text-left">{item.label}</span>
+                  )}
+                  {activeTab === item.id && (
+                    <span
+                      className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
+                        toggleSideBar
+                          ? "ml-auto"
+                          : "absolute right-1.5 bottom-1.5"
+                      }`}
+                    ></span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-
-
-
-                  
+        {/* Logout */}
+        <div className="p-4 border-t border-gray-700/50">
+          <button
+            onClick={handleLogout}
+            className={`w-full flex items-center ${
+              toggleSideBar ? "space-x-3 justify-start" : "justify-center"
+            } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
+          >
+            <LogOut className="w-5 h-5" />
+            {toggleSideBar && <span>Logout</span>}
+          </button>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

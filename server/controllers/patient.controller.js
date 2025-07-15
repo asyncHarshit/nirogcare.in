@@ -2,6 +2,7 @@
 import { Hospital } from "../models/Hospital.js";
 import { Patient } from "../models/Patient.js";
 import {Lab} from "../models/Lab.js"
+import  User  from "../models/User.js";
 
 
 
@@ -112,7 +113,83 @@ export const getNearbylabs = async (req, res) => {
 
 
 
-// get lab reports
+export const updateVitalsForUser = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const {
+      heartRate,
+      bloodPressure,
+      oxygenLevel,
+      temperature,
+    } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user || user.role !== "patient") {
+      return res.status(404).json({ success: false, message: "Patient not found" });
+    }
+
+    user.heartRate = heartRate;
+    user.bloodPressure = bloodPressure;
+    user.oxygenLevel = oxygenLevel;
+    user.tempture = temperature;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Vitals updated successfully",
+      data: {
+        heartRate: user.heartRate,
+        bloodPressure: user.bloodPressure,
+        oxygenLevel: user.oxygenLevel,
+        temperature: user.tempture,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error updating vitals:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+export const getVitalsForUser = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+
+    const user = await User.findById(userId);
+
+    if (!user || user.role !== "patient") {
+      return res.status(404).json({ success: false, message: "Patient not found" });
+    }
+
+    const vitals = {
+      heartRate: user.heartRate,
+      bloodPressure: user.bloodPressure,
+      oxygenLevel: user.oxygenLevel,
+      temperature: user.tempture,
+    };
+
+    res.status(200).json({
+      success: true,
+      data: vitals,
+    });
+
+  } catch (error) {
+    console.error("Error fetching vitals:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+}
 
 
 
@@ -124,30 +201,3 @@ export const getNearbylabs = async (req, res) => {
 
 
 
-
-// apply for appointments
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// can fetch past appointments
-
-
-
-
-
-// add family members
