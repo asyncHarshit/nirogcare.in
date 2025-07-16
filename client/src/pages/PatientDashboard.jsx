@@ -85,7 +85,10 @@ const PatientDashboard = () => {
 
         ]);
 
-        if (userRes) setUserData(userRes);
+        if (userRes) {
+          setUserData(userRes);
+          console.log(userRes)
+        }
         if (appointmentRes) setAppointment(appointmentRes?.appointments || []);
         if (labAppointmentRes) setLabAppointment(labAppointmentRes || []);
         if(vitalData) setVital(vitalData);
@@ -153,28 +156,28 @@ const PatientDashboard = () => {
     {
       icon: Heart,
       label: "Heart Rate",
-      value: userData?.user?.heartRate + " bpm",
+      value: (userData?.user?.heartRate ? userData?.user?.heartRate + " bpm" : 72 + " bpm"),
       status: "normal",
       color: "text-rose-500",
     },
     {
       icon: Thermometer,
       label: "Temperature",
-      value: userData?.user?.tempture + " °F",
+      value: (userData?.user?.temperature ? userData?.user?.temperature + " °F" : 98.6 + " °F"),
       status: "normal",
       color: "text-cyan-400",
     },
     {
       icon: Weight,
       label: "Blood Pressure",
-      value: userData?.user?.bloodPressure,
+      value: (userData?.user?.bloodPressure ? userData?.user?.bloodPressure + " mmHg" : "120/80 mmHg"),
       status: "normal",
       color: "text-purple-400",
     },
     {
       icon: Activity,
       label: "Oxygen Level",
-      value: userData?.user?.oxygenLevel + "%",
+      value: (userData?.user?.oxygenLevel ? userData?.user?.oxygenLevel + "%" : "98%"),
       status: "normal",
       color: "text-blue-400",
     },
@@ -210,6 +213,7 @@ const PatientDashboard = () => {
             <div className="bg-gradient-to-r  from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
               <h2 className="text-2xl font-bold text-white mb-2">
                 Welcome back, {userData?.user?.name}
+                
               </h2>
               <p className="text-gray-300">
                 Here's your health overview for today

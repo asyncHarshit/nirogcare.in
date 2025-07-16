@@ -224,7 +224,7 @@ export const allAppointments = async (req, res) => {
     })
       .populate({
         path: "bookedBy",
-        select: "name email",
+        select: "name email vitalUpdated",
       })
       .populate({
         path: "doctorId",

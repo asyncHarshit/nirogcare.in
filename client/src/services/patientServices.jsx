@@ -85,7 +85,7 @@ export async function updateVitalsForUser(formData, userId) {
   try {
     const response = await axios.patch(
       `${baseUrl}/api/patient/update-vitals`,
-      { ...formData, userId },
+      { ...formData, userId ,vitalUpdated:true},
       {
         withCredentials: true,
       }
@@ -95,6 +95,11 @@ export async function updateVitalsForUser(formData, userId) {
     console.log("Error in updating vitals for user !!", error);
   }
 }
+
+
+
+
+
 
 export async function getVitalsForUser() {
   try {

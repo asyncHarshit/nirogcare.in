@@ -32,6 +32,7 @@ export function VitalSignsForm({ appointment, onClose }) {
 
   const id = appointment?.bookedBy?._id;
 
+
   const handleSubmit = async(e)=>{
     e.preventDefault();
     try {

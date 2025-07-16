@@ -56,7 +56,7 @@ export const getMyAppointments = async (req, res) => {
         },
         select: "specialization userId",
       })
-      .populate("hospitalId", "name address vitalUpdated")
+      .populate("hospitalId", "name address")
       .populate("gender age")
       .sort({ date: -1 });
 

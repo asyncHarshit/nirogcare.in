@@ -544,15 +544,22 @@ const AssistantDashboard = () => {
                               Urgent
                             </span>
                           )}
-                          <button
-                            onClick={() => {
-                              setShowVitalForm(true);
-                              setSelectedAppointment(appointment);
-                            }}
-                            className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md text-sm transition-colors"
-                          >
-                            Update Vital Stats
-                          </button>
+                          {
+                            appointment?.bookedBy?.vitalUpdated === true ? (
+                              <span className="bg-green-500/20 text-green-400  px-3 py-1 rounded-md text-sm transition-colors">
+                                Already Updated
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setShowVitalForm(true);
+                                  setSelectedAppointment(appointment);
+                                }}
+                                className="bg-blue-500/20 cursor-pointer hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md text-sm transition-colors"
+                              >
+                                Update Vital Stats
+                              </button>
+                            )}
                         </div>
                       </div>
                     </div>

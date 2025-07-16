@@ -46,9 +46,14 @@ const userSchema = new mongoose.Schema(
       type : String,
       trim : true
     },
-    tempture : {
+    temperature : {
       type : String,
       trim : true
+    },
+
+    vitalUpdated: {
+      type: Boolean,
+      default: false,
     },
     isVerified: { type: Boolean, default: false },
   },

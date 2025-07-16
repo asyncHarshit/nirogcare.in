@@ -122,6 +122,7 @@ export const updateVitalsForUser = async (req, res) => {
       bloodPressure,
       oxygenLevel,
       temperature,
+      vitalUpdated
     } = req.body;
 
     const user = await User.findById(userId);
@@ -133,7 +134,8 @@ export const updateVitalsForUser = async (req, res) => {
     user.heartRate = heartRate;
     user.bloodPressure = bloodPressure;
     user.oxygenLevel = oxygenLevel;
-    user.tempture = temperature;
+    user.temperature = temperature;
+    user.vitalUpdated = true;
 
     await user.save();
 
@@ -144,7 +146,8 @@ export const updateVitalsForUser = async (req, res) => {
         heartRate: user.heartRate,
         bloodPressure: user.bloodPressure,
         oxygenLevel: user.oxygenLevel,
-        temperature: user.tempture,
+        temperature: user.temperature,
+        vitalUpdated: user.vitalUpdated,
       },
     });
 
@@ -173,7 +176,7 @@ export const getVitalsForUser = async (req, res) => {
       heartRate: user.heartRate,
       bloodPressure: user.bloodPressure,
       oxygenLevel: user.oxygenLevel,
-      temperature: user.tempture,
+      temperature: user.temperature,
     };
 
     res.status(200).json({
