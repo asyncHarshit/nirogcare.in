@@ -65,6 +65,8 @@ const PatientDashboard = () => {
     }
   };
 
+  
+
   // Call on mount
   handleResize();
 

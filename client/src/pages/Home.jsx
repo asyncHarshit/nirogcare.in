@@ -33,6 +33,12 @@ const HealthcareLandingPage = () => {
       color: 'from-blue-500 to-indigo-500'
     },
     {
+      icon: Clock,
+      title: 'Queue Management',
+      description: 'Efficiently manage patient flow and reduce wait times',
+      color: 'from-yellow-500 to-orange-500'
+    },
+    {
       icon: TestTube,
       title: 'Lab Test Management',
       description: 'Book lab tests and track results in real-time',
@@ -56,29 +62,23 @@ const HealthcareLandingPage = () => {
       description: 'Manage health records for your entire family',
       color: 'from-rose-500 to-purple-500'
     },
-    {
-      icon: Clock,
-      title: '24/7 Support',
-      description: 'Round-the-clock healthcare assistance',
-      color: 'from-yellow-500 to-orange-500'
-    }
   ];
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
+      name: 'Shubham Singh',
       role: 'Patient',
       content: 'NirogCare has transformed how I manage my healthcare. Booking appointments is now effortless!',
       rating: 5
     },
     {
-      name: 'Dr. Michael Chen',
+      name: 'Dr. Harshit Singh',
       role: 'Cardiologist',
       content: 'The platform streamlines patient management and improves communication significantly.',
       rating: 5
     },
     {
-      name: 'Emily Rodriguez',
+      name: 'Anjali Verma',
       role: 'Family User',
       content: 'Managing my family\'s health records has never been easier. Highly recommended!',
       rating: 5
