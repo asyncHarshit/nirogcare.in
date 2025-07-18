@@ -9,7 +9,7 @@ export const sendFirebaseNotification = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Notification sent successfully",
-      });
+      });  
     }
 
     return res.status(400).json({

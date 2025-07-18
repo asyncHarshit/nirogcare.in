@@ -268,9 +268,10 @@ const AssistantDashboard = () => {
       const response = await notifyViaFCM(userId);
       if (response.success) {
         toast.info(`Notification sent to ${patient.name}`);
+        console.log("Notification sent successfully");
       }
     } catch (error) {
-      console.log("Error in sending notificattion in Assistant dashboard");
+      console.log("Error in sending notification in Assistant dashboard");
     }
   };
 

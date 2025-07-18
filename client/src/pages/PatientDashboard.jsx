@@ -12,6 +12,7 @@ import { logoutUser } from "../services/logoutService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+
 import {
   Home,
   TestTube,
@@ -35,10 +36,15 @@ import {
   Stethoscope,
   PanelLeft,
   PanelRight,
+  BotMessageSquare
+
 } from "lucide-react";
+
 import { getMe } from "../services/getMeServices";
 import UpdatePatientProfile from "../component/UpdateProfile";
 import LoaderOnly from "../component/Loader";
+import { AiIcon } from "../assets/robot";
+import ChatBot from "../component/ChatBot";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -151,6 +157,8 @@ const PatientDashboard = () => {
     { id: "lab", label: "Book Lab", icon: FlaskConical },
     { id: "records", label: "Medical Record", icon: FileText },
     { id: "reports", label: "Lab Report", icon: BarChart3 },
+    { id: "ai", label: "AI Assistant", icon: BotMessageSquare },
+
   ];
 
 
@@ -466,25 +474,25 @@ const PatientDashboard = () => {
                   {
                     date: "2025-07-01",
                     type: "Consultation",
-                    doctor: "Dr. Johnson",
+                    doctor: "Dr. singh",
                     diagnosis: "Routine Checkup",
                   },
                   {
                     date: "2025-06-15",
                     type: "Lab Results",
-                    doctor: "Dr. Smith",
+                    doctor: "Dr. singh",
                     diagnosis: "Blood Work Normal",
                   },
                   {
                     date: "2025-06-01",
                     type: "Prescription",
-                    doctor: "Dr. Brown",
+                    doctor: "Dr. singh",
                     diagnosis: "Hypertension Management",
                   },
                   {
                     date: "2025-05-20",
                     type: "Imaging",
-                    doctor: "Dr. Wilson",
+                    doctor: "Dr. singh",
                     diagnosis: "X-Ray Chest",
                   },
                 ].map((record, index) => (
@@ -567,6 +575,13 @@ const PatientDashboard = () => {
             </div>
           </div>
         );
+      case "ai":
+        return (
+          
+              <ChatBot />
+            
+
+        );
       default:
         return null;
     }
@@ -578,6 +593,9 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
       <div
+
+      
+      
         className={`${
           toggleSideBar ? "w-64" : "w-20"
         } transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
@@ -621,11 +639,15 @@ const PatientDashboard = () => {
                       : "text-gray-300 hover:text-white hover:bg-gray-800/50"
                   }`}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  
+                  {item.id !== 'ai' && (
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                  )}
+                  {item.id === 'ai' && ( <AiIcon className="w-4 h-4 flex-shrink-0" />)}
                   {toggleSideBar && (
                     <span className="flex-1 text-left">{item.label}</span>
                   )}
-                  {activeTab === item.id && (
+                  {activeTab === item.id && item.id !== 'ai' &&  (
                     <span
                       className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
                         toggleSideBar
@@ -634,6 +656,19 @@ const PatientDashboard = () => {
                       }`}
                     ></span>
                   )}
+
+                  {
+                    activeTab === item.id && item.id === 'ai' &&  (
+                    <span
+                      className={`w-1.5 h-1.5 bg-emerald-500 rounded-full ${
+                        toggleSideBar
+                          ? "ml-auto"
+                          : "absolute right-1.5 bottom-1.5"
+                      }`}
+                    ></span>
+
+                  )}
+                 
                 </button>
               </li>
             ))}
@@ -678,6 +713,7 @@ const PatientDashboard = () => {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
+               
                 <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
                   <Bell className="w-5 h-5" />
                   {notifications > 0 && (
@@ -686,6 +722,7 @@ const PatientDashboard = () => {
                     </span>
                   )}
                 </button>
+
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">
                     <button

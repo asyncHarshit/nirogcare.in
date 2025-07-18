@@ -263,7 +263,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
               <div className="flex items-center mb-6">
                 {/* <div className="w-16 h-16 bg-gray-700/50 rounded-lg overflow-hidden mr-4">
                   <img 
-                    src={selectedHospital.image} 
+                    src={"https://static.vecteezy.com/system/resources/previews/004/493/181/original/hospital-building-for-healthcare-background-illustration-with-ambulance-car-doctor-patient-nurses-and-medical-clinic-exterior-free-vector.jpg"} 
                     alt={selectedHospital.name}
                     className="w-full h-full object-cover"
                   />
