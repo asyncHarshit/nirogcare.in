@@ -7,16 +7,13 @@ import {
   User,
   Bell,
   Clock,
-  AlertCircle,
   CheckCircle,
   XCircle,
   Calendar,
   Stethoscope,
   Activity,
-  Plus,
   Send,
   PanelLeft,
-  PanelRight,
 } from "lucide-react";
 import { logoutUser } from "../services/logoutService";
 import { toast } from "sonner";
@@ -29,19 +26,18 @@ import { getAllApointments } from "../services/appointmentServices";
 import { notifyViaFCM } from "../services/firebaseServices";
 import LoaderOnly from "../component/Loader";
 import { VitalSignsForm } from "../component/VitalStats";
-import { updateVitalsForUser } from "../services/patientServices";
+
 
 const AssistantDashboard = () => {
   const [toggleSideBar, setToggleSideBar] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
-  const [notifications, setNotifications] = useState(3);
+
   const [draggedPatient, setDraggedPatient] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
   const [userData, setUserData] = useState([]);
   const [assistantData, setAssistantData] = useState([]);
   const [toggle, setToggle] = useState(false);
   const [appointments, setAllAppointments] = useState([]);
-  const [dragId, setDragId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showVitalForm, setShowVitalForm] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -758,11 +754,11 @@ const AssistantDashboard = () => {
               <div className="flex items-center space-x-4">
                 <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
                   <Bell className="w-5 h-5" />
-                  {notifications > 0 && (
+                  {/* {notifications > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                       {notifications}
                     </span>
-                  )}
+                  )} */}
                 </button>
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">

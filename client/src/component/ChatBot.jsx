@@ -1,109 +1,181 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User } from 'lucide-react';
+import { Send, User, BotIcon } from 'lucide-react';
+import { sendChatMessage } from '../services/chatBotService';
+import { Think } from '../assets/think';
+import { Ai2Icon } from '../assets/robot';
 
 const ChatBot = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    
+    {
+      id: 1,
+      text: "Hello! I'm an AI assistant. How can I help you today?",
+      isBot: true
+    }
   ]);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const [isSending, setIsSending] = useState(false);
+
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = (e) => {
+  const getBotResponse = async (userMessage) => {
+    try {
+      const response = await sendChatMessage(userMessage);
+      return response.message; 
+    } catch (error) {
+      console.error("Error getting bot response:", error);
+      return "Sorry, I couldn't process your request. Please try again later.";
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isSending) return;
 
     const newUserMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: input,
       isBot: false
     };
 
     setMessages((prev) => [...prev, newUserMessage]);
+    const userInput = input;
     setInput('');
+    setIsSending(true);
 
-    setTimeout(() => {
+    try {
+      const typingMessageId = Date.now() + 1;
       setMessages((prev) => [
         ...prev,
         {
-          id: prev.length + 1,
-          text: "Sure, I’ll help you with that!",
-          isBot: true
-        }
+          id: typingMessageId,
+          text: "Thinking...",
+          isBot: true,
+          isTyping: true
+        },
       ]);
-    }, 1000);
+      const botMessageText = await getBotResponse(userInput);
+
+      setMessages((prev) => {
+        const updatedMessages = prev.filter(msg => msg.id !== typingMessageId);
+        return [
+          ...updatedMessages,
+          {
+            id: Date.now() + 2,
+            text: botMessageText,
+            isBot: true
+          }
+        ];
+      });
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+      setMessages((prev) => {
+        const updatedMessages = prev.filter(msg => !msg.isTyping);
+        return [
+          ...updatedMessages,
+          {
+            id: Date.now() + 2,
+            text: "An error occurred. Please check the console.",
+            isBot: true
+          }
+        ];
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-900 border-l border-gray-800">
-      {/* Header */}
-      <div className="bg-black border-b border-gray-800 p-3 flex items-center gap-3">
-        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-          <Bot className="w-5 h-5 text-black" />
+    <div className="w-full mx-auto h-[770px] flex flex-col bg-black border border-gray-700 rounded-lg shadow-lg overflow-hidden relative">
+      
+      <div className="absolute top-0 left-0 w-full z-10 backdrop-blur-md bg-black/30 border-b border-gray-800 p-4 flex items-center gap-3">
+        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center">
+          <BotIcon className="w-5 h-5 text-black" />
         </div>
+
         <div>
-          <h2 className="text-green-400 font-medium text-sm">AI Assistant</h2>
-          <p className="text-gray-500 text-xs">Online</p>
+          <h2 className="text-gray-100 font-medium text-sm">NirogCare Bot</h2>
+          
+          <p className="text-gray-400 text-xs">AI Assistant</p>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 pt-20 space-y-6 scroll-smooth"
+        style={{ scrollBehavior: 'smooth' }}
+      >
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
           >
-            <div className={`flex items-start space-x-2 max-w-[75%] ${
+            <div className={`flex items-start space-x-3 max-w-[85%] ${
               message.isBot ? 'flex-row' : 'flex-row-reverse space-x-reverse'
             }`}>
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                message.isBot ? 'bg-green-500' : 'bg-gray-600'
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                message.isBot 
+                  ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' 
+                  : 'bg-gradient-to-r from-green-700 to-blue-700'
               }`}>
                 {message.isBot ? (
-                  <Bot className="w-3 h-3 text-black" />
+                  <BotIcon className="w-5 h-5 text-black" />
                 ) : (
-                  <User className="w-3 h-3 text-white" />
+                  <User className="w-5 h-5 text-gray-300" />
                 )}
               </div>
-              <div className={`px-3 py-2 rounded-lg text-sm ${
-                message.isBot 
-                  ? 'bg-green-500 text-black' 
-                  : 'bg-gray-700 text-white'
-              }`}>
-                {message.text}
-              </div>
+              <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+  message.isTyping ? 'animate-pulse' : ''
+} ${
+  message.isBot 
+    ? 'bg-white/10 backdrop-blur-sm border border-white/10 text-white' 
+    : 'bg-white/20 backdrop-blur-sm border border-white/10 text-white'
+}`}>
+  {message.isTyping ? <Think />   : message.text}
+</div>
+
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="bg-black border-t border-gray-800 p-3">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
+      <div className="bg-black/30 backdrop-blur-sm p-4 border-t border-white/10">
+        <form onSubmit={handleSubmit} className="flex items-center gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-600"
+            placeholder={isSending ? "Bot is thinking..." : "Type your message..."}
+            disabled={isSending}
+            className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md text-sm text-gray-100 placeholder-gray-400 border border-white/10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent shadow-md shadow-black/20 disabled:opacity-70 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
-            disabled={!input.trim()}
-            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 px-3 py-2 rounded-md"
+            disabled={!input.trim() || isSending}
+            className=" cursor-pointer bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md shadow-emerald-800/30"
           >
-            <Send className="w-4 h-4 text-black" />
+            {isSending ? (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <Send className="w-4 h-4 text-white" />
+            )}
           </button>
         </form>
       </div>
+
     </div>
   );
 };
 
 export default ChatBot;
-

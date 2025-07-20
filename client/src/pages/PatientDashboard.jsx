@@ -643,7 +643,11 @@ const PatientDashboard = () => {
                   {item.id !== 'ai' && (
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                   )}
-                  {item.id === 'ai' && ( <AiIcon className="w-4 h-4 flex-shrink-0" />)}
+                  {item.id === 'ai' && (
+                    <div>
+                      <AiIcon className="w-4 h-4 flex-shrink-0" />
+                    </div>
+                  )}
                   {toggleSideBar && (
                     <span className="flex-1 text-left">{item.label}</span>
                   )}
