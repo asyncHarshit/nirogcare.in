@@ -2,49 +2,49 @@ import { Doctor } from "../models/Doctor.js";
 import {Appointment} from "../models/Appointment.js"
 import User from "../models/User.js";
 import { Assistant } from "../models/Assistant.js";
-// import { Patient } from "../models/Patient.js";
 
 
-// Create or Update Doctor Profile
 export const doctorProfile = async (req, res) => {
   try {
-    const userId = req.user.id;
-
     const {
       gender,
       specialization,
       experience,
       licenseNumber,
-      hospitalId
+      hospitalId,
+      education,
+      userId
     } = req.body;
 
-    if (!gender || !specialization || !licenseNumber || !hospitalId) {
-      return res.status(400).json({ error: "All required fields must be filled." });
-    }
-
-    // Check if doctor profile already exists for this user
-    const doctor = await Doctor.findOne({ userId });
+    let doctor = await Doctor.findOne({ userId });
 
     if (!doctor) {
-      
+      if (!gender || !specialization || !licenseNumber || !hospitalId) {
+        return res.status(400).json({ error: "All required fields must be filled." });
+      }
+
       const newDoctor = await Doctor.create({
         userId,
         gender,
         specialization,
         experience,
         licenseNumber,
-        hospitalId
+        hospitalId,
+        education,
       });
 
       return res.status(201).json({
         message: "Doctor profile created successfully.",
         doctor: newDoctor,
       });
-
     } else {
-      
+      // Update fields if provided
+      doctor.gender = gender || doctor.gender;
+      doctor.specialization = specialization || doctor.specialization;
       doctor.experience = experience !== undefined ? experience : doctor.experience;
+      doctor.licenseNumber = licenseNumber || doctor.licenseNumber;
       doctor.hospitalId = hospitalId || doctor.hospitalId;
+      doctor.education = education || doctor.education;
 
       await doctor.save();
 
@@ -59,6 +59,31 @@ export const doctorProfile = async (req, res) => {
     return res.status(500).json({ error: "Server error while handling doctor profile." });
   }
 };
+
+
+export const getDoctorProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const doctor = await Doctor.findOne({ userId })
+      .populate("userId", "name email")
+      .populate("hospitalId", "name");
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor profile not found." });
+    }
+
+    return res.status(200).json({
+      message: "Doctor profile fetched successfully.",
+      doctor,
+    });
+
+  } catch (error) {
+    console.error("Error fetching doctor profile:", error);
+    return res.status(500).json({ error: "Server error while fetching doctor profile." });
+  }
+}
+
 
 // fetch todays patients
 
@@ -143,6 +168,7 @@ export const addMedicineRecord = async (req, res) => {
     res.status(500).json({ error: "Failed to save medicine record." });
   }
 };
+
 
 export const getMedicineRecords = async (req, res) => {
   try {

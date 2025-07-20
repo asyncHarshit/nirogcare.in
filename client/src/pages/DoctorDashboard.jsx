@@ -24,19 +24,19 @@ import {
 import { logoutUser } from '../services/logoutService';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import UpdateDoctorProfile from '../component/UpdateDoctorProfile';
+import { getMe } from '../services/getMeServices';
+import { getDoctorProfileApi } from '../services/doctorServices';
+import { UpdatedDoctor } from '../component/UpdatedDoctor';
+
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
   const [toggleSideBar, setToggleSideBar] = useState(false);
-
-
-
-
-
-
-
-
+  const [doctorDetails, setDoctorDetails] = useState(null);
+  const [doctorProfileDetail , setDoctorProfileDetail] = useState(null);
+  const [toggle,setToggle] = useState(false);
 
 
 
@@ -62,6 +62,29 @@ const DoctorDashboard = () => {
 
   const navigate = useNavigate();
 
+
+  const getMyDetails = async()=>{
+    const response = await getMe();
+    if(response){
+      setDoctorDetails(response.user);
+      console.log("My info fetched successfully !!",response.user);
+    }  
+  }
+
+  const getDoctorDetails = async()=>{
+    const response = await getDoctorProfileApi();
+    if(response){
+      console.log(response.doctor)
+      setDoctorProfileDetail(response.doctor)
+      setToggle(true)
+    }
+  }
+
+  useEffect(()=>{
+    getMyDetails();
+    getDoctorDetails();
+  },[])
+
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'profile', label: 'My Profile', icon: User },
@@ -81,15 +104,15 @@ const DoctorDashboard = () => {
 
 
   const doctorInfo = {
-    name: 'Dr. Sarah Johnson',
-    specialty: 'Cardiology',
-    id: 'DOC-001',
-    phone: '+1 (555) 123-4567',
-    email: 'dr.johnson@hospital.com',
-    address: '123 Medical Center Dr, City, State 12345',
-    experience: '12 years',
-    education: 'MD from Harvard Medical School',
-    license: 'MD12345',
+    name: doctorDetails?.name,
+    specialty: doctorProfileDetail?.specialization,
+    id: doctorProfileDetail?._id,
+    phone: doctorDetails?.phone,
+    email: doctorDetails?.email,
+    address: doctorProfileDetail?.address,
+    experience: doctorProfileDetail?.experience,
+    education: doctorProfileDetail?.education,
+    license: doctorProfileDetail?.licenseNumber,
     todaySchedule: '9:00 AM - 5:00 PM',
     nextAppointment: '2:30 PM - John Smith'
   };
@@ -242,93 +265,11 @@ const DoctorDashboard = () => {
         );
 
       case 'profile':
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">My Profile</h2>
-                <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                  <Edit className="w-4 h-4" />
-                  <span>Edit Profile</span>
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Profile Picture and Basic Info */}
-                <div className="bg-gray-700/30 p-6 rounded-lg border border-gray-600/30">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Stethoscope className="w-12 h-12 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white">{doctorInfo.name}</h3>
-                    <p className="text-blue-400 font-medium">{doctorInfo.specialty}</p>
-                    <p className="text-gray-400 text-sm mt-1">ID: {doctorInfo.id}</p>
-                  </div>
-                </div>
+       return (
+            toggle ? <UpdatedDoctor doctorInfo={doctorInfo} /> : <UpdateDoctorProfile doctorDetails={doctorDetails} />
+          );
 
-                {/* Contact Information */}
-                <div className="bg-gray-700/30 p-6 rounded-lg border border-gray-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4">Contact Information</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 text-blue-400" />
-                      <span className="text-gray-300">{doctorInfo.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 text-green-400" />
-                      <span className="text-gray-300">{doctorInfo.email}</span>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="w-5 h-5 text-red-400 mt-1" />
-                      <span className="text-gray-300">{doctorInfo.address}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Professional Information */}
-                <div className="bg-gray-700/30 p-6 rounded-lg border border-gray-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4">Professional Details</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-gray-400 text-sm">Experience</p>
-                      <p className="text-white font-medium">{doctorInfo.experience}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Education</p>
-                      <p className="text-white font-medium">{doctorInfo.education}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">License Number</p>
-                      <p className="text-white font-medium">{doctorInfo.license}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Statistics */}
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-blue-500/20 p-4 rounded-lg border border-blue-500/30">
-                  <h5 className="text-blue-400 font-medium">Patients Treated</h5>
-                  <p className="text-2xl font-bold text-white">1,247</p>
-                </div>
-                <div className="bg-green-500/20 p-4 rounded-lg border border-green-500/30">
-                  <h5 className="text-green-400 font-medium">Success Rate</h5>
-                  <p className="text-2xl font-bold text-white">98.5%</p>
-                </div>
-                <div className="bg-purple-500/20 p-4 rounded-lg border border-purple-500/30">
-                  <h5 className="text-purple-400 font-medium">Specializations</h5>
-                  <p className="text-2xl font-bold text-white">3</p>
-                </div>
-                <div className="bg-yellow-500/20 p-4 rounded-lg border border-yellow-500/30">
-                  <h5 className="text-yellow-400 font-medium">Years Experience</h5>
-                  <p className="text-2xl font-bold text-white">12</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'patients':
+          case 'patients':
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
@@ -397,9 +338,9 @@ const DoctorDashboard = () => {
             </div>
           </div>
         );
-
-      default:
-        return null;
+        
+        default:
+          return null;
     }
   };
 
@@ -409,7 +350,7 @@ const DoctorDashboard = () => {
       <div
         className={
           `${toggleSideBar ? "w-64" : "w-20"} transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
-      >
+          >
         <div className=" p-4 border-b border-gray-700/50">
           <div className="flex mt-0.5 items-center justify-between">
             <div className="flex items-center space-x-3 group">
@@ -430,7 +371,7 @@ const DoctorDashboard = () => {
               className={`${
                 toggleSideBar ? "" : "mt-[10px] mb-[13px] mr-[10px]"
               } text-emerald-700 hover:text-emerald-500 cursor-pointer   transition duration-300`}
-            />
+              />
           </div>
         </div>
 
@@ -445,23 +386,23 @@ const DoctorDashboard = () => {
                     toggleSideBar ? "space-x-3" : "justify-center"
                   } cursor-pointer p-3 rounded-lg relative ${
                     activeTab === item.id
-                      ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
+                    ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800/50"
                   }`}
-                >
+                  >
                   <item.icon className="w-5 h-5 flex-shrink-0" />
                   {toggleSideBar && (
                     <span className="flex-1 text-left">{item.label}</span>
                   )}
                   {activeTab === item.id && (
                     <span
-                      className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
-                        toggleSideBar
-                          ? "ml-auto"
-                          : "absolute right-1.5 bottom-1.5"
+                    className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
+                      toggleSideBar
+                      ? "ml-auto"
+                      : "absolute right-1.5 bottom-1.5"
                       }`}
-                    ></span>
-                  )}
+                      ></span>
+                    )}
                 </button>
               </li>
             ))}
@@ -475,7 +416,7 @@ const DoctorDashboard = () => {
             className={`w-full flex items-center ${
               toggleSideBar ? "space-x-3 justify-start" : "justify-center"
             } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
-          >
+            >
             <LogOut className="w-5 h-5" />
             {toggleSideBar && <span>Logout</span>}
           </button>
@@ -531,3 +472,11 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
+
+
+
+
+
+
+
+

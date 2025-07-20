@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, BotIcon } from 'lucide-react';
 import { sendChatMessage } from '../services/chatBotService';
 import { Think } from '../assets/think';
-import { Ai2Icon } from '../assets/robot';
 
-const ChatBot = () => {
+
+const ChatBot = ({userData}) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
     {
@@ -28,8 +28,8 @@ const ChatBot = () => {
 
   const getBotResponse = async (userMessage) => {
     try {
-      const response = await sendChatMessage(userMessage);
-      return response.message; 
+      const response = await sendChatMessage(userMessage,userData);
+      return response.message;
     } catch (error) {
       console.error("Error getting bot response:", error);
       return "Sorry, I couldn't process your request. Please try again later.";

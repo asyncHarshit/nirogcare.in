@@ -578,7 +578,7 @@ const PatientDashboard = () => {
       case "ai":
         return (
           
-              <ChatBot />
+              <ChatBot userData={userData} />
             
 
         );

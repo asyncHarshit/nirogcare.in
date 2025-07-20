@@ -11,7 +11,7 @@ const doctorSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["Male", "Female", "Other"],
+      enum: ["male", "female", "other"],
       required: true,
     },
     specialization: {
@@ -38,6 +38,9 @@ const doctorSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    education : {
+      type : String,
+    }
   },
   { timestamps: true }
 );

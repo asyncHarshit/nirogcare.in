@@ -1,8 +1,8 @@
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_API_URL;
-export async function sendChatMessage(userMessage){
+export async function sendChatMessage(userMessage,userData){
     try {
-        const response = await axios.post(`${baseUrl}/api/ai/chat`, { userMessage }, { withCredentials: true });
+        const response = await axios.post(`${baseUrl}/api/ai/chat`, { userMessage,userData }, { withCredentials: true });
         console.log(response.data);
         return response.data;
     } catch (error) {
