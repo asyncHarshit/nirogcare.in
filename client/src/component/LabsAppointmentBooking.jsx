@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { MapPin, Clock, Phone, Calendar, ChevronLeft, FileText, Compass, User } from 'lucide-react';
 import {toast} from "sonner"
 import {createAppointmentLab} from "../services/patientServices"
