@@ -92,4 +92,13 @@ export const verifyLab = async (req, res) => {
 
 
 
+export const getMyLab = async (req, res) => {
+  try {
+    const lab = await Lab.findOne({ userId: req.user._id }); // auth middleware must populate req.user
+    if (!lab) return res.status(404).json({ error: "Lab not found" });
+    res.json(lab);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
 

@@ -11,3 +11,47 @@ export async function getAllLabAppointmentbyLab(labId) {
     console.log("Error in fetching all doctors !!", error);
   }
 }
+
+
+export const bookLabAppointment = async (data) => {
+  try {
+  const response = await axios.post(`${baseUrl}/api/lab/lab-appointments/book-appointment`, data,
+      {
+        withCredentials: true, 
+      }
+  );
+  return response.data;
+  }
+  catch(error){
+    console.log("ERROR Booking Lab", error)
+  }
+};
+
+export async function uploadLabReport(appointmentId, reportPDFUrl) {
+  if (!appointmentId || !reportPDFUrl) {
+    throw new Error("Missing appointment ID or PDF URL");
+  }
+
+  const response = await axios.post(
+    `/api/lab/lab-appointments/${appointmentId}/upload-report`,
+    { reportPDF: reportPDFUrl },
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data; 
+}
+
+export async function updateLab(formData) {
+  try {
+    const response = await axios.put(
+      `${baseUrl}/api/lab/profile`,
+      formData,
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating Lab profile!", error);
+    throw error.response?.data || error;
+  }
+}

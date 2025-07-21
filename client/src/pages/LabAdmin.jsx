@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import RecentAdmissions from '../component/recentAddmission';
+
 import { 
   Home, 
   Users, 
@@ -23,46 +26,76 @@ import {
   Settings,
   FlaskConicalIcon
 } from 'lucide-react';
+import UpdateLabProfile from '../component/UpdateLabProfile';
 
 const LabDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(5);
+  const [totalPatientsToday, setTotalPatientsToday] = useState(0);
+  const [labId, setLabId] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [labData, setLabData] = useState(null);
+
+  useEffect(() => {
+    async function fetchLab() {
+      try {
+        const res = await axios.get("/api/lab/profile"); 
+        setLabId(res.data._id);
+        setLabData(res.data);
+      } catch (err) {
+        console.error("Fetching lab failed", err);
+      }
+    }
+    fetchLab();
+  }, []);
+
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const response = await axios.get("/api/lab-appointments/today/count");
+        setTotalPatientsToday(response.data.count);
+      } catch {
+        setTotalPatientsToday(0);
+      }
+    }
+    fetchCount();
+  }, []);
+
+
+
+  useEffect(() => {
+    if (!labId) return;
+    async function fetchData() {
+      const res = await axios.get(`/api/lab-appointments/labs/${labId}/today-appointments`);
+      setAppointments(res.data || []);
+    }
+    fetchData();
+  }, [labId]);
+
+    const filtered = !search.trim()
+    ? appointments
+    : appointments.filter(appt =>
+        (appt.bookedBy?.name || "")
+          .toLowerCase()
+          .includes(search.toLowerCase().trim())
+      );
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'patients', label: 'Todays Patients', icon: Users },
     { id: 'Send Reports', label: 'Send Reports', icon: FlaskConical },
-    { id: 'assistants', label: 'Assistant Collection', icon: UserPlus },
     { id: 'Update Profile', label : 'Update Profile' , icon : Settings}
   ];
 
   const labStats = [
-    { icon: Users, label: 'Total Patients', value: '324', change: '+12%', color: 'text-blue-400' },
+    { icon: Users, label: 'Total Patients', value: totalPatientsToday, change: '+0%', color: 'text-blue-400' },
     { icon: FlaskConicalIcon, label: 'Total Collections', value: '156/200', change: '78%', color: 'text-green-400' },
     { icon: UserCheck, label: 'Assistant on Duty', value: '24', change: '+2', color: 'text-purple-400' },
     { icon: Activity, label: 'Report Submitted', value: '8', change: '+3', color: 'text-red-400' },
   ];
 
-  const todaysPatients = [
-    { id: 'P001', name: 'John Smith', age: 45, condition: 'Cardiac Checkup', doctor: 'Dr. Johnson', time: '09:00 AM', status: 'Waiting' },
-    { id: 'P002', name: 'Mary Wilson', age: 62, condition: 'Diabetes Follow-up', doctor: 'Dr. Brown', time: '09:30 AM', status: 'In Progress' },
-    { id: 'P003', name: 'Robert Davis', age: 38, condition: 'Orthopedic Consultation', doctor: 'Dr. Miller', time: '10:00 AM', status: 'Completed' },
-    { id: 'P004', name: 'Lisa Anderson', age: 29, condition: 'Prenatal Checkup', doctor: 'Dr. Garcia', time: '10:30 AM', status: 'Waiting' },
-  ];
-
-  const labCollection = [
-    { id: 'L001', patient: 'John Smith', test: 'Complete Blood Count', status: 'Collected', time: '08:30 AM' },
-    { id: 'L002', patient: 'Mary Wilson', test: 'Glucose Test', status: 'Pending', time: '09:15 AM' },
-    { id: 'L003', patient: 'Robert Davis', test: 'X-Ray Knee', status: 'Completed', time: '09:45 AM' },
-    { id: 'L004', patient: 'Lisa Anderson', test: 'Ultrasound', status: 'In Progress', time: '10:00 AM' },
-  ];
-
-  const assistantCollection = [
-    { id: 'A001', name: 'Jennifer Lee', role: 'Head Nurse', department: 'ICU', shift: 'Night', status: 'On Duty' },
-    { id: 'A002', name: 'Mark Thompson', role: 'Lab Technician', department: 'Laboratory', shift: 'Morning', status: 'Available' },
-    { id: 'A003', name: 'Patricia Davis', role: 'Nurse', department: 'Emergency', shift: 'Evening', status: 'Busy' },
-    { id: 'A004', name: 'James Wilson', role: 'Radiologist Tech', department: 'Radiology', shift: 'Morning', status: 'Available' },
-  ];
 
   const renderContent = () => {
     switch(activeTab) {
@@ -92,31 +125,7 @@ const LabDashboard = () => {
 
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-                <h3 className="text-xl font-semibold text-white mb-4">Recent Admissions</h3>
-                <div className="space-y-3">
-                  {todaysPatients.slice(0, 3).map((patient, index) => (
-                    <div key={index} className="bg-gray-700/30 p-3 rounded-lg border border-gray-600/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-white">{patient.name}</h4>
-                          <p className="text-gray-400 text-sm">{patient.condition}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-blue-400 text-sm">{patient.time}</p>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            patient.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
-                            patient.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
-                            'bg-blue-400/20 text-blue-400'
-                          }`}>
-                            {patient.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <RecentAdmissions labId={labId} />
 
               <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
                 <h3 className="text-xl font-semibold text-white mb-4">Emergency Alerts</h3>
@@ -153,138 +162,98 @@ const LabDashboard = () => {
                 <div className="flex items-center space-x-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="text" placeholder="Search patients..." className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                    <input
+                      type="text"
+                      placeholder="Search patients..."
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
                   </div>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                    <Plus className="w-4 h-4" />
-                    <span>Add Patient</span>
-                  </button>
                 </div>
               </div>
               <div className="space-y-4">
-                {todaysPatients.map((patient, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-blue-500/50 transition-all duration-300">
+                {filtered.map(appt => (
+                  <div
+                    key={appt._id}
+                    className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-blue-500/50 transition-all duration-300"
+                  >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-medium text-white">{patient.name} ({patient.id})</h4>
-                        <p className="text-gray-400 text-sm">Age: {patient.age} | {patient.condition}</p>
-                        <p className="text-gray-300 text-sm">Doctor: {patient.doctor}</p>
+                        <h4 className="font-medium text-white">
+                          {appt.bookedBy?.name || "Unknown"} ({appt.bookedBy?._id || "ID"})
+                        </h4>
+                        <p className="text-gray-400 text-sm">
+                          Test: {appt.testDetails?.testName || "N/A"} | Type: {appt.testDetails?.testType}
+                        </p>
+                        <p className="text-gray-300 text-sm">
+                          {appt.doctorReference?.name && `Doctor: ${appt.doctorReference.name}`}
+                        </p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-blue-400 font-medium">{patient.time}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          patient.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
-                          patient.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-blue-400/20 text-blue-400'
-                        }`}>
-                          {patient.status}
-                        </span>
+                      <div className="text-right flex flex-col items-end gap-2">
+                        <p className="text-blue-400 font-medium">
+                          {new Date(appt.scheduledDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                        {appt.status === "Pending" ? (
+                            <button
+                              className="text-blue-600 bg-blue-400/20 px-3 py-1 rounded-full font-semibold hover:bg-blue-400/40 transition"
+                              onClick={() => {
+                                setSelectedAppointment(appt);
+                                setActiveTab('Send Reports'); 
+                              }}
+                            >
+                              Review
+                            </button>
+                        ) : (
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              appt.status === "Completed"
+                                ? "bg-green-400/20 text-green-400"
+                                : appt.status === "In Progress"
+                                ? "bg-yellow-400/20 text-yellow-400"
+                                : "bg-blue-400/20 text-blue-400"
+                            }`}
+                          >
+                            {appt.status}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
+                {filtered.length === 0 && (
+                  <div className="text-gray-400 text-center">No patients found today.</div>
+                )}
+                
               </div>
             </div>
           </div>
         );
-      case 'lab':
+        
+      case 'Send Reports':
         return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Lab Collection</h2>
-              <div className="space-y-4">
-                {labCollection.map((lab, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">{lab.test} ({lab.id})</h4>
-                        <p className="text-gray-400 text-sm">Patient: {lab.patient}</p>
-                        <p className="text-gray-300 text-sm">Collection Time: {lab.time}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-3 py-1 rounded-full ${
-                          lab.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
-                          lab.status === 'Collected' ? 'bg-blue-400/20 text-blue-400' :
-                          lab.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-gray-400/20 text-gray-400'
-                        }`}>
-                          {lab.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="p-6 space-y-4">
+          <h2 className="text-2xl font-bold text-white mb-2">Upload Patient Report</h2>
+
+          {!selectedAppointment ? (
+            <p className="text-gray-400">Please select a patient from the Today's Patients list first.</p>
+          ) : (
+            <UploadReportForm appointment={selectedAppointment} />
+          )}
+        </div>
         );
-      case 'doctors':
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Doctor Collection</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {doctorCollection.map((doctor, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <Stethoscope className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-white">{doctor.name}</h4>
-                        <p className="text-gray-400 text-sm">{doctor.specialty}</p>
-                        <p className="text-gray-300 text-sm">Patients: {doctor.patients} | {doctor.shift}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          doctor.status === 'Available' ? 'bg-green-400/20 text-green-400' :
-                          doctor.status === 'Busy' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-red-400/20 text-red-400'
-                        }`}>
-                          {doctor.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case 'assistants':
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Assistant Collection</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {assistantCollection.map((assistant, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                        <UserPlus className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-white">{assistant.name}</h4>
-                        <p className="text-gray-400 text-sm">{assistant.role}</p>
-                        <p className="text-gray-300 text-sm">{assistant.department} | {assistant.shift}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          assistant.status === 'Available' ? 'bg-green-400/20 text-green-400' :
-                          assistant.status === 'On Duty' ? 'bg-blue-400/20 text-blue-400' :
-                          'bg-yellow-400/20 text-yellow-400'
-                        }`}>
-                          {assistant.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      default:
+      case 'Update Profile':
+      return (
+        <>
+          {labData ? (
+            <UpdateLabProfile labData={labData} />
+          ) : (
+            <div className="text-white text-center">Loading profile...</div>
+          )}
+        </>
+      );
+
+        default:
         return null;
     }
   };
