@@ -55,3 +55,27 @@ export async function updateLab(formData) {
     throw error.response?.data || error;
   }
 }
+
+
+export async function registerLab(data) {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/lab/register`,
+      data,
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error registering Lab!", error);
+    throw error.response?.data || error;
+  }
+}
+
+export async function getLabProfile(params = {}) {
+   const url = new URL(`${baseUrl}/api/lab/profile`);
+   Object.entries(params).forEach(
+     ([key, value]) => url.searchParams.append(key, value)
+   );
+   const response = await axios.get(url.toString(), { withCredentials: true });
+   return response.data;
+}

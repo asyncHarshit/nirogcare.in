@@ -12,9 +12,9 @@ import { uploadReportForAppointment } from "../controllers/labAppointment.contro
 
 const router = express.Router();
 
-router.post("/register", registerLab);
 router.use(protect);
 
+router.post("/register", registerLab);
 router.get("/profile", getMyLabProfile);
 router.put("/profile",updateLabProfile);
 router.patch("/verify/:labId", verifyLab);

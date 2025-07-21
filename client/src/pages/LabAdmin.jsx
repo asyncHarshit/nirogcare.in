@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import RecentAdmissions from '../component/recentAddmission';
+import { getLabProfile } from '../services/labServices'; 
+import { logoutUser } from "../services/logoutService";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 import { 
   Home, 
@@ -27,29 +31,65 @@ import {
   FlaskConicalIcon
 } from 'lucide-react';
 import UpdateLabProfile from '../component/UpdateLabProfile';
+import LabRegistration from '../component/LabRegisteration';
+import LabProfileView from '../component/LabProfile';
+
 
 const LabDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(5);
+  const [labLoading, setLabLoading] = useState(true);
   const [totalPatientsToday, setTotalPatientsToday] = useState(0);
   const [labId, setLabId] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [labData, setLabData] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchLab() {
-      try {
-        const res = await axios.get("/api/lab/profile"); 
-        setLabId(res.data._id);
-        setLabData(res.data);
-      } catch (err) {
-        console.error("Fetching lab failed", err);
+useEffect(() => {
+  // Fetch on mount
+  setLabLoading(true);
+  axios.get("/api/lab/profile")
+    .then(res => {
+      setLabId(res.data._id);
+      setLabData(res.data);
+      setLabLoading(false);
+    })
+    .catch(err => {
+      console.log(err)
+      setLabLoading(false);
+      setLabId(null);
+      setLabData(null);
+    });
+}, []);
+
+useEffect(() => {
+  if (activeTab !== "profile") return;
+  setLabLoading(true);
+  axios.get("/api/lab/profile")
+    .then(res => {
+      setLabId(res.data._id);
+      setLabData(res.data);
+      setLabLoading(false);
+    })
+    .catch(err => {
+      console.log(err)
+      setLabLoading(false);
+      setLabId(null);
+      setLabData(null);
+    });
+}, [activeTab]);
+
+    const handleLogout = async () => {
+      const response = await logoutUser();
+      if (response?.status === 200) {
+        console.log("Logout successfully !!");
+  
+        toast.success("Logout successful!");
+        navigate("/auth");
       }
-    }
-    fetchLab();
-  }, []);
+    };
 
   useEffect(() => {
     async function fetchCount() {
@@ -68,7 +108,7 @@ const LabDashboard = () => {
   useEffect(() => {
     if (!labId) return;
     async function fetchData() {
-      const res = await axios.get(`/api/lab-appointments/labs/${labId}/today-appointments`);
+      const res = await axios.get(`/api/lab/labs/${labId}/today-appointments`);
       setAppointments(res.data || []);
     }
     fetchData();
@@ -82,8 +122,10 @@ const LabDashboard = () => {
           .includes(search.toLowerCase().trim())
       );
 
+
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
+    { id: "profile", label: "My Profile", icon: User },
     { id: 'patients', label: 'Todays Patients', icon: Users },
     { id: 'Send Reports', label: 'Send Reports', icon: FlaskConical },
     { id: 'Update Profile', label : 'Update Profile' , icon : Settings}
@@ -102,7 +144,7 @@ const LabDashboard = () => {
       case 'home':
         return (
           <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-xl border border-purple-500/30">
+            <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-xl border border-purple-500/30">
               <h2 className="text-2xl font-bold text-white mb-2">Lab Overview</h2>
               <p className="text-gray-300">Real-time Lab operations dashboard</p>
             </div>
@@ -230,6 +272,24 @@ const LabDashboard = () => {
           </div>
         );
         
+
+    case 'profile': {
+      console.log("labData in render:", labData);
+      if (labLoading) return <div>Loading...</div>
+      const isLabRegistered = Boolean(labData && labData.address && labData.licenseNumber);
+      return (
+        isLabRegistered
+          ? <LabProfileView lab={labData}/>
+          : <LabRegistration onRegistered={async () => {
+              setLabLoading(true);
+              const data = await getLabProfile();
+              setLabId(data._id);
+              setLabData(data);
+              setLabLoading(false);
+            }}/>
+      );
+    }
+        
       case 'Send Reports':
         return (
         <div className="p-6 space-y-4">
@@ -264,7 +324,14 @@ const LabDashboard = () => {
       <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
         <div className="p-6 border-b border-gray-700/50">
-          <h1 className="text-2xl font-bold text-blue-400">Lab DashBoard</h1>
+            <div className="flex items-center gap-x-3">
+                <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
+                  <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
+                </div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                  NirogCare
+                </h1>
+            </div>
         </div>
 
         {/* Navigation */}
@@ -276,7 +343,7 @@ const LabDashboard = () => {
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center space-x-3 p-3 rounded-lg  ${
                     activeTab === item.id
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/50'
+                      ? 'bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-white border border-blue-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
@@ -290,7 +357,7 @@ const LabDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
+          <button onClick = {handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
           </button>

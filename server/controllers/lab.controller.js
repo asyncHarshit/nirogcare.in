@@ -5,9 +5,9 @@ import { Lab } from "../models/Lab.js";
 export const registerLab = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { address, licenseNumber, coordinates, testTypes } = req.body;
+    const {name , phone ,  address, licenseNumber, coordinates, testTypes } = req.body;
 
-    if (!address || !licenseNumber || !coordinates) {
+    if (!name || !phone || !address || !licenseNumber || !coordinates) {
       return res.status(400).json({ error: "All required fields must be provided." });
     }
 
@@ -18,6 +18,8 @@ export const registerLab = async (req, res) => {
 
     const newLab = new Lab({
       userId,
+      name , 
+      phone , 
       address,
       licenseNumber,
       location: {
@@ -37,22 +39,21 @@ export const registerLab = async (req, res) => {
 };
 
 // Get the lab profile of the current user
+
 export const getMyLabProfile = async (req, res) => {
   try {
-    const labId = req.query;
+    const lab = await Lab.findOne({ userId: req.user.id }).populate("userId");
 
-    const lab = await Lab.findOne({ labId });
     if (!lab) {
       return res.status(404).json({ error: "Lab profile not found." });
     }
 
-    res.status(200).json({ lab });
+    res.status(200).json(lab); // 👈 do NOT use `{ lab }`, just return the object!
   } catch (error) {
     console.error("Error fetching lab profile:", error);
     res.status(500).json({ error: "Failed to fetch lab profile." });
   }
 };
-
 // Update lab profile
 export const updateLabProfile = async (req, res) => {
   try {
