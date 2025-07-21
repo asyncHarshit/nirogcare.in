@@ -15,7 +15,7 @@ export const registerLab = async (req, res) => {
     if (existingLab) {
       return res.status(400).json({ error: "Lab already registered for this user." });
     }
-
+     // user id
     const newLab = new Lab({
       userId,
       name , 
