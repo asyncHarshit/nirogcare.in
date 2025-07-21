@@ -12,6 +12,7 @@ import {
 import { callRoleApi } from '../api/authServices';
 import { useNavigate } from 'react-router-dom';
 import { requestFCMToken } from "../utils/firebaseConfig.js";
+import { updatePatient } from '../services/patientServices.jsx';
 
 const roles = [
   {
@@ -83,6 +84,10 @@ const SelectRole = () => {
         try {
           tokenToSend = await requestFCMToken();
           console.log("FCM token:", tokenToSend);
+          const verifyRole = await updatePatient();
+          if(verifyRole){
+            console.log("Patient Verified !!");
+          }
         } catch (error) {
           console.error("FCM Token Error:", error);
           toast.error("Notification permission denied or blocked.");

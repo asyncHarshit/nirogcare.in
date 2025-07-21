@@ -28,3 +28,21 @@ export async function getDoctorProfileApi(){
     }
 
 }
+
+
+
+
+
+
+export async function todaysPatientsApi(){
+    try {
+        const response = await axios.get(
+            `${baseUrl}/api/doctor/getAllDrAppointments`,
+            { withCredentials: true }
+        );
+      return response.data;
+
+    } catch (error) {
+        console.log("Error in Doctor service !!",error)
+    }
+}

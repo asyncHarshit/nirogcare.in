@@ -45,6 +45,8 @@ export function VitalSignsForm({ appointment, onClose }) {
     }
     onClose();
   }
+
+  
  
 
   return (

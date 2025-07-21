@@ -1,15 +1,15 @@
 import express from "express";
 import {
-  addMedicineRecord,
-  getMedicineRecords,
-} from "../controllers/medicine.controller.js";
+  addMedicalRecord,
+  getMedicalRecords,
+} from "../controllers/medicalRecord.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 router.use(protect);
 
-router.post("/", addMedicineRecord);
-router.get("/:patientId/:forPatientType", getMedicineRecords);
+router.post("/medical-record", addMedicalRecord);
+router.get("/get-medical-record", getMedicalRecords);
 
 export default router;

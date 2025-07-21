@@ -1,8 +1,8 @@
-import { MedicineRecord } from "../models/MedicineRecord.js";
+import { MedicalRecord } from "../models/MedicalRecord.js";
 import { Doctor } from "../models/Doctor.js";
 
-//  Add a new medicine record
-export const addMedicineRecord = async (req, res) => {
+
+export const addMedicalRecord = async (req, res) => {
   try {
     const userId = req.user.id;
     const doctor = await Doctor.findOne({ userId });
@@ -13,20 +13,21 @@ export const addMedicineRecord = async (req, res) => {
 
     const {
       patientId,
-      forPatientType,
+      appointmentId,
+      doctorId,
       hospitalId,
       medicines,
       notes,
     } = req.body;
 
-    if (!patientId || !forPatientType || !hospitalId || !medicines || medicines.length === 0) {
+    if (!patientId || !appointmentId || !doctorId || !hospitalId || !medicines || medicines.length === 0) {
       return res.status(400).json({ error: "All required fields must be provided." });
     }
 
-    const record = new MedicineRecord({
+    const record = new MedicalRecord({
       patientId,
-      forPatientType,
-      doctorId: doctor._id,
+      appointmentId,
+      doctorId,
       hospitalId,
       medicines,
       notes,
@@ -44,26 +45,26 @@ export const addMedicineRecord = async (req, res) => {
   }
 };
 
-// Get medicine history for a patient or family member
-export const getMedicineRecords = async (req, res) => {
+// Get medical history for a patient or family member
+export const getMedicalRecords = async (req, res) => {
   try {
-    const { patientId, forPatientType } = req.params;
+    const patientId = req.user.id;
 
-    if (!patientId || !forPatientType) {
+    if (!patientId) {
       return res.status(400).json({ error: "Patient ID and type are required." });
     }
 
-    const records = await MedicineRecord.find({ patientId, forPatientType })
+    const records = await MedicalRecord.find({ patientId })
       .populate("doctorId", "specialization")
       .sort({ prescribedAt: -1 });
 
     res.status(200).json({
-      message: "Medicine records fetched.",
+      message: "Medical records fetched.",
       total: records.length,
       records,
     });
   } catch (error) {
-    console.error("Error fetching medicine records:", error);
-    res.status(500).json({ error: "Failed to fetch medicine records." });
+    console.error("Error fetching medical records:", error);
+    res.status(500).json({ error: "Failed to fetch medical records." });
   }
 };

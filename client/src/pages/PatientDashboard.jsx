@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   getAllNearbyHospitals,
   getAllNearbyLabs,
   getMyAppointment,
   getMyLabAppointment,
-  getVitalsForUser,
 } from "../services/patientServices";
 import HospitalAppointmentBooking from "../component/HospitalAppointmentBooking";
 import { LabAppointmentBooking } from "../component/LabsAppointmentBooking";
 import { logoutUser } from "../services/logoutService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-
+import { getMedicalRecordsAPI } from "../services/medicalRecordServices";
 
 import {
   Home,
@@ -37,7 +36,6 @@ import {
   PanelLeft,
   PanelRight,
   BotMessageSquare
-
 } from "lucide-react";
 
 import { getMe } from "../services/getMeServices";
@@ -58,48 +56,64 @@ const PatientDashboard = () => {
   const [labAppointments, setLabAppointment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggleSideBar, setToggleSideBar] = useState(false);
-  const [vital , setVital] = useState(null);
+  const [vital, setVital] = useState(null);
+  const [medicalRecord, setMedicalRecord] = useState([]);
+  
+  // Search state for records
+  const [searchQuery, setSearchQuery] = useState("");
 
-
+  // Memoized filtered records based on search query
+  const filteredRecords = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return medicalRecord;
+    }
+    
+    return medicalRecord.filter((record) => {
+      const searchTerm = searchQuery.toLowerCase();
+      return (
+        (record?.type?.toLowerCase().includes(searchTerm)) ||
+        (record?.doctorId?.name?.toLowerCase().includes(searchTerm)) ||
+        (record?.diagnosis?.toLowerCase().includes(searchTerm)) ||
+        (record?.description?.toLowerCase().includes(searchTerm)) ||
+        (record?.hospitalId?.name?.toLowerCase().includes(searchTerm))
+      );
+    });
+  }, [medicalRecord, searchQuery]);
 
   useEffect(() => {
-  const handleResize = () => {
-    if (window.innerWidth < 768) {
-      setToggleSideBar(false); 
-    } else {
-      setToggleSideBar(true);
-    }
-  };
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setToggleSideBar(false);
+      } else {
+        setToggleSideBar(true);
+      }
+    };
 
-  
+    // Call on mount
+    handleResize();
 
-  // Call on mount
-  handleResize();
-
-  // Optional: respond to future resizes
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    // Optional: respond to future resizes
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchAllData = async () => {
       setLoading(true);
       try {
-        const [userRes, appointmentRes, labAppointmentRes,vitalData] = await Promise.all([
+        const [userRes, appointmentRes, labAppointmentRes, vitalData] = await Promise.all([
           getMe(),
           getMyAppointment(),
           getMyLabAppointment(),
-          getVitalsForUser(),
-
         ]);
 
         if (userRes) {
           setUserData(userRes);
-          console.log(userRes)
+          console.log(userRes);
         }
         if (appointmentRes) setAppointment(appointmentRes?.appointments || []);
         if (labAppointmentRes) setLabAppointment(labAppointmentRes || []);
-        if(vitalData) setVital(vitalData);
+        if (vitalData) setVital(vitalData);
       } catch (error) {
         console.log("Error fetching dashboard data", error);
       } finally {
@@ -116,7 +130,6 @@ const PatientDashboard = () => {
     const response = await logoutUser();
     if (response?.status === 200) {
       console.log("Logout successfully !!");
-
       toast.success("Logout successful!");
       navigate("/auth");
     }
@@ -133,6 +146,20 @@ const PatientDashboard = () => {
   useEffect(() => {
     if (activeTab === "appointment") {
       getHospital();
+    }
+  }, [activeTab]);
+
+  const getMedicalRecords = async () => {
+    const response = await getMedicalRecordsAPI();
+    if (response) {
+      console.log(response);
+      setMedicalRecord(response?.records || []);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "records") {
+      getMedicalRecords();
     }
   }, [activeTab]);
 
@@ -158,9 +185,7 @@ const PatientDashboard = () => {
     { id: "records", label: "Medical Record", icon: FileText },
     { id: "reports", label: "Lab Report", icon: BarChart3 },
     { id: "ai", label: "AI Assistant", icon: BotMessageSquare },
-
   ];
-
 
   const vitalStats = [
     {
@@ -220,10 +245,9 @@ const PatientDashboard = () => {
         return (
           <div className="space-y-6 ">
             {/* Welcome Section */}
-            <div className="bg-gradient-to-r  from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
+            <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 p-6 rounded-xl border border-green-500/30">
               <h2 className="text-2xl font-bold text-white mb-2">
                 Welcome back, {userData?.user?.name}
-                
               </h2>
               <p className="text-gray-300">
                 Here's your health overview for today
@@ -452,16 +476,16 @@ const PatientDashboard = () => {
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">
-                  Medical Records
-                </h2>
+                <h2 className="text-2xl font-bold text-white">Medical Records</h2>
                 <div className="flex items-center space-x-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search records..."
-                      className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-green-500 focus:outline-none"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-green-500 focus:outline-none min-w-64"
                     />
                   </div>
                   <button className="bg-gray-700/50 border border-gray-600 rounded-lg p-2 text-gray-400 hover:text-white hover:border-green-500 transition-all duration-300">
@@ -469,62 +493,99 @@ const PatientDashboard = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Search Results Info */}
+              {searchQuery && (
+                <div className="mb-4 text-sm text-gray-400">
+                  {filteredRecords.length > 0 
+                    ? `Found ${filteredRecords.length} record(s) for "${searchQuery}"`
+                    : `No records found for "${searchQuery}"`
+                  }
+                </div>
+              )}
+
               <div className="space-y-4">
-                {[
-                  {
-                    date: "2025-07-01",
-                    type: "Consultation",
-                    doctor: "Dr. singh",
-                    diagnosis: "Routine Checkup",
-                  },
-                  {
-                    date: "2025-06-15",
-                    type: "Lab Results",
-                    doctor: "Dr. singh",
-                    diagnosis: "Blood Work Normal",
-                  },
-                  {
-                    date: "2025-06-01",
-                    type: "Prescription",
-                    doctor: "Dr. singh",
-                    diagnosis: "Hypertension Management",
-                  },
-                  {
-                    date: "2025-05-20",
-                    type: "Imaging",
-                    doctor: "Dr. singh",
-                    diagnosis: "X-Ray Chest",
-                  },
-                ].map((record, index) => (
+                {filteredRecords?.map((record, index) => (
                   <div
-                    key={index}
-                    className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 "
+                    key={record._id || index}
+                    className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 transition-all duration-300"
                   >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">
-                          {record.type}
-                        </h4>
-                        <p className="text-gray-400 text-sm">{record.doctor}</p>
-                        <p className="text-gray-300 text-sm">
-                          {record.diagnosis}
-                        </p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="w-4 h-4 text-blue-400" />
+                          <h4 className="font-medium text-white">{record?.type || 'Medical Record'}</h4>
+                        </div>
+                        
+                        {record?.doctorId?.name && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <User className="w-4 h-4 text-green-400" />
+                            <p className="text-gray-400 text-sm">Doctor: {record.doctorId.name}</p>
+                          </div>
+                        )}
+                        
+                        {record?.diagnosis && (
+                          <div className="flex items-start gap-2 mb-1">
+                            <Stethoscope className="w-4 h-4 text-purple-400 mt-0.5" />
+                            <p className="text-gray-300 text-sm">Diagnosis: {record.diagnosis}</p>
+                          </div>
+                        )}
+                        
+                        {record?.description && (
+                          <div className="flex items-start gap-2 mb-1">
+                            <FileText className="w-4 h-4 text-yellow-400 mt-0.5" />
+                            <p className="text-gray-300 text-sm">Description: {record.description}</p>
+                          </div>
+                        )}
+                        
+                        {record?.hospitalId?.name && (
+                          <div className="flex items-center gap-2">
+                            <Building2 className="w-4 h-4 text-cyan-400" />
+                            <p className="text-gray-400 text-xs">Hospital: {record.hospitalId.name}</p>
+                          </div>
+                        )}
                       </div>
+                      
                       <div className="text-right">
-                        <p className="text-green-400 font-medium">
-                          {record.date}
-                        </p>
-                        <button className="text-blue-400 hover:text-blue-300 text-sm">
+                        <div className="flex items-center gap-2 justify-end mb-2">
+                          <Calendar className="w-4 h-4 text-blue-400" />
+                          <p className="text-green-400 font-medium">
+                            {new Date(record?.createdAt || record?.date).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        
+                        <button className="text-blue-400 hover:text-blue-300 text-sm transition-colors duration-200">
                           View Details
                         </button>
                       </div>
                     </div>
                   </div>
                 ))}
+
+                {filteredRecords.length === 0 && !searchQuery && (
+                  <div className="text-center py-12">
+                    <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400 text-lg">No medical records available</p>
+                    <p className="text-gray-500 text-sm mt-2">Your medical records will appear here once available</p>
+                  </div>
+                )}
+
+                {filteredRecords.length === 0 && searchQuery && (
+                  <div className="text-center py-12">
+                    <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400 text-lg">No records found</p>
+                    <p className="text-gray-500 text-sm mt-2">Try searching with different keywords</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         );
+
       case "reports":
         return (
           <div className="space-y-6">
@@ -577,10 +638,7 @@ const PatientDashboard = () => {
         );
       case "ai":
         return (
-          
-              <ChatBot userData={userData} />
-            
-
+          <ChatBot userData={userData} />
         );
       default:
         return null;
@@ -593,9 +651,6 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
       <div
-
-      
-      
         className={`${
           toggleSideBar ? "w-64" : "w-20"
         } transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}

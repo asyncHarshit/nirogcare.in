@@ -2,6 +2,24 @@ import axios from "axios";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
+
+export async function updatePatient() {
+  const formData = {};
+  try {
+    const response = await axios.post(
+      `${baseUrl}/api/patient/profile`,
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error in updating patient profile!!", error);
+  }
+}
+
 export async function getAllNearbyHospitals() {
   try {
     const response = await axios.get(`${baseUrl}/api/patient/near-hospitals`, {

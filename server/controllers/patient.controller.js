@@ -10,21 +10,12 @@ import  User  from "../models/User.js";
 export const patientProfile = async (req, res) => {
   try {
     const userId = req.user.id; 
-    const { age, gender, address } = req.body;
 
-    // Basic validation
-    if (!age || !gender || !address ) {
-      return res.status(400).json({ error: "All fields (age, gender, address) are required." });
-    }
 
     let patient = await Patient.findOne({ userId });
 
     if (!patient) {
-      patient = new Patient({ userId, age, gender, address});
-    } else {
-      patient.age = age;
-      patient.gender = gender;
-      patient.address = address;
+      patient = new Patient({ userId});
     }
 
     await patient.save();
@@ -97,7 +88,7 @@ export const getNearbylabs = async (req, res) => {
           },
           distanceField: "distance", // Distance in meters
           spherical: true,
-          maxDistance: 10000, // 10 km in meters
+          maxDistance: 10000000000000, // 10 km in meters
         },
       },
     ]);
@@ -150,6 +141,8 @@ export const updateVitalsForUser = async (req, res) => {
         vitalUpdated: user.vitalUpdated,
       },
     });
+
+    
 
   } catch (error) {
     console.error("Error updating vitals:", error);

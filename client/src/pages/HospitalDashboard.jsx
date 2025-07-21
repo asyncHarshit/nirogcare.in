@@ -42,31 +42,28 @@ const HospitalDashboard = () => {
   ];
 
   const todaysPatients = [
-    { id: 'P001', name: 'John Smith', age: 45, condition: 'Cardiac Checkup', doctor: 'Dr. Johnson', time: '09:00 AM', status: 'Waiting' },
-    { id: 'P002', name: 'Mary Wilson', age: 62, condition: 'Diabetes Follow-up', doctor: 'Dr. Brown', time: '09:30 AM', status: 'In Progress' },
-    { id: 'P003', name: 'Robert Davis', age: 38, condition: 'Orthopedic Consultation', doctor: 'Dr. Miller', time: '10:00 AM', status: 'Completed' },
-    { id: 'P004', name: 'Lisa Anderson', age: 29, condition: 'Prenatal Checkup', doctor: 'Dr. Garcia', time: '10:30 AM', status: 'Waiting' },
+    { id: 'P001', name: 'Rahul', age: 45, condition: 'Cardiac Checkup', doctor: 'Dr. Harshit Rajput', time: '09:00 AM', status: 'Waiting' },
+    { id: 'P002', name: 'Shubham', age: 62, condition: 'Diabetes Follow-up', doctor: 'Dr. Tarun Jain', time: '09:30 AM', status: 'In Progress' },
+   
   ];
 
   const labCollection = [
-    { id: 'L001', patient: 'John Smith', test: 'Complete Blood Count', status: 'Collected', time: '08:30 AM' },
-    { id: 'L002', patient: 'Mary Wilson', test: 'Glucose Test', status: 'Pending', time: '09:15 AM' },
-    { id: 'L003', patient: 'Robert Davis', test: 'X-Ray Knee', status: 'Completed', time: '09:45 AM' },
-    { id: 'L004', patient: 'Lisa Anderson', test: 'Ultrasound', status: 'In Progress', time: '10:00 AM' },
+    { id: 'L001', patient: 'Patient 1', test: 'Complete Blood Count', status: 'Collected', time: '08:30 AM' },
+    { id: 'L002', patient: 'Patient 2', test: 'Glucose Test', status: 'Pending', time: '09:15 AM' },
+    { id: 'L003', patient: 'Patient 3', test: 'X-Ray Knee', status: 'Completed', time: '09:45 AM' },
+    { id: 'L004', patient: 'Patient 4', test: 'Ultrasound', status: 'In Progress', time: '10:00 AM' },
   ];
 
   const doctorCollection = [
-    { id: 'D001', name: 'Dr. Sarah Johnson', specialty: 'Cardiology', patients: 12, status: 'Available', shift: 'Morning' },
-    { id: 'D002', name: 'Dr. Michael Brown', specialty: 'Endocrinology', patients: 8, status: 'Busy', shift: 'Morning' },
-    { id: 'D003', name: 'Dr. Emily Miller', specialty: 'Orthopedics', patients: 15, status: 'Available', shift: 'Afternoon' },
-    { id: 'D004', name: 'Dr. Carlos Garcia', specialty: 'Gynecology', patients: 10, status: 'In Surgery', shift: 'Full Day' },
+    { id: 'D001', name: 'Dr. Harshit Rajput', specialty: 'Cardiology', patients: 12, status: 'Available', shift: 'Morning' },
+    { id: 'D002', name: 'Dr. Tarun Jain', specialty: 'Neurology', patients: 8, status: 'Busy', shift: 'Morning' },
+    
   ];
 
   const assistantCollection = [
     { id: 'A001', name: 'Jennifer Lee', role: 'Head Nurse', department: 'ICU', shift: 'Night', status: 'On Duty' },
     { id: 'A002', name: 'Mark Thompson', role: 'Lab Technician', department: 'Laboratory', shift: 'Morning', status: 'Available' },
-    { id: 'A003', name: 'Patricia Davis', role: 'Nurse', department: 'Emergency', shift: 'Evening', status: 'Busy' },
-    { id: 'A004', name: 'James Wilson', role: 'Radiologist Tech', department: 'Radiology', shift: 'Morning', status: 'Available' },
+    
   ];
 
   const renderContent = () => {
@@ -75,7 +72,7 @@ const HospitalDashboard = () => {
         return (
           <div className="space-y-6">
             {/* Hospital Overview */}
-            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-xl border border-blue-500/30">
+            <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-xl border border-blue-500/30">
               <h2 className="text-2xl font-bold text-white mb-2">Hospital Overview</h2>
               <p className="text-gray-300">Real-time hospital operations dashboard</p>
             </div>
@@ -301,7 +298,7 @@ const HospitalDashboard = () => {
       <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
         {/* Logo */}
         <div className="p-6 border-b border-gray-700/50">
-          <h1 className="text-2xl font-bold text-blue-400">Hospital DashBoard</h1>
+          <h1 className="text-2xl font-bold text-emerald-600">NirogCare</h1>
         </div>
 
         {/* Navigation */}
@@ -313,7 +310,7 @@ const HospitalDashboard = () => {
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center space-x-3 p-3 rounded-lg  ${
                     activeTab === item.id
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/50'
+                      ? 'bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-white border border-blue-500/50'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >

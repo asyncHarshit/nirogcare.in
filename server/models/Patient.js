@@ -8,20 +8,6 @@ const patientSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    gender: {
-      type: String,
-      enum: ["male", "female", "other"],
-      required: true,
-    },
-    age: {
-      type: Number,
-      min: 0,
-      max: 120,
-    },
-    address: {
-      type: String,
-      trim: true,
-    },
   },
   { timestamps: true }
 );
