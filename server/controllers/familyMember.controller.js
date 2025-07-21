@@ -1,7 +1,7 @@
 import { FamilyMember } from "../models/FamilyMember.js";
 import { Patient } from "../models/Patient.js";
 
-// Create or Add a new Family Member
+// Create or Add a new family member
 export const addFamilyMember = async (req, res) => {
   try {
     const userId = req.user.id;
