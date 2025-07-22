@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { 
   Home, 
   Users, 
@@ -19,12 +19,38 @@ import {
   Plus,
   Heart,
   Stethoscope,
-  Building
+  Building,
+  PanelLeft 
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { logoutUser } from '../services/logoutService';
+import { useNavigate } from 'react-router-dom';
 
 const HospitalDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(5);
+  const [toggleSideBar, setToggleSideBar] = useState(false);
+
+
+
+    useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth < 768) {
+          setToggleSideBar(false); 
+        } else {
+          setToggleSideBar(true);
+        }
+      };
+  
+      // Call on mount
+      handleResize();
+  
+      // Optional: respond to future resizes
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const navigate = useNavigate();
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -65,6 +91,17 @@ const HospitalDashboard = () => {
     { id: 'A002', name: 'Mark Thompson', role: 'Lab Technician', department: 'Laboratory', shift: 'Morning', status: 'Available' },
     
   ];
+
+   const handleLogout = async () => {
+      const response = await logoutUser();
+      if (response?.status === 200) {
+        console.log("Logout successfully !!");
+        toast.success("Logout successful!");
+        navigate("/auth");
+      } else {
+        toast.error("Logout failed!");
+      }
+  };
 
   const renderContent = () => {
     switch(activeTab) {
@@ -295,10 +332,32 @@ const HospitalDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-700/50">
-          <h1 className="text-2xl font-bold text-emerald-600">NirogCare</h1>
+      <div
+        className={`${toggleSideBar ? "w-64" : "w-20"} transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
+      >
+        <div className="p-4 border-b border-gray-700/50">
+          <div className="flex mt-0.5 items-center justify-between">
+            <div className="flex items-center space-x-3 group">
+              {toggleSideBar && (
+                <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
+                  <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
+                </div>
+              )}
+              
+
+              {toggleSideBar && (
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                  NirogCare
+                </h1>
+              )}
+            </div>
+            <PanelLeft
+              onClick={() => setToggleSideBar((prev) => !prev)}
+              className={`${
+                toggleSideBar ? "" : "mt-[10px] mb-[13px] mr-[10px]"
+              } text-emerald-700 hover:text-emerald-500 cursor-pointer transition duration-300`}
+            />
+          </div>
         </div>
 
         {/* Navigation */}
@@ -308,14 +367,27 @@ const HospitalDashboard = () => {
               <li key={item.id}>
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg  ${
+                  className={`w-full flex items-center ${
+                    toggleSideBar ? "space-x-3" : "justify-center"
+                  } cursor-pointer p-3 rounded-lg relative ${
                     activeTab === item.id
-                      ? 'bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-white border border-blue-500/50'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                      ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
+                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
                   }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  {toggleSideBar && (
+                    <span className="flex-1 text-left">{item.label}</span>
+                  )}
+                  {activeTab === item.id && (
+                    <span
+                      className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
+                        toggleSideBar
+                          ? "ml-auto"
+                          : "absolute right-1.5 bottom-1.5"
+                      }`}
+                    ></span>
+                  )}
                 </button>
               </li>
             ))}
@@ -324,9 +396,14 @@ const HospitalDashboard = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700/50">
-          <button className="w-full flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300">
+          <button
+            onClick={handleLogout}
+            className={`w-full flex items-center ${
+              toggleSideBar ? "space-x-3 justify-start" : "justify-center"
+            } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
+          >
             <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            {toggleSideBar && <span>Logout</span>}
           </button>
         </div>
       </div>

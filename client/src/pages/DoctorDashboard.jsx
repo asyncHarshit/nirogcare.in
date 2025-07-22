@@ -143,17 +143,7 @@ const DoctorDashboard = () => {
       if(response){
         console.log(response)
       }
-      // console.log('Submitting diagnosis:', diagnosisData);
-      
-      // Example API call:
-      // const response = await saveDiagnosisApi(diagnosisData);
-      // if (response.success) {
-      //   toast.success('Diagnosis saved successfully!');
-      //   handleCloseDiagnosisForm();
-      //   getTodaysPatient(); // Refresh the patient list
-      // }
-      
-      // For now, just close the form and show success
+
       toast.success('Diagnosis saved successfully!');
       handleCloseDiagnosisForm();
       

@@ -17,7 +17,8 @@ import {
   Award,
   TrendingUp,
   Menu,
-  X
+  X,
+  BotIcon
 } from 'lucide-react';
 import CloudGlobe from '../component/Globe';
 
@@ -76,8 +77,8 @@ const HealthcareLandingPage = () => {
     },
     {
       icon: Shield,
-      title: 'Military-Grade Security',
-      description: 'End-to-end encryption with blockchain verification',
+      title: 'Advanced Security',
+      description: 'End-to-end encryption',
       color: 'from-red-500 to-rose-500',
       stats: '100% Secure'
     },
@@ -89,11 +90,11 @@ const HealthcareLandingPage = () => {
       stats: '95% Accuracy'
     },
     {
-      icon: Users,
-      title: 'Family Health Hub',
-      description: 'Comprehensive family health management in one dashboard',
+      icon: BotIcon,
+      title: 'AI Assistant',
+      description: 'Your personal health assistant for 24/7 support',
       color: 'from-violet-500 to-purple-500',
-      stats: '5 Members Max'
+      stats: '99% Response Rate'
     },
   ];
 

@@ -51,11 +51,26 @@ export const getMedicalRecords = async (req, res) => {
     const patientId = req.user.id;
 
     if (!patientId) {
-      return res.status(400).json({ error: "Patient ID and type are required." });
+      return res.status(400).json({ error: "Patient ID is required." });
     }
 
     const records = await MedicalRecord.find({ patientId })
-      .populate("doctorId", "specialization")
+      .populate({
+          path: "doctorId",
+          select: "specialization hospitalId userId", 
+          populate: [
+            {
+              path: "hospitalId",
+              select: "name", 
+            },
+            {
+              path: "userId",
+              select: "name", 
+            },
+          ],
+        })
+
+
       .sort({ prescribedAt: -1 });
 
     res.status(200).json({

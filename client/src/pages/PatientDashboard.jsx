@@ -43,6 +43,7 @@ import UpdatePatientProfile from "../component/UpdateProfile";
 import LoaderOnly from "../component/Loader";
 import { AiIcon } from "../assets/robot";
 import ChatBot from "../component/ChatBot";
+import MedicalRecordPatient from "../component/MedicalRecordPatient";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -60,25 +61,11 @@ const PatientDashboard = () => {
   const [medicalRecord, setMedicalRecord] = useState([]);
   
   // Search state for records
-  const [searchQuery, setSearchQuery] = useState("");
+  
 
-  // Memoized filtered records based on search query
-  const filteredRecords = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return medicalRecord;
-    }
-    
-    return medicalRecord.filter((record) => {
-      const searchTerm = searchQuery.toLowerCase();
-      return (
-        (record?.type?.toLowerCase().includes(searchTerm)) ||
-        (record?.doctorId?.name?.toLowerCase().includes(searchTerm)) ||
-        (record?.diagnosis?.toLowerCase().includes(searchTerm)) ||
-        (record?.description?.toLowerCase().includes(searchTerm)) ||
-        (record?.hospitalId?.name?.toLowerCase().includes(searchTerm))
-      );
-    });
-  }, [medicalRecord, searchQuery]);
+
+
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -152,7 +139,7 @@ const PatientDashboard = () => {
   const getMedicalRecords = async () => {
     const response = await getMedicalRecordsAPI();
     if (response) {
-      console.log(response);
+      // console.log(response);
       setMedicalRecord(response?.records || []);
     }
   };
@@ -474,116 +461,8 @@ const PatientDashboard = () => {
       
         case "records":
         return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Medical Records</h2>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search records..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-green-500 focus:outline-none min-w-64"
-                    />
-                  </div>
-                  <button className="bg-gray-700/50 border border-gray-600 rounded-lg p-2 text-gray-400 hover:text-white hover:border-green-500 transition-all duration-300">
-                    <Filter className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Search Results Info */}
-              {searchQuery && (
-                <div className="mb-4 text-sm text-gray-400">
-                  {filteredRecords.length > 0 
-                    ? `Found ${filteredRecords.length} record(s) for "${searchQuery}"`
-                    : `No records found for "${searchQuery}"`
-                  }
-                </div>
-              )}
-
-              <div className="space-y-4">
-                {filteredRecords?.map((record, index) => (
-                  <div
-                    key={record._id || index}
-                    className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-green-500/50 transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FileText className="w-4 h-4 text-blue-400" />
-                          <h4 className="font-medium text-white">{record?.type || 'Medical Record'}</h4>
-                        </div>
-                        
-                        {record?.doctorId?.name && (
-                          <div className="flex items-center gap-2 mb-1">
-                            <User className="w-4 h-4 text-green-400" />
-                            <p className="text-gray-400 text-sm">Doctor: {record.doctorId.name}</p>
-                          </div>
-                        )}
-                        
-                        {record?.diagnosis && (
-                          <div className="flex items-start gap-2 mb-1">
-                            <Stethoscope className="w-4 h-4 text-purple-400 mt-0.5" />
-                            <p className="text-gray-300 text-sm">Diagnosis: {record.diagnosis}</p>
-                          </div>
-                        )}
-                        
-                        {record?.description && (
-                          <div className="flex items-start gap-2 mb-1">
-                            <FileText className="w-4 h-4 text-yellow-400 mt-0.5" />
-                            <p className="text-gray-300 text-sm">Description: {record.description}</p>
-                          </div>
-                        )}
-                        
-                        {record?.hospitalId?.name && (
-                          <div className="flex items-center gap-2">
-                            <Building2 className="w-4 h-4 text-cyan-400" />
-                            <p className="text-gray-400 text-xs">Hospital: {record.hospitalId.name}</p>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="flex items-center gap-2 justify-end mb-2">
-                          <Calendar className="w-4 h-4 text-blue-400" />
-                          <p className="text-green-400 font-medium">
-                            {new Date(record?.createdAt || record?.date).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        
-                        <button className="text-blue-400 hover:text-blue-300 text-sm transition-colors duration-200">
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {filteredRecords.length === 0 && !searchQuery && (
-                  <div className="text-center py-12">
-                    <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400 text-lg">No medical records available</p>
-                    <p className="text-gray-500 text-sm mt-2">Your medical records will appear here once available</p>
-                  </div>
-                )}
-
-                {filteredRecords.length === 0 && searchQuery && (
-                  <div className="text-center py-12">
-                    <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400 text-lg">No records found</p>
-                    <p className="text-gray-500 text-sm mt-2">Try searching with different keywords</p>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="space-y-6 bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+           <MedicalRecordPatient medicalRecord={medicalRecord} />
           </div>
         );
 
