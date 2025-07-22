@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { 
   Heart, 
   Shield, 
@@ -11,14 +11,41 @@ import {
   ChevronRight,
   Star,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Play,
+  Zap,
+  Award,
+  TrendingUp,
+  Menu,
+  X
 } from 'lucide-react';
+import CloudGlobe from '../component/Globe';
 
 const HealthcareLandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const[formData,setFormData] = useState({
+
+  })
 
   useEffect(() => {
     setIsVisible(true);
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleGetStarted = () => {
@@ -28,175 +55,258 @@ const HealthcareLandingPage = () => {
   const features = [
     {
       icon: Calendar,
-      title: 'Easy Appointment Booking',
-      description: 'Schedule appointments with doctors and labs seamlessly',
-      color: 'from-blue-500 to-indigo-500'
+      title: 'Smart Appointment Booking',
+      description: 'AI-powered scheduling that finds the perfect time for you and your doctor',
+      color: 'from-blue-500 to-cyan-500',
+      stats: '99% Success Rate'
     },
     {
       icon: Clock,
-      title: 'Queue Management',
-      description: 'Efficiently manage patient flow and reduce wait times',
-      color: 'from-yellow-500 to-orange-500'
+      title: 'Real-time Queue Management',
+      description: 'Live updates on wait times with smart notifications',
+      color: 'from-amber-500 to-orange-500',
+      stats: '70% Less Wait Time'
     },
     {
       icon: TestTube,
-      title: 'Lab Test Management',
-      description: 'Book lab tests and track results in real-time',
-      color: 'from-purple-500 to-pink-500'
+      title: 'Instant Lab Results',
+      description: 'Get your test results instantly with AI-powered insights',
+      color: 'from-purple-500 to-pink-500',
+      stats: '24/7 Access'
     },
     {
       icon: Shield,
-      title: 'Secure Health Records',
-      description: 'Your medical data is encrypted and protected',
-      color: 'from-orange-500 to-red-500'
+      title: 'Military-Grade Security',
+      description: 'End-to-end encryption with blockchain verification',
+      color: 'from-red-500 to-rose-500',
+      stats: '100% Secure'
     },
     {
       icon: Activity,
-      title: 'Health Monitoring',
-      description: 'Track your health metrics and get insights',
-      color: 'from-cyan-500 to-blue-500'
+      title: 'AI Health Monitoring',
+      description: 'Predictive health analytics powered by machine learning',
+      color: 'from-emerald-500 to-teal-500',
+      stats: '95% Accuracy'
     },
     {
       icon: Users,
-      title: 'Family Management',
-      description: 'Manage health records for your entire family',
-      color: 'from-rose-500 to-purple-500'
+      title: 'Family Health Hub',
+      description: 'Comprehensive family health management in one dashboard',
+      color: 'from-violet-500 to-purple-500',
+      stats: '5 Members Max'
     },
   ];
 
   const testimonials = [
     {
       name: 'Shubham Singh',
-      role: 'Patient',
-      content: 'NirogCare has transformed how I manage my healthcare. Booking appointments is now effortless!',
-      rating: 5
+      role: 'Software Engineer',
+      content: 'NirogCare\'s AI-powered scheduling saved me 3 hours every week. The predictive health insights are incredible!',
+      rating: 5,
+      image: 'S'
     },
     {
       name: 'Dr. Harshit Singh',
       role: 'Cardiologist',
-      content: 'The platform streamlines patient management and improves communication significantly.',
-      rating: 5
+      content: 'The platform has revolutionized my practice. Patient engagement increased by 200% since we started using NirogCare.',
+      rating: 5,
+      image: 'H'
     },
     {
       name: 'Anjali Verma',
-      role: 'Family User',
-      content: 'Managing my family\'s health records has never been easier. Highly recommended!',
-      rating: 5
+      role: 'Working Mother',
+      content: 'Managing my family\'s health has never been this simple. The emergency alerts potentially saved my son\'s life.',
+      rating: 5,
+      image: 'A'
     }
   ];
 
+  const stats = [
+    { number: '50K+', label: 'Happy Patients', icon: Heart },
+    { number: '500+', label: 'Expert Doctors', icon: Stethoscope },
+    { number: '100+', label: 'Partner Labs', icon: TestTube },
+    { number: '99.9%', label: 'Uptime', icon: Shield }
+  ];
+
   return (
-    <div className="bg-black text-white min-h-screen overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xs border-b border-gray-800">
+    <div className="bg-gradient-to-br from-slate-900 via-black to-slate-900 text-white min-h-screen overflow-x-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-0 right-1/2 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+      </div>
+
+      {/* Enhanced Navigation */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300  'bg-transparent-500/10 backdrop-blur-md border-b border-gray-800/50 ${scrolled ? 'bg-black/80 shadow-lg' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-3 group">
-                <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-xl border border-emerald-500/20 group-hover:border-emerald-400/30 transition-all duration-300 group-hover:scale-105">
+            <div className="flex items-center space-x-3 group cursor-pointer">
+              <div className="relative">
+                <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
                   <Stethoscope className="text-emerald-300 w-7 h-7 group-hover:text-emerald-200 transition-colors duration-300" />
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-50 to-emerald-100 bg-clip-text text-transparent group-hover:from-emerald-200 group-hover:to-blue-200 transition-all duration-300">
-                  NirogCare
-                </h1> 
+               
               </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+                NirogCare
+              </h1> 
             </div>
+            
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
-              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Reviews</a>
-              <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+              {['Features', 'About', 'Reviews', 'Contact'].map((item) => (
+                <a key={item} href={`#${item.toLowerCase()}`} className="relative text-gray-300 hover:text-white transition-colors group">
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                </a>
+              ))}
             </div>
-            <button 
-              onClick={handleGetStarted}
-              className="text-black cursor-pointer bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 px-6 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/20"
-            >
-             Login
+            
+            <div className="flex items-center space-x-4">
+              <button 
+                onClick={handleGetStarted}
+                className="hidden sm:flex items-center text-black bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-emerald-400/30"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Get Started
+              </button>
+              
+              <button 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-800/50 transition-colors"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        <div className={`md:hidden transition-all duration-300 ${mobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+          <div className="bg-black/95 backdrop-blur-md border-t border-gray-800/50 px-4 py-4 space-y-2">
+            {['Features', 'About', 'Reviews', 'Contact'].map((item) => (
+              <a key={item} href={`#${item.toLowerCase()}`} className="block py-2 text-gray-300 hover:text-white transition-colors">
+                {item}
+              </a>
+            ))}
+            <button onClick={handleGetStarted} className="w-full bg-gradient-to-r from-emerald-400 to-cyan-400 text-black py-2 rounded-lg font-semibold mt-4">
+              Get Started
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/10 to-green-900/10"></div>
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl animate-pulse"></div>
-        
-        <div className={`relative z-10 text-center max-w-4xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="mb-6">
-            <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 text-emerald-200 text-sm font-medium">
-              <Stethoscope className="w-4 h-4 mr-2 text-cyan-400" />
-              Advanced Healthcare Platform
-            </span>
-          </div>
+      {/* Enhanced Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-30">
+        <div className={`relative z-10 text-center max-w-5xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="mb-8">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border border-cyan-700 text-cyan-300 font-semibold shadow-sm backdrop-blur-md">
+            <span className="text-lg">✨</span> 
+            <span>#1 Healthcare Platform in India</span>
+          </span>
+        </div>
+
           
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent leading-tight">
-            Your Health,
-            <span className="block bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent">
-              Our Priority
+          <h1 className="text-5xl md:text-8xl font-black mb-8 leading-tight">
+            <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+              Healthcare
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent ">
+              Reimagined
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Experience seamless healthcare management with our comprehensive platform. 
-            Book appointments, manage lab tests, and track your health journey all in one place.
+          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+            Experience the future of healthcare with our AI-powered platform. 
+            Seamless appointments, instant results, and personalized care - all at your fingertips.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <button 
               onClick={handleGetStarted}
-              className="group cursor-pointer bg-gradient-to-r from-emerald-500 to-green-500 opacity-80 hover:opacity-100 hover:from-emerald-600 hover:to-green-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all text-black duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 flex items-center"
+              className="group cursor-pointer relative overflow-hidden bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 px-8 py-4 rounded-2xl font-bold text-lg text-black transition-all duration-300 transform hover:scale-105 "
             >
-              Get Started Now
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              <span className="relative z-10 flex items-center">
+                Start Your Journey
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </span>
+              
             </button>
 
-            <button className="px-8 cursor-pointer py-4 rounded-xl font-semibold text-lg border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 hover:bg-gray-800/50">
-              Learn More
+            <button className="group flex items-center cursor-pointer px-8 py-4 rounded-2xl font-semibold text-lg border-2 border-gray-600 hover:border-emerald-400/50 transition-all duration-300 hover:bg-emerald-500/5 backdrop-blur-sm">
+              <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+              Watch Demo
             </button>
           </div>
+
+          <br />
+          <br />
+          <br />
+       
           
-          <div className="mt-12 flex justify-center items-center space-x-8 text-gray-400">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">50K+</div>
-              <div className="text-sm">Happy Patients</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">500+</div>
-              <div className="text-sm">Doctors</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">100+</div>
-              <div className="text-sm">Labs</div>
-            </div>
+          {/* Enhanced Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {stats.map((stat, index) => (
+              <div key={index} className="group text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-2xl mb-4 group-hover:scale-110 group-hover:border-emerald-500/50 transition-all duration-300">
+                  <stat.icon className="w-8 h-8 text-emerald-400" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-400 text-sm font-medium">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* Enhanced Features Section */}
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-10 text-emerald-500">
-              Why Choose NirogCare?
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-6">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Advanced Features
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                Why Choose
+              </span>
+              <br />
+              <span className="text-white">NirogCare?</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Discover the features that make healthcare management effortless and efficient
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Cutting-edge technology meets compassionate care. Discover features designed for the modern healthcare experience.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="group relative bg-gradient-to-br from-gray-900/50 to-gray-800/30 p-8 rounded-2xl border border-gray-700/40 hover:border-gray-600/60 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/10">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} p-4 mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4 text-white">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div key={index} className="group relative bg-gradient-to-br from-gray-900/80 to-gray-800/40 p-8 rounded-3xl border border-gray-700/50 hover:border-emerald-500/30 transition-all duration-500 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/10 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+                
+                <div className="relative z-10">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} p-4 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                    <feature.icon className="w-8 h-8 text-white" />
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white group-hover:text-emerald-200 transition-colors">
+                      {feature.title}
+                    </h3>
+                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full font-medium">
+                      {feature.stats}
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-300 leading-relaxed mb-4">{feature.description}</p>
+                  
+                  <div className="flex items-center text-emerald-400 font-medium group-hover:text-emerald-300 transition-colors">
+                    Learn More
+                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -204,77 +314,202 @@ const HealthcareLandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-900/50 to-gray-800/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-emerald-500">
-              What Our Users Say
+      {/* Enhanced Testimonials Section */}
+      <section id="reviews" className="py-24 px-4 sm:px-6 lg:px-8 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/30 via-transparent to-gray-900/30"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-medium mb-6">
+              <Star className="w-4 h-4 mr-2 fill-current" />
+              Customer Stories
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                Loved by
+              </span>
+              <span className="text-white pl-6">Thousands</span>
+              <br />
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Real stories from real people who trust NirogCare with their healthcare
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Real stories from real people who transformed their healthcare journey with NirogCare
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 p-8 rounded-2xl border border-gray-600/40 hover:border-gray-500/60 transition-all duration-300">
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
+          {/* Testimonial Carousel */}
+          <div className="max-w-4xl mx-auto">
+            <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/40 p-12 rounded-3xl border border-gray-600/40 backdrop-blur-sm">
+              <div className="flex items-center justify-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-current mx-1" />
+                ))}
+              </div>
+              
+              <blockquote className="text-2xl text-center text-gray-200 mb-8 leading-relaxed font-light italic">
+                "{testimonials[currentTestimonial].content}"
+              </blockquote>
+              
+              <div className="flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-black font-bold text-xl mr-4">
+                  {testimonials[currentTestimonial].image}
                 </div>
-                <p className="text-gray-300 mb-6 italic leading-relaxed">"{testimonial.content}"</p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-green-400 rounded-full flex items-center justify-center text-white font-bold">
-                    {testimonial.name.charAt(0)}
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-gray-400 text-sm">{testimonial.role}</div>
-                  </div>
+                <div className="text-left">
+                  <div className="font-bold text-white text-lg">{testimonials[currentTestimonial].name}</div>
+                  <div className="text-gray-400">{testimonials[currentTestimonial].role}</div>
                 </div>
               </div>
-            ))}
+              
+              {/* Testimonial Indicators */}
+              <div className="flex justify-center mt-8 space-x-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTestimonial(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      index === currentTestimonial ? 'bg-emerald-400 scale-125' : 'bg-gray-600 hover:bg-gray-500'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-emerald-600/10 to-green-600/10 rounded-3xl p-12 border border-emerald-500/20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Ready to Transform Your Healthcare Experience?
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of satisfied users who have revolutionized their healthcare management with NirogCare
-            </p>
-            <button 
-              onClick={handleGetStarted}
-              className="group cursor-pointer text-black bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 flex items-center mx-auto"
-            >
-              Start Your Journey
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
+      {/* Enhanced CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="relative bg-gradient-to-br from-emerald-900/20 via-cyan-900/20 to-blue-900/20 rounded-3xl p-16 border border-emerald-500/30 backdrop-blur-sm overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-cyan-500/5"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-5xl md:text-6xl font-bold mb-8">
+                <span className="bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+                  Ready to Transform
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                  Your Health?
+                </span>
+              </h2>
+              
+              <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+                Join over 50,000 users who have revolutionized their healthcare experience. Start your journey today.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <button 
+                  onClick={handleGetStarted}
+                  className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 px-10 py-5 rounded-2xl font-bold text-lg text-black transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/30"
+                >
+                  <span className="relative z-10 flex items-center">
+                    Start Free Trial
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </button>
+                
+                <div className="text-gray-400 text-sm">
+                  ✨ No credit card required • 14-day free trial
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex justify-center space-x-3 mb-4 group">
-                <div className="p-2 flex items-center bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-xl border border-emerald-500/20 group-hover:border-emerald-400/30 transition-all duration-300 group-hover:scale-105">
-                  <Stethoscope className="text-emerald-300 w-7 h-7 group-hover:text-emerald-200 transition-colors duration-300" />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-50 to-emerald-100 bg-clip-text text-transparent group-hover:from-emerald-200 group-hover:to-blue-200 transition-all duration-300">
-                  NirogCare
-                </h1> 
-              </div>
-          <p className="text-gray-400 font">
-            Made with <span>❤️</span> by HomoSapiens
+
+      {/* Contact Section */}
+    <section
+  id="contact"
+  className="relative py-24 px-4 sm:px-6 lg:px-8 bg-black text-white flex items-center justify-center overflow-hidden"
+>
+  {/* Globe as background */}
+  <div className="absolute inset-0 z-0">
+    <CloudGlobe />
+    {/* Light blur with less darkness */}
+    <div className="absolute inset-0  pointer-events-none" />
+  </div>
+
+  {/* Content */}
+  <div className="relative z-10 w-full max-w-4xl">
+    <div className=" p-10 rounded-2xl border border-white/10 shadow-xl">
+      <div className="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium">
+        <Award className="w-4 h-4 mr-2" />
+        Contact Us
+      </div>
+
+      <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+        <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          Get In Touch
+        </span>
+      </h2>
+
+      <p className="text-gray-300 text-lg mb-10 leading-relaxed">
+        Have questions, suggestions, or just want to say hello? We'd love to hear from you.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          value={formData.name}
+          className="bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email"
+          value={formData.email}
+          className="bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
+        />
+        <textarea
+          name="message"
+          placeholder="Your Message"
+          value={formData.message}
+          className="md:col-span-2 bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 h-36 resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
+        ></textarea>
+        <button
+          className="md:col-span-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
+        >
+          Send Message
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+    
+
+
+
+      {/* Enhanced Footer */}
+      <footer className="border-t border-gray-800/50 py-16 px-4 sm:px-6 lg:px-8 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="flex justify-center items-center space-x-3 mb-6 group">
+            <div className="p-3 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+              <Stethoscope className="text-emerald-300 w-8 h-8 group-hover:text-emerald-200 transition-colors duration-300" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent">
+              NirogCare
+            </h1> 
+          </div>
+          
+          <p className="text-gray-400 text-lg mb-8">
+            Transforming healthcare, one patient at a time
           </p>
+          
+          <div className="flex justify-center items-center space-x-2 text-gray-500">
+            <span>Made with</span>
+            <Heart className="w-4 h-4 text-red-400 fill-current animate-pulse" />
+            <span>by HomoSapiens</span>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-800/50 text-gray-500 text-sm">
+            © 2025 NirogCare. All rights reserved.
+          </div>
         </div>
       </footer>
     </div>

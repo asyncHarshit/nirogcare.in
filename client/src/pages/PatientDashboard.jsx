@@ -471,7 +471,8 @@ const PatientDashboard = () => {
             </div>
           </div>
         );
-      case "records":
+      
+        case "records":
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
