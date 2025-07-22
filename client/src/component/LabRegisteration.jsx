@@ -12,8 +12,14 @@ import {
   ShieldCheck,
   FlaskConical
 } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+// import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import { registerLab } from '../services/labServices';
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
 const LabRegistration = ({ onRegistered = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -29,6 +35,9 @@ const LabRegistration = ({ onRegistered = () => {} }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [locationActive, setLocationActive] = useState(false);
+
+
 
   const testOptions = [
     "X-Ray", "Blood Test", "MRI", "CT Scan", "Ultrasound", "Urine Test",
@@ -40,6 +49,11 @@ const LabRegistration = ({ onRegistered = () => {} }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+      const handleLocationClick = () => {
+      setLocationActive(prev => !prev);
+      handleUseLocation(); // Your existing function which fills lat/lng
+    };
+
   const handleCheckboxChange = (test) => {
     setFormData((prev) => {
       const selected = prev.testTypes.includes(test)
@@ -47,6 +61,24 @@ const LabRegistration = ({ onRegistered = () => {} }) => {
         : [...prev.testTypes, test];
       return { ...prev, testTypes: selected };
     });
+  };
+
+    const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setFormData((prev) => ({ ...prev, latitude, longitude }));
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        alert("Failed to get location.");
+      }
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -78,10 +110,18 @@ const LabRegistration = ({ onRegistered = () => {} }) => {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="w-full max-w-2xl border-none">
+    <div className="flex items-center justify-center ">
+      <div className="w-full max-w-2xl border-none ">
         <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl shadow-2xl p-7 border border-green-500/20 backdrop-blur-sm">
           <div className="text-center mb-5">
+                    <MapPin
+            size={28}             
+            className={`absolute top-4 right-4 cursor-pointer transition-colors ${
+              locationActive ? 'text-emerald-400' : 'text-gray-400 hover:text-gray-200'
+            }`}
+            onClick={handleLocationClick}
+            title="Use My Current Location"
+          />
             <div className="flex justify-center items-center gap-2 mb-1">
               <ShieldCheck className="w-8 h-8 text-cyan-400" />
               <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">

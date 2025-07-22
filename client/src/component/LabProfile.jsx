@@ -3,7 +3,7 @@ import { User, Phone, Mail, IdCard, MapPin, FlaskConical } from 'lucide-react';
 
 const LabProfileView = ({ lab }) => {
   // const user = lab.userId;
-
+// 
   return (
     <div className="space-y-4 text-white">
       <h2 className="text-2xl font-semibold text-green-400">Lab Profile</h2>
@@ -18,7 +18,7 @@ const LabProfileView = ({ lab }) => {
         <div className="flex items-center gap-2">
           <Phone className="w-5 h-5 text-teal-400" />
           <span>Phone:</span>
-          <span className="ml-2 font-medium">{lab?.phone || 'N/A'}</span>
+          <span className="ml-2 font-medium">{lab.phone || 'N/A'}</span>
         </div>
 
         <div className="flex items-center gap-2">

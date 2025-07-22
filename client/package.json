@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.1.0",
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
     "firebase": "^11.10.0",
     "lucide-react": "^0.525.0",
+    "mapbox-gl": "^3.13.0",
+    "mapbox-gl-geocoder": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.60.0",

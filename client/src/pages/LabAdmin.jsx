@@ -81,6 +81,22 @@ useEffect(() => {
     });
 }, [activeTab]);
 
+const loadLabProfile = async () => {
+  setLabLoading(true);
+  try {
+    const data = await getLabProfile(); // your API call to fetch lab profile
+    setLabData(data);
+  } catch  {
+    setLabData(null);
+  } finally {
+    setLabLoading(false);
+  }
+};
+
+React.useEffect(() => {
+  loadLabProfile();
+}, []);
+
     const handleLogout = async () => {
       const response = await logoutUser();
       if (response?.status === 200) {
@@ -276,18 +292,14 @@ useEffect(() => {
     case 'profile': {
       console.log("labData in render:", labData);
       if (labLoading) return <div>Loading...</div>
-      const isLabRegistered = Boolean(labData && labData.address && labData.licenseNumber);
-      return (
-        isLabRegistered
-          ? <LabProfileView lab={labData}/>
-          : <LabRegistration onRegistered={async () => {
-              setLabLoading(true);
-              const data = await getLabProfile();
-              setLabId(data._id);
-              setLabData(data);
-              setLabLoading(false);
-            }}/>
-      );
+      const isLabRegistered = labData.name && labData.phone
+          return isLabRegistered ? (
+          <LabProfileView lab={labData} />
+        ) : (
+          <LabRegistration onRegistered={async () => {
+            await loadLabProfile();
+          }} />
+        );
     }
         
       case 'Send Reports':
