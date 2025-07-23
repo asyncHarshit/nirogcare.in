@@ -18,17 +18,23 @@ export const registerHospital = async (req, res) => {
       return res.status(400).json({ error: "Hospital already registered." });
     }
 
-    const hospital = new Hospital({
-      userId,
-      name,
-      phone,
-      address,
-      licenseNumber,
+    // Create a new Hospital document/instance with the given details
+const hospital = new Hospital({
+      userId,        // Reference to the user who is adding/registering the hospital
+      name,          // Hospital's name
+      phone,         // Contact number of the hospital
+      address,       // Physical address of the hospital
+      licenseNumber, // Official license/registration number of the hospital
+      
+      // GeoJSON location object to store hospital's coordinates
       location: {
-        type: "Point",
-        coordinates: [parseFloat(longitude), parseFloat(latitude)],
+        type: "Point", // GeoJSON type (Point = single coordinate pair)
+        coordinates: [
+          parseFloat(longitude), // Longitude converted to float
+          parseFloat(latitude),  // Latitude converted to float
+        ],
       },
-    });
+});
 
     await hospital.save();
 
