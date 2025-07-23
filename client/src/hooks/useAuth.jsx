@@ -7,7 +7,7 @@ export const useAuth = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/auth/me", {
+      const response = await axios.get("https://nirogcare-in-12-backend.onrender.com/api/auth/me", {
         withCredentials: true,
       });
       setUser(response.data.user);
