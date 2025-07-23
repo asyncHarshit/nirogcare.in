@@ -420,99 +420,53 @@ const HealthcareLandingPage = () => {
 
 
       {/* Contact Section */}
-    <section
-  id="contact"
-  className="relative py-24 px-4 sm:px-6 lg:px-8 bg-black text-white flex items-center justify-center overflow-hidden"
->
-  {/* Globe as background */}
-  <div className="absolute inset-0 z-0">
-    <CloudGlobe />
-    {/* Light blur with less darkness */}
-    <div className="absolute inset-0  pointer-events-none" />
-  </div>
-
-  {/* Content */}
-  <div className="relative z-10 w-full max-w-4xl">
-    <div className=" p-10 rounded-2xl border border-white/10 shadow-xl">
-      <div className="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium">
-        <Award className="w-4 h-4 mr-2" />
-        Contact Us
-      </div>
-
-      <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-        <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          Get In Touch
-        </span>
-      </h2>
-
-      <p className="text-gray-300 text-lg mb-10 leading-relaxed">
-        Have questions, suggestions, or just want to say hello? We'd love to hear from you.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-        <input
-          type="text"
-          name="name"
-          placeholder="Your Name"
-          value={formData.name}
-          className="bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Your Email"
-          value={formData.email}
-          className="bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
-        />
-        <textarea
-          name="message"
-          placeholder="Your Message"
-          value={formData.message}
-          className="md:col-span-2 bg-gray-800/60 text-white border border-gray-700/50 rounded-xl px-4 py-3 h-36 resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
-        ></textarea>
-        <button
-          className="md:col-span-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
-        >
-          Send Message
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
 
     
 
 
 
       {/* Enhanced Footer */}
-      <footer className="border-t border-gray-800/50 py-16 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="flex justify-center items-center space-x-3 mb-6 group">
-            <div className="p-3 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
-              <Stethoscope className="text-emerald-300 w-8 h-8 group-hover:text-emerald-200 transition-colors duration-300" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent">
-              NirogCare
-            </h1> 
-          </div>
-          
-          <p className="text-gray-400 text-lg mb-8">
-            Transforming healthcare, one patient at a time
-          </p>
-          
-          <div className="flex justify-center items-center space-x-2 text-gray-500">
-            <span>Made with</span>
-            <Heart className="w-4 h-4 text-red-400 fill-current animate-pulse" />
-            <span>by HomoSapiens</span>
-          </div>
-          
-          <div className="mt-8 pt-8 border-t border-gray-800/50 text-gray-500 text-sm">
-            © 2025 NirogCare. All rights reserved.
-          </div>
-        </div>
-      </footer>
+<footer className=" md:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-[400px] md:min-h-[500px]">
+  {/* Globe and overlay background */}
+  <div className="absolute inset-0 z-0 flex items-center justify-center">
+    <div className="relative">
+      {/* Globe size responsive */}
+      <div className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px]">
+        <CloudGlobe />
+      </div>
+
+      {/* Light overlay to enhance readability */}
+      <div className="absolute inset-0 bg-black/20 pointer-events-none rounded-full" />
+    </div>
+  </div>
+
+  {/* Gradient overlay for subtle readability improvement */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-[1]" />
+
+  {/* Footer content on top */}
+  <div className="relative z-10 max-w-7xl mx-auto text-center flex flex-col justify-center min-h-[400px] md:min-h-[500px]">
+    {/* Logo and Brand */}
+    <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mb-6 group">
+      <div className="p-2.5 md:p-3 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl border border-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+        <Stethoscope className="text-emerald-300 w-6 h-6 md:w-8 md:h-8 group-hover:text-emerald-200 transition-colors duration-300" />
+      </div>
+      <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent">
+        NirogCare
+      </h1>
+    </div>
+
+    {/* Tagline */}
+    <p className="text-white text-base md:text-lg mb-6 md:mb-8 px-4">
+      Transforming healthcare, one patient at a time
+    </p>
+
+    {/* Copyright */}
+    <div className="text-white text-xs md:text-sm">
+      © 2025 NirogCare. All rights reserved.
+    </div>
+  </div>
+</footer>
+
     </div>
   );
 };

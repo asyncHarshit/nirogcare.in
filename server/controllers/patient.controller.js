@@ -3,6 +3,7 @@ import { Hospital } from "../models/Hospital.js";
 import { Patient } from "../models/Patient.js";
 import {Lab} from "../models/Lab.js"
 import  User  from "../models/User.js";
+import { LabAppointment } from "../models/LabAppointment.js";
 
 
 
@@ -186,6 +187,34 @@ export const getVitalsForUser = async (req, res) => {
     });
   }
 }
+
+
+
+export const getAllLabReportsBookedByUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const reports = await LabAppointment.find({
+      bookedBy: userId,
+      reportPDF: { $exists: true, $ne: null },
+    })
+      .populate("labId", "name address")
+      .populate("testDetails", "testName testType")
+      .sort({ createdAt: -1 });
+
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({ error: "No reports found." });
+    }
+
+    res.status(200).json({
+      message: "Lab reports fetched successfully.",
+      reports,
+    });
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ error: "Server error fetching lab reports." });
+  }
+};
 
 
 

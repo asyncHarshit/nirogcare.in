@@ -12,6 +12,14 @@ const labSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
     licenseNumber: {
       type: String,
       required: true,

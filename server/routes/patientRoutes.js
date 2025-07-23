@@ -3,6 +3,7 @@ import { getNearbyHospitals, patientProfile , getNearbylabs } from "../controlle
 import { protect } from "../middlewares/auth.middleware.js";
 import { createAppointment , getMyAppointments ,cancelAppointment, getAppointmentById} from "../controllers/appointment.controller.js";
 import { updateVitalsForUser ,getVitalsForUser} from "../controllers/patient.controller.js";
+import { getAllLabReportsBookedByUser } from "../controllers/patient.controller.js";
 const router = express.Router();
 
 
@@ -16,6 +17,7 @@ router.get('/vitals',protect,getVitalsForUser)
 
 router.post("/book-appointment",protect,createAppointment)
 router.get("/appointments",protect,getMyAppointments)
+router.get('/lab-Reports',protect,getAllLabReportsBookedByUser)
 router.get("/appointments/:id",protect,getAppointmentById)
 router.patch("/appointments/:id/cancel",protect,cancelAppointment)
 

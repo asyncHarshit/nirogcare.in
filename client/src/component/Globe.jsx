@@ -17,7 +17,7 @@ const CloudGlobe = () => {
   }, []);
 
   return (
-    <div className="h-[300px] w-[300px] ml-0 ">
+    <div className="h-full w-full">
       <Globe
         ref={globeRef}
         globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"

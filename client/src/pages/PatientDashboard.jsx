@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, act } from "react";
 import {
   getAllNearbyHospitals,
   getAllNearbyLabs,
@@ -11,6 +11,7 @@ import { logoutUser } from "../services/logoutService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { getMedicalRecordsAPI } from "../services/medicalRecordServices";
+import LabReportComponent from "../component/LabReport";
 
 import {
   Home,
@@ -44,6 +45,7 @@ import LoaderOnly from "../component/Loader";
 import { AiIcon } from "../assets/robot";
 import ChatBot from "../component/ChatBot";
 import MedicalRecordPatient from "../component/MedicalRecordPatient";
+import { getAllLabReport } from "../services/labServices";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -59,6 +61,7 @@ const PatientDashboard = () => {
   const [toggleSideBar, setToggleSideBar] = useState(false);
   const [vital, setVital] = useState(null);
   const [medicalRecord, setMedicalRecord] = useState([]);
+  const [labReports, setLabReport] = useState([]);
   
   // Search state for records
   
@@ -164,6 +167,35 @@ const PatientDashboard = () => {
     }
   }, [activeTab]);
 
+
+  const getLabReport = async()=>{
+    try {
+      const response = await getAllLabReport();
+      if(response){
+        setLabReport(response.reports)
+        console.log(response);
+      }
+      
+    } catch (error) {
+      console.log("Error in fetching lab report",error)
+      
+    }
+  }
+
+
+  useEffect(()=>{
+    if(activeTab === 'reports'){
+      getLabReport();
+      console.log(labReports);
+      
+    }
+
+  },[activeTab])
+
+
+
+  
+
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "profile", label: "My Profile", icon: User },
@@ -205,26 +237,7 @@ const PatientDashboard = () => {
     },
   ];
 
-  const recentLabResults = [
-    {
-      test: "Complete Blood Count",
-      date: "2025-07-01",
-      status: "Normal",
-      doctor: "Dr. Johnson",
-    },
-    {
-      test: "Lipid Panel",
-      date: "2025-06-28",
-      status: "Normal",
-      doctor: "Dr. Smith",
-    },
-    {
-      test: "Thyroid Function",
-      date: "2025-06-25",
-      status: "Pending",
-      doctor: "Dr. Brown",
-    },
-  ];
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -469,51 +482,7 @@ const PatientDashboard = () => {
       case "reports":
         return (
           <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Lab Reports
-              </h2>
-              <div className="space-y-4">
-                {recentLabResults.map((result, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">
-                          {result.test}
-                        </h4>
-                        <p className="text-gray-400 text-sm">
-                          Requested by {result.doctor}
-                        </p>
-                        <p className="text-gray-300 text-sm">
-                          Date: {result.date}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span
-                          className={`text-xs px-3 py-1 rounded-full ${
-                            result.status === "Normal"
-                              ? "bg-green-400/20 text-green-400"
-                              : result.status === "Pending"
-                              ? "bg-yellow-400/20 text-yellow-400"
-                              : "bg-red-400/20 text-red-400"
-                          }`}
-                        >
-                          {result.status}
-                        </span>
-                        <div className="mt-2">
-                          <button className="text-blue-400 hover:text-blue-300 text-sm">
-                            Download PDF
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <LabReportComponent labReports={labReports} />
           </div>
         );
       case "ai":

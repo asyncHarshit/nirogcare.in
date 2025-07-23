@@ -5,7 +5,7 @@ const labAppointmentSchema = new mongoose.Schema(
     bookedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     forPatientType: {
       type: String,
@@ -66,6 +66,11 @@ const labAppointmentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    reportPDF: {
+    type: String, // this will store Cloudinary PDF URL
+    required: false,
+    trim  : true,
+  },
   },
   { timestamps: true }
 );
