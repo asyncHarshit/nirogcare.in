@@ -22,7 +22,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173','https://nirogcare-in-frontend.vercel.app'],
+  origin: ['http://localhost:5173','https://nirogcare-in-frontend.vercel.app','https://www.nirogcare.in'],
   credentials: true 
 }));
 

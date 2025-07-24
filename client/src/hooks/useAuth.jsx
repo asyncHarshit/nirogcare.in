@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_API_URL;
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
@@ -7,7 +8,7 @@ export const useAuth = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get("https://nirogcare-in-12-backend.onrender.com/api/auth/me", {
+      const response = await axios.get(`${baseUrl}/api/auth/me`, {
         withCredentials: true,
       });
       setUser(response.data.user);
