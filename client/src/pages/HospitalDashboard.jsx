@@ -20,16 +20,27 @@ import {
   Heart,
   Stethoscope,
   Building,
-  PanelLeft 
+  PanelLeft ,
+  Phone,
+  Mail,
+  Scale,
+  IdCard,
+  MapPin
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logoutUser } from '../services/logoutService';
 import { useNavigate } from 'react-router-dom';
+import { getHospital } from '../services/hospitalsServices';
+import { todaysPatientsApi } from '../services/doctorServices';
+import { getPatientsByHospital } from '../services/hospitalsServices';
+import DrPatientsListByHospital from '../component/DrPatientsListByHospital';
 
 const HospitalDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(5);
   const [toggleSideBar, setToggleSideBar] = useState(false);
+  const [userData,setUserData] = useState(null);
+  const [doctorsPatientsData,setDoctorsPatientsData] = useState([]);
 
 
 
@@ -52,10 +63,70 @@ const HospitalDashboard = () => {
 
     const navigate = useNavigate();
 
+
+
+    const getHospitalProfile = async()=>{
+      try {
+        const response = await getHospital();
+        if(response){
+          console.log(response);
+          setUserData(response.hospital)
+        }
+        
+      } catch (error) {
+        console.log("Error in fetching profile",error)
+      }
+    }
+    useEffect(()=>{
+        getHospitalProfile();
+    },[])
+
+
+    const fetchTodaysPatients = async()=>{
+      try {
+        const response = await todaysPatientsApi();
+        if(response){
+          console.log(response);
+        }
+        
+      } catch (error) {
+        console.log("Error in fetching todays patients",error)
+      }
+    }
+
+    useEffect(()=>{
+      if(activeTab === 'patients'){
+        fetchTodaysPatients();
+      }
+
+    },[activeTab])
+
+
+    const fetchDRPatientsStats = async()=>{
+      try {
+        const response = await getPatientsByHospital();
+        if(response){
+          setDoctorsPatientsData(response.doctors);
+          console.log("Patient Stats: ",response);
+        }
+        
+      } catch (error) {
+        console.log("Error in fetching patient stats",error)
+      }
+    }
+
+    useEffect(()=>{
+      if(activeTab === 'doctors'){
+        fetchDRPatientsStats();
+      }
+    },[activeTab])
+
+    
+
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
+    { id: 'profile', label: 'My Profile', icon: User },
     { id: 'patients', label: 'Todays Patients', icon: Users },
-    { id: 'lab', label: 'Lab Collection', icon: FlaskConical },
     { id: 'doctors', label: 'Doctor Collection', icon: UserCheck },
     { id: 'assistants', label: 'Assistant Collection', icon: UserPlus },
   ];
@@ -80,11 +151,6 @@ const HospitalDashboard = () => {
     { id: 'L004', patient: 'Patient 4', test: 'Ultrasound', status: 'In Progress', time: '10:00 AM' },
   ];
 
-  const doctorCollection = [
-    { id: 'D001', name: 'Dr. Harshit Rajput', specialty: 'Cardiology', patients: 12, status: 'Available', shift: 'Morning' },
-    { id: 'D002', name: 'Dr. Tarun Jain', specialty: 'Neurology', patients: 8, status: 'Busy', shift: 'Morning' },
-    
-  ];
 
   const assistantCollection = [
     { id: 'A001', name: 'Jennifer Lee', role: 'Head Nurse', department: 'ICU', shift: 'Night', status: 'On Duty' },
@@ -184,6 +250,80 @@ const HospitalDashboard = () => {
             </div>
           </div>
         );
+      case 'profile' : 
+      return (
+         <div className="flex items-center justify-center ">
+              <div className="w-full max-w-lg border-none">
+                {/* Main Card */}
+                <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl shadow-2xl p-7 border border-green-500/20 backdrop-blur-sm">
+                  
+                  {/* Header */}
+                <div className="text-center mb-4">
+                <div className="flex justify-center items-center gap-2 mb-1">
+                    <User className="w-8 h-8 text-blue-400" />
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-500 to-green-300 bg-clip-text text-transparent">
+                   Hospital Profile
+                    </h2>
+                </div>
+                  </div>
+        
+        
+                  {/* User Information Display */}
+                  <div className="relative bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-xl p-5 mb-4 border border-green-500/30 backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent rounded-xl"></div>
+                    <h3 className="text-xl font-semibold text-cyan-500 mb-4 flex items-center">
+                      <div className="w-2 h-2 bg-cyan-300 rounded-full mr-3 animate-pulse"></div>
+                      User Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center group">
+                        <User className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Name:</span>
+                        <span className="text-white ml-2 font-medium">{userData?.name || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center group">
+                        <Phone className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Phone:</span>
+                        <span className="text-white ml-2 font-medium">{userData?.phone || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center group">
+                        <Mail className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Email:</span>
+                        <span className="text-white ml-2 font-medium">{userData?.userId?.email || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center group">
+                        <Scale className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Licence No:</span>
+                        <span className="text-white ml-2 font-medium">{userData?.licenseNumber|| 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center group">
+                        <IdCard className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Id:</span>
+                        <span className="text-white ml-2 font-medium">{userData?._id || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center group">
+                        <MapPin className="w-5 h-5 text-green-400 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-gray-300 text-sm min-w-[60px]">Address:</span>
+                        <span className="text-white ml-2 font-medium">{userData?.address || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+        
+              </div>
+        
+        
+              
+        
+                {/* Footer */}
+                <div className="text-center mt-6">
+                  <p className="text-gray-500 text-sm">
+                    Your information is secure and encrypted
+                  </p>
+                </div>
+              </div>
+            </div>
+
+      )
       case 'patients':
         return (
           <div className="space-y-6">
@@ -261,34 +401,7 @@ const HospitalDashboard = () => {
       case 'doctors':
         return (
           <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Doctor Collection</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {doctorCollection.map((doctor, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <Stethoscope className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-white">{doctor.name}</h4>
-                        <p className="text-gray-400 text-sm">{doctor.specialty}</p>
-                        <p className="text-gray-300 text-sm">Patients: {doctor.patients} | {doctor.shift}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          doctor.status === 'Available' ? 'bg-green-400/20 text-green-400' :
-                          doctor.status === 'Busy' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-red-400/20 text-red-400'
-                        }`}>
-                          {doctor.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <DrPatientsListByHospital data={doctorsPatientsData} />
           </div>
         );
       case 'assistants':
@@ -330,10 +443,10 @@ const HospitalDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Sidebar */}
       <div
-        className={`${toggleSideBar ? "w-64" : "w-20"} transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
+        className={`${toggleSideBar ? "w-64" : "w-20"} fixed top-0 left-0 h-screen transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden z-50`}
       >
         <div className="p-4 border-b border-gray-700/50">
           <div className="flex mt-0.5 items-center justify-between">
@@ -361,7 +474,7 @@ const HospitalDashboard = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.id}>
@@ -409,7 +522,7 @@ const HospitalDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className={`${toggleSideBar ? "ml-64" : "ml-20"} transition-all duration-300 ease-in-out flex flex-col min-h-screen`}>
         {/* Header */}
         <header className="bg-gray-900/30 border-b border-gray-700/50 p-4 backdrop-blur-sm">
           <div className="flex items-center justify-between">
@@ -439,7 +552,7 @@ const HospitalDashboard = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-medium">Admin</span>
+                <span className="text-white font-medium">{userData?.userId?.name}</span>
               </div>
             </div>
           </div>

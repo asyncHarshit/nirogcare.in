@@ -99,8 +99,16 @@ const SelectRole = () => {
       const response = await callRoleApi(selectedRole, tokenToSend);
       
       if (response) {
-        toast.success("Role selected successfully");
-        navigate(`/${selectedRole}/dashboard`);
+        if(selectedRole === 'hospitalAdmin'){
+          toast.success("Role selected successfully");
+          navigate('/hospitalAdmin/profile');
+
+        }else{
+          toast.success("Role selected successfully");
+          navigate(`/${selectedRole}/dashboard`);
+
+        }
+        
       }
     } catch (error) {
       console.error("Role selection failed:", error);

@@ -53,7 +53,7 @@ export const getNearbyHospitals = async (req, res) => {
           },
           distanceField: "distance", // field added to each doc
           spherical: true,
-          maxDistance: 10000, // 10km in meters
+          maxDistance: 100000, // 10km in meters
         },
       },
     ]);

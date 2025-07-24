@@ -13,3 +13,42 @@ export async function getAllDoctorsbyHospitals(hospitalId) {
 }
 
 
+export async function registerHospital(formdata){
+  try {
+    const response = await axios.post(`${baseUrl}/api/hospital/register`, formdata, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error registering hospital:", error);
+    throw error; // Re-throw the error for further handling
+  }
+}
+
+export async function getHospital(){
+  try {
+    const response = await axios.get(`${baseUrl}/api/hospital/profile`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching hospital profile:", error);
+    throw error; // Re-throw the error for further handling
+  }
+}
+
+
+export async function getPatientsByHospital(){
+  try {
+    const response = await axios.get(`${baseUrl}/api/hospital/stats`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching hospital profile:", error);
+    throw error; // Re-throw the error for further handling
+  }
+}
+
+
+

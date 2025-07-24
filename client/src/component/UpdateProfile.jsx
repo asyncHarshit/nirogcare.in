@@ -17,7 +17,6 @@ const UpdatePatientProfile = ({ userData = {} }) => {
             Update Patient Profile
             </h2>
         </div>
-        <p className="text-gray-400 mt-2">Complete your medical profile information</p>
           </div>
 
 

@@ -35,8 +35,8 @@ import {
   Calendar,
   Stethoscope,
   PanelLeft,
-  PanelRight,
-  BotMessageSquare
+  Monitor,
+  BotMessageSquare,
 } from "lucide-react";
 
 import { getMe } from "../services/getMeServices";
@@ -203,6 +203,7 @@ const PatientDashboard = () => {
     { id: "lab", label: "Book Lab", icon: FlaskConical },
     { id: "records", label: "Medical Record", icon: FileText },
     { id: "reports", label: "Lab Report", icon: BarChart3 },
+    { id: "live", label: "Live Chat", icon: Monitor },
     { id: "ai", label: "AI Assistant", icon: BotMessageSquare },
   ];
 
@@ -483,6 +484,14 @@ const PatientDashboard = () => {
         return (
           <div className="space-y-6">
           <LabReportComponent labReports={labReports} />
+          </div>
+        );
+        case "live":
+        return (
+          <div className="space-y-6">
+            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+              
+            </div>
           </div>
         );
       case "ai":

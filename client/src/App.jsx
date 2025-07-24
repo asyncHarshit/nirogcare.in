@@ -9,7 +9,7 @@ import HospitalDashboard from "./pages/HospitalDashboard";
 import AssistantDashboard from "./pages/AssistantDashboard";
 import LabAdmin from "./pages/LabAdmin";
 import { ProtectRole } from "./component/protect_role";
-import {AiIcon} from "./assets/robot";
+import HospitalProfileForm from "./component/HospitalProfile";
 
 const App = () => {
   return (
@@ -50,6 +50,14 @@ const App = () => {
         element={
           <ProtectedRoute allowedRoles={["hospitalAdmin"]}>
             <HospitalDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hospitalAdmin/profile"
+        element={
+          <ProtectedRoute allowedRoles={["hospitalAdmin"]}>
+            <HospitalProfileForm />
           </ProtectedRoute>
         }
       />
