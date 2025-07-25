@@ -114,6 +114,7 @@ export const updateVitalsForUser = async (req, res) => {
       temperature,
       vitalUpdated
     } = req.body;
+    //
 
     const user = await User.findById(userId);
 
