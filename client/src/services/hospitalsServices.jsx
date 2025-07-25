@@ -52,3 +52,29 @@ export async function getPatientsByHospital(){
 
 
 
+export async function getAllHospitalPatients() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/hospital/patients`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all hospital patients:", error);
+    throw error; // Re-throw the error for further handling
+  }
+}
+
+export async function getAllAssistantsForHospital() {
+  try {
+    const response = await axios.get(`${baseUrl}/api/hospital/all-assistants`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all assistants for hospital:", error);
+    throw error; // Re-throw the error for further handling
+  }
+}
+
+
+

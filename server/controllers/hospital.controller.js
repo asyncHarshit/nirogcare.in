@@ -1,5 +1,5 @@
 import { Hospital } from "../models/Hospital.js";
-import { Patient } from "../models/Patient.js";
+import { Assistant } from "../models/Assistant.js";
 import { Doctor } from "../models/Doctor.js";
 import { Appointment } from "../models/Appointment.js";
 
@@ -66,38 +66,43 @@ export const getMyHospitalProfile = async (req, res) => {
 export const getPatientStats = async (req, res) => {
   try {
     const userId = req.user.id;
-    const hospital = await Hospital.findOne({ userId });
 
+    // Find hospital by logged-in user ID
+    const hospital = await Hospital.findOne({ userId });
     if (!hospital) {
       return res.status(404).json({ error: "Hospital not found." });
     }
 
-    // Get all doctors in this hospital
-    const doctors = await Doctor.find({ hospitalId: hospital._id });
+    // Get all doctors under this hospital, and populate their user name
+    const doctors = await Doctor.find({ hospitalId: hospital._id }).populate({
+      path: "userId",
+      select: "name", // get doctor name from User model
+    });
 
     const doctorIds = doctors.map((doc) => doc._id);
 
-    // Populate patientId and its userId (with name & phone)
-    const appointments = await Appointment.find({ doctorId: { $in: doctorIds } })
-      .populate({
-        path: "patientId",
-        populate: {
-          path: "userId",
-          select: "name phone", // Selecting only required fields
-        },
-      });
+    // Get appointments linked to these doctors
+    const appointments = await Appointment.find({ doctorId: { $in: doctorIds } }).populate({
+      path: "patientId",
+      populate: {
+        path: "userId",
+        select: "name phone", // get patient name & phone from User model
+      },
+    });
 
+    // Initialize mapping of doctors to their patients
     const doctorPatientsMap = {};
 
     for (const doctor of doctors) {
       doctorPatientsMap[doctor._id.toString()] = {
         doctorId: doctor._id,
-        doctorName: doctor.name,
+        doctorName: doctor.userId?.name || "Unknown Doctor",
         specialization: doctor.specialization,
         patients: [],
       };
     }
 
+    // Group patients under each doctor (avoiding duplicates)
     for (const appointment of appointments) {
       const doctorId = appointment.doctorId.toString();
       const patient = appointment.patientId;
@@ -105,15 +110,15 @@ export const getPatientStats = async (req, res) => {
       if (patient && patient.userId && doctorPatientsMap[doctorId]) {
         const patientUser = patient.userId;
 
-        // Avoid duplicate patients
+        // Avoid duplicate patients for same doctor
         const alreadyAdded = doctorPatientsMap[doctorId].patients.some(
           (p) => p._id.toString() === patient._id.toString()
         );
 
         if (!alreadyAdded) {
           doctorPatientsMap[doctorId].patients.push({
-            _id: patient._id,                   // Patient ID
-            userId: patientUser._id,            // User ID of the patient
+            _id: patient._id,            // patient schema ID
+            userId: patientUser._id,     // user ID from User model
             name: patientUser.name,
             phone: patientUser.phone,
             age: patient.age,
@@ -124,6 +129,7 @@ export const getPatientStats = async (req, res) => {
       }
     }
 
+    // Final list of doctors with their patients
     const doctorsWithPatients = Object.values(doctorPatientsMap);
 
     res.status(200).json({
@@ -136,6 +142,116 @@ export const getPatientStats = async (req, res) => {
   }
 };
 
+
+export const getAllHospitalPatients = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Find the hospital linked to this user
+    const hospital = await Hospital.findOne({ userId });
+    if (!hospital) {
+      return res.status(404).json({ error: "Hospital not found." });
+    }
+
+    // Fetch all appointments for this hospital
+    const appointments = await Appointment.find({ hospitalId: hospital._id })
+      .populate({
+        path: "patientId",
+        populate: {
+          path: "userId",
+          select: "name phone", // Only fetch name & phone from user
+        },
+      })
+      .populate({
+        path: "doctorId",
+        select: "name specialization", // Optional: Doctor info
+      });
+
+    // Format appointment list
+    const patientAppointments = appointments.map((appointment) => {
+      const patient = appointment.patientId;
+      const user = patient?.userId;
+
+      return {
+        appointmentId: appointment._id,
+        patientId: patient?._id,
+        userId: user?._id,
+        name: user?.name,
+        phone: user?.phone,
+        age: patient?.age,
+        gender: patient?.gender,
+        address: patient?.address,
+        doctorName: appointment.doctorId?.name,
+        specialization: appointment.doctorId?.specialization,
+        appointmentDate: appointment.date,
+        status: appointment.status,
+      };
+    });
+
+    res.status(200).json({
+      totalAppointments: patientAppointments.length,
+      appointments: patientAppointments,
+    });
+  } catch (error) {
+    console.error("Error fetching hospital patients:", error);
+    res.status(500).json({ error: "Failed to fetch appointment details." });
+  }
+};
+
+
+
+export const getAllAssistantsForHospital = async (req, res) => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: user ID not found",
+    });
+  }
+
+  try {
+    // Find hospital from logged-in user
+    const hospital = await Hospital.findOne({ userId });
+
+    if (!hospital) {
+      return res.status(404).json({
+        success: false,
+        message: "Hospital not found",
+      });
+    }
+
+    // Fetch all assistants for that hospital
+    const assistants = await Assistant.find({ hospitalId: hospital._id })
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId",
+          model: "User",
+          select: "name email",
+        },
+        select: "specialization gender userId",
+      })
+      .populate({
+        path: "userId",
+        model: "User",
+        select: "name email phone",
+      });
+
+    res.status(200).json({
+      success: true,
+      total: assistants.length,
+      assistants,
+    });
+  } catch (error) {
+    console.error("Error fetching assistants:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching assistants",
+      error: error.message,
+    });
+  }
+};
 
 
 

@@ -31,9 +31,11 @@ import { toast } from 'sonner';
 import { logoutUser } from '../services/logoutService';
 import { useNavigate } from 'react-router-dom';
 import { getHospital } from '../services/hospitalsServices';
-import { todaysPatientsApi } from '../services/doctorServices';
 import { getPatientsByHospital } from '../services/hospitalsServices';
 import DrPatientsListByHospital from '../component/DrPatientsListByHospital';
+import { getAllHospitalPatients } from '../services/hospitalsServices';
+import { getAllAssistantsForHospital } from '../services/hospitalsServices';
+import AllAssistants from '../component/AllAssistants';
 
 const HospitalDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -41,6 +43,11 @@ const HospitalDashboard = () => {
   const [toggleSideBar, setToggleSideBar] = useState(false);
   const [userData,setUserData] = useState(null);
   const [doctorsPatientsData,setDoctorsPatientsData] = useState([]);
+  const [AllPatients,setAllPatients] = useState([]);
+  const [allAssistants,setAllAssistants] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [patientsLength, setPatientsLength] = useState(0);
+
 
 
 
@@ -82,25 +89,6 @@ const HospitalDashboard = () => {
     },[])
 
 
-    const fetchTodaysPatients = async()=>{
-      try {
-        const response = await todaysPatientsApi();
-        if(response){
-          console.log(response);
-        }
-        
-      } catch (error) {
-        console.log("Error in fetching todays patients",error)
-      }
-    }
-
-    useEffect(()=>{
-      if(activeTab === 'patients'){
-        fetchTodaysPatients();
-      }
-
-    },[activeTab])
-
 
     const fetchDRPatientsStats = async()=>{
       try {
@@ -121,6 +109,50 @@ const HospitalDashboard = () => {
       }
     },[activeTab])
 
+
+
+    const fetchAllHospitalPatients = async()=>{
+      try {
+        const response = await getAllHospitalPatients();
+        if(response){
+          console.log("All Hospital Patients: ",response);
+          setAllPatients(response.appointments);
+          setPatientsLength(response.totalAppointments);
+        }
+        
+      } catch (error) {
+        console.log("Error in fetching all hospital patients",error)
+      }
+    };
+
+    useEffect(()=>{
+     
+        fetchAllHospitalPatients();
+      
+    },[])
+
+
+    const fetchAllAssistants = async()=>{
+      try {
+        const response = await getAllAssistantsForHospital();
+        if(response){
+          console.log(response)
+          setAllAssistants(response?.assistants);
+        }
+        
+      } catch (error) {
+        console.log("Error in fetching all assistants",error)
+        
+      }
+    }
+
+
+    useEffect(()=>{
+      if(activeTab === 'assistants'){
+        fetchAllAssistants();
+      }
+    },[activeTab])
+
     
 
   const navItems = [
@@ -132,16 +164,9 @@ const HospitalDashboard = () => {
   ];
 
   const hospitalStats = [
-    { icon: Users, label: 'Total Patients', value: '324', change: '+12%', color: 'text-blue-400' },
-    { icon: Bed, label: 'Occupied Beds', value: '156/200', change: '78%', color: 'text-green-400' },
-    { icon: UserCheck, label: 'Doctors on Duty', value: '24', change: '+2', color: 'text-purple-400' },
-    { icon: Activity, label: 'Emergency Cases', value: '8', change: '+3', color: 'text-red-400' },
-  ];
-
-  const todaysPatients = [
-    { id: 'P001', name: 'Rahul', age: 45, condition: 'Cardiac Checkup', doctor: 'Dr. Harshit Rajput', time: '09:00 AM', status: 'Waiting' },
-    { id: 'P002', name: 'Shubham', age: 62, condition: 'Diabetes Follow-up', doctor: 'Dr. Tarun Jain', time: '09:30 AM', status: 'In Progress' },
-   
+    { icon: Users, label: 'Total Patients', value: patientsLength, change: '+12%', color: 'text-blue-400' },
+    { icon: UserCheck, label: 'Doctors on Duty', value: '2', change: '+2', color: 'text-purple-400' },
+    { icon: Activity, label: 'Emergency Cases', value: '0', change: '+3', color: 'text-red-400' },
   ];
 
   const labCollection = [
@@ -201,7 +226,7 @@ const HospitalDashboard = () => {
               <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
                 <h3 className="text-xl font-semibold text-white mb-4">Recent Admissions</h3>
                 <div className="space-y-3">
-                  {todaysPatients.slice(0, 3).map((patient, index) => (
+                  {AllPatients.slice(0, 3).map((patient, index) => (
                     <div key={index} className="bg-gray-700/30 p-3 rounded-lg border border-gray-600/30">
                       <div className="flex items-center justify-between">
                         <div>
@@ -325,79 +350,65 @@ const HospitalDashboard = () => {
 
       )
       case 'patients':
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Today's Patients</h2>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="text" placeholder="Search patients..." className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+              const filteredPatients = AllPatients.filter((patient) => {
+                const name = patient.name?.toLowerCase() || "";
+                const phone = patient.phone || "";
+                const query = searchQuery.toLowerCase();
+                return name.includes(query) || phone.includes(query);
+              });
+
+              return (
+                <div className="space-y-6">
+                  <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-white">Today's Patients</h2>
+                      <div className="flex items-center space-x-2">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <input
+                            type="text"
+                            placeholder="Search patients..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-gray-700/50 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                          <Plus className="w-4 h-4" />
+                          <span>Add Patient</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      {filteredPatients.map((patient, index) => (
+                        <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-blue-500/50 transition-all duration-300">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-white">{patient.name} ({patient.userId})</h4>
+                              <p className="text-gray-400 text-sm">Age: {patient.age}</p>
+                              <p className="text-gray-300 text-sm">Phone: {patient.phone}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-blue-400 font-medium">{patient.time}</p>
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                patient.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
+                                patient.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
+                                'bg-blue-400/20 text-blue-400'
+                              }`}>
+                                {patient.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                    <Plus className="w-4 h-4" />
-                    <span>Add Patient</span>
-                  </button>
                 </div>
-              </div>
-              <div className="space-y-4">
-                {todaysPatients.map((patient, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30 hover:border-blue-500/50 transition-all duration-300">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">{patient.name} ({patient.id})</h4>
-                        <p className="text-gray-400 text-sm">Age: {patient.age} | {patient.condition}</p>
-                        <p className="text-gray-300 text-sm">Doctor: {patient.doctor}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-blue-400 font-medium">{patient.time}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          patient.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
-                          patient.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-blue-400/20 text-blue-400'
-                        }`}>
-                          {patient.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case 'lab':
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Lab Collection</h2>
-              <div className="space-y-4">
-                {labCollection.map((lab, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white">{lab.test} ({lab.id})</h4>
-                        <p className="text-gray-400 text-sm">Patient: {lab.patient}</p>
-                        <p className="text-gray-300 text-sm">Collection Time: {lab.time}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-3 py-1 rounded-full ${
-                          lab.status === 'Completed' ? 'bg-green-400/20 text-green-400' :
-                          lab.status === 'Collected' ? 'bg-blue-400/20 text-blue-400' :
-                          lab.status === 'In Progress' ? 'bg-yellow-400/20 text-yellow-400' :
-                          'bg-gray-400/20 text-gray-400'
-                        }`}>
-                          {lab.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
+              );
+
+        
+      
+       
       case 'doctors':
         return (
           <div className="space-y-6">
@@ -407,34 +418,7 @@ const HospitalDashboard = () => {
       case 'assistants':
         return (
           <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-6">Assistant Collection</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {assistantCollection.map((assistant, index) => (
-                  <div key={index} className="bg-gray-700/30 p-4 rounded-lg border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                        <UserPlus className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-white">{assistant.name}</h4>
-                        <p className="text-gray-400 text-sm">{assistant.role}</p>
-                        <p className="text-gray-300 text-sm">{assistant.department} | {assistant.shift}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          assistant.status === 'Available' ? 'bg-green-400/20 text-green-400' :
-                          assistant.status === 'On Duty' ? 'bg-blue-400/20 text-blue-400' :
-                          'bg-yellow-400/20 text-yellow-400'
-                        }`}>
-                          {assistant.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+           <AllAssistants data={allAssistants} />
           </div>
         );
       default:

@@ -69,7 +69,7 @@ const VapiWidget = ({ apiKey, assistantId }) => {
                 <Mic className="w-6 h-6 animate-pulse" />
                 <div className="absolute -inset-2 bg-white/20 rounded-full animate-ping opacity-75"></div>
               </div>
-              <span className="text-lg">Start Voice Chat</span>
+              <span className="text-lg cursor-pointer">Start Voice Chat</span>
               <div className="flex items-center gap-1 ml-2">
                 <div className="w-1 h-3 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-1 h-4 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>

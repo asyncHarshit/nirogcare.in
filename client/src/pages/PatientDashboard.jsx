@@ -46,6 +46,7 @@ import { AiIcon } from "../assets/robot";
 import ChatBot from "../component/ChatBot";
 import MedicalRecordPatient from "../component/MedicalRecordPatient";
 import { getAllLabReport } from "../services/labServices";
+import ThemeToggleSwitch from "../component/ThemeButton";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -203,7 +204,7 @@ const PatientDashboard = () => {
     { id: "lab", label: "Book Lab", icon: FlaskConical },
     { id: "records", label: "Medical Record", icon: FileText },
     { id: "reports", label: "Lab Report", icon: BarChart3 },
-    { id: "live", label: "Live Chat", icon: Monitor },
+    // { id: "live", label: "Live Chat", icon: Monitor },
     { id: "ai", label: "AI Assistant", icon: BotMessageSquare },
   ];
 
@@ -506,163 +507,160 @@ const PatientDashboard = () => {
   if (loading) return <LoaderOnly />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex">
-      {/* Sidebar */}
-      <div
-        className={`${
-          toggleSideBar ? "w-64" : "w-20"
-        } transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm overflow-hidden`}
-      >
-        <div className=" p-3 border-b border-gray-700/50">
-          <div className="flex mt-0.5 items-center justify-between">
-            <div className="flex items-center space-x-3 group">
-              {toggleSideBar && (
-                <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
-                  <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
-                </div>
-              )}
-
-              {toggleSideBar && (
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
-                  NirogCare
-                </h1>
-              )}
-            </div>
-            <PanelLeft
-              onClick={() => setToggleSideBar((prev) => !prev)}
-              className={`${
-                toggleSideBar ? "" : "mt-[10px] mb-[11px] mr-[10px]"
-              } text-emerald-700 hover:text-emerald-500 cursor-pointer   transition duration-300`}
-            />
+  <div className="h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex overflow-hidden">
+    {/* Sidebar */}
+    <div
+      className={`${
+        toggleSideBar ? "w-64" : "w-20"
+      } h-screen overflow-y-auto transition-all duration-300 ease-in-out bg-gray-900/50 border-r border-gray-700/50 flex flex-col backdrop-blur-sm`}
+    >
+      <div className="p-3 border-b border-gray-700/50">
+        <div className="flex mt-0.5 items-center justify-between">
+          <div className="flex items-center space-x-3 group">
+            {toggleSideBar && (
+              <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30">
+                <Stethoscope className="text-emerald-400 w-7 h-7 group-hover:text-emerald-300" />
+              </div>
+            )}
+            {toggleSideBar && (
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-emerald-100 to-emerald-200 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-blue-300 transition-all duration-300">
+                NirogCare
+              </h1>
+            )}
           </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center ${
-                    toggleSideBar ? "space-x-3" : "justify-center"
-                  } cursor-pointer p-3 rounded-lg relative ${
-                    activeTab === item.id
-                      ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
-                  }`}
-                >
-                  
-                  {item.id !== 'ai' && (
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                  )}
-                  {item.id === 'ai' && (
-                    <div>
-                      <AiIcon className="w-4 h-4 flex-shrink-0" />
-                    </div>
-                  )}
-                  {toggleSideBar && (
-                    <span className="flex-1 text-left">{item.label}</span>
-                  )}
-                  {activeTab === item.id && item.id !== 'ai' &&  (
-                    <span
-                      className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
-                        toggleSideBar
-                          ? "ml-auto"
-                          : "absolute right-1.5 bottom-1.5"
-                      }`}
-                    ></span>
-                  )}
-
-                  {
-                    activeTab === item.id && item.id === 'ai' &&  (
-                    <span
-                      className={`w-1.5 h-1.5 bg-emerald-500 rounded-full ${
-                        toggleSideBar
-                          ? "ml-auto"
-                          : "absolute right-1.5 bottom-1.5"
-                      }`}
-                    ></span>
-
-                  )}
-                 
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-700/50">
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center ${
-              toggleSideBar ? "space-x-3 justify-start" : "justify-center"
-            } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
-          >
-            <LogOut className="w-5 h-5" />
-            {toggleSideBar && <span>Logout</span>}
-          </button>
+          <PanelLeft
+            onClick={() => setToggleSideBar((prev) => !prev)}
+            className={`${
+              toggleSideBar ? "" : "mt-[10px] mb-[11px] mr-[10px]"
+            } text-emerald-700 hover:text-emerald-500 cursor-pointer transition duration-300`}
+          />
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-
-        {activeTab === "home" && (
-          <header className="bg-gray-900/30 border-b border-gray-700/50 p-3 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-white capitalize flex items-center">
-                  {activeTab === "home"
-                    ? "Dashboard"
-                    : activeTab.replace(/([A-Z])/g, " $1").trim()}
-                </h2>
-
-                <p className="text-gray-400 text-sm">
-                  {new Date().toLocaleDateString("en", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-              <div className="flex items-center space-x-4">
-               
-                <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
-                  <Bell className="w-5 h-5" />
-                  {notifications > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {notifications}
-                    </span>
-                  )}
-                </button>
-
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">
-                    <button
-                      className="cursor-pointer"
-                      onClick={() => setActiveTab("profile")}
-                    >
-                      <User className="w-4 h-4 text-white" />
-                    </button>
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {navItems.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center ${
+                  toggleSideBar ? "space-x-3" : "justify-center"
+                } cursor-pointer p-3 rounded-lg relative ${
+                  activeTab === item.id
+                    ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white border border-green-500/50"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800/50"
+                }`}
+              >
+                {item.id !== "ai" && (
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                )}
+                {item.id === "ai" && (
+                  <div>
+                    <AiIcon className="w-4 h-4 flex-shrink-0" />
                   </div>
-                  <span className="text-white font-medium">
-                    {userData?.user?.name}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </header>
-        )}
+                )}
+                {toggleSideBar && (
+                  <span className="flex-1 text-left">{item.label}</span>
+                )}
+                {activeTab === item.id && item.id !== "ai" && (
+                  <span
+                    className={`w-1.5 h-1.5 bg-cyan-300 rounded-full ${
+                      toggleSideBar
+                        ? "ml-auto"
+                        : "absolute right-1.5 bottom-1.5"
+                    }`}
+                  ></span>
+                )}
+                {activeTab === item.id && item.id === "ai" && (
+                  <span
+                    className={`w-1.5 h-1.5 bg-emerald-500 rounded-full ${
+                      toggleSideBar
+                        ? "ml-auto"
+                        : "absolute right-1.5 bottom-1.5"
+                    }`}
+                  ></span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-        {/* Content */}
-        <main className="flex-1 p-6 overflow-y-auto">{renderContent()}</main>
+      {/* Logout */}
+      <div className="p-4 border-t border-gray-700/50">
+        <button
+          onClick={handleLogout}
+          className={`w-full flex items-center ${
+            toggleSideBar ? "space-x-3 justify-start" : "justify-center"
+          } p-3 rounded-lg text-gray-300 hover:bg-red-600 cursor-pointer hover:text-white transition-all duration-300`}
+        >
+          <LogOut className="w-5 h-5" />
+          {toggleSideBar && <span>Logout</span>}
+        </button>
       </div>
     </div>
-  );
+
+    {/* Main Content */}
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Header */}
+      {activeTab === "home" && (
+        <header className="sticky top-0 z-10 h-18 bg-gray-900/30 border-b border-gray-700/50 p-3 backdrop-blur-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white capitalize flex items-center">
+                {activeTab === "home"
+                  ? "Dashboard"
+                  : activeTab.replace(/([A-Z])/g, " $1").trim()}
+              </h2>
+              <p className="text-gray-400 text-sm">
+                {new Date().toLocaleDateString("en", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <ThemeToggleSwitch />
+              <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
+                <Bell className="w-5 h-5" />
+                {notifications > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notifications}
+                  </span>
+                )}
+              </button>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-700 to-blue-700 rounded-full flex items-center justify-center">
+                  <button
+                    className="cursor-pointer"
+                    onClick={() => setActiveTab("profile")}
+                  >
+                    <User className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+                <span className="text-white font-medium">
+                  {userData?.user?.name}
+                </span>
+              </div>
+            </div>
+          </div>
+        </header>
+      )}
+
+      {/* Scrollable content */}
+      <main
+  className={`flex-1 overflow-y-auto p-6`}
+>
+  {renderContent()}
+</main>
+
+    </div>
+  </div>
+);
+
 };
 
 export default PatientDashboard;
