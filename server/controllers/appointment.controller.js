@@ -44,7 +44,7 @@ export const createAppointment = async (req, res) => {
     });
   }
 };
-
+// GET appointments for logged-in user
 
 export const getMyAppointments = async (req, res) => {
   try {
