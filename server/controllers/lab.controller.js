@@ -31,7 +31,7 @@ export const registerLab = async (req, res) => {
 
     await newLab.save();
 
-    res.status(201).json({ message: "Lab registered successfully.", lab: newLab });
+    res.status(201).json({ message: "Lab Registered Successfully.", lab: newLab });
   } catch (error) {
     console.error("Error registering lab:", error);
     res.status(500).json({ error: "Failed to register lab." });
