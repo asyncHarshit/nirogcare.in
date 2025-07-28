@@ -10,6 +10,8 @@ import AssistantDashboard from "./pages/AssistantDashboard";
 import LabAdmin from "./pages/LabAdmin";
 import { ProtectRole } from "./component/protect_role";
 import HospitalProfileForm from "./component/HospitalProfile";
+import ForgotPassword from "./component/ForgotPassword";
+import ResetPassword from "./component/ResetPassword";
 
 const App = () => {
   return (
@@ -18,6 +20,8 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route
         path="/select-role"

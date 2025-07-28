@@ -50,6 +50,14 @@ const userSchema = new mongoose.Schema(
       type : String,
       trim : true
     },
+    otp: {
+      type: String,
+      trim: true
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+    },
 
     vitalUpdated: {
       type: Boolean,
