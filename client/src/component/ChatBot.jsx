@@ -104,7 +104,7 @@ const ChatBot = ({userData}) => {
   // Voice AI Component - moved outside to prevent recreation
   const renderVoiceAI = () => {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 h-screen flex items-center justify-center">
         <VapiWidget
           apiKey={apiKey}
           assistantId={assistantId}
