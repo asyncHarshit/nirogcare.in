@@ -47,6 +47,7 @@ import ChatBot from "../component/ChatBot";
 import MedicalRecordPatient from "../component/MedicalRecordPatient";
 import { getAllLabReport } from "../services/labServices";
 import ThemeToggleSwitch from "../component/ThemeButton";
+import VideoCall from "../component/VideoCall";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -204,7 +205,7 @@ const PatientDashboard = () => {
     { id: "lab", label: "Book Lab", icon: FlaskConical },
     { id: "records", label: "Medical Record", icon: FileText },
     { id: "reports", label: "Lab Report", icon: BarChart3 },
-    // { id: "live", label: "Live Chat", icon: Monitor },
+    { id: "live", label: "Live Chat", icon: Monitor },
     { id: "ai", label: "AI Assistant", icon: BotMessageSquare },
   ];
 
@@ -488,9 +489,13 @@ const PatientDashboard = () => {
           </div>
         );
         case "live":
+          const userId = 'rghfhgfhfh';
+          const callId = 'video-consult-003'
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+
+            <VideoCall callId={callId} userId={userId} name = {userData?.user?.name}/>
               
             </div>
           </div>

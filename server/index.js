@@ -14,6 +14,7 @@ import assistantRoute from "./routes/assistantRoutes.js"
 import appointmentRoute from "./routes/appointmentRoutes.js"
 import aiRouter from "./routes/aiRoutes.js"
 import medicalRecordRoutes from "./routes/medicalRecordRoutes.js"
+import videoRoutes from './routes/videoRoutes.js'
 
 
 
@@ -25,6 +26,7 @@ app.use(cors({
   origin: ['http://localhost:5173','https://nirogcare-in-frontend.vercel.app','https://www.nirogcare.in'],
   credentials: true 
 }));
+
 
 
 app.use(express.json());
@@ -45,6 +47,7 @@ app.use('/api/assistant',assistantRoute)
 app.use('/api/appointment',appointmentRoute)
 app.use('/api/ai',aiRouter)
 app.use('/api/record',medicalRecordRoutes)
+app.use('/api/stream',videoRoutes)
 
 
 

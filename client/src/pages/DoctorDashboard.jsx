@@ -11,7 +11,7 @@ import {
   Phone,
   CheckCircle,
   AlertCircle,
-  XCircle,
+  Monitor,
   PanelLeft,
   Calendar,
   Activity
@@ -26,6 +26,7 @@ import { UpdatedDoctor } from '../component/UpdatedDoctor';
 import { todaysPatientsApi } from '../services/doctorServices';
 import DiagnosisForm from '../component/DiagnosisForm';
 import { addMedicalRecordAPI } from '../services/medicalRecordServices';
+import VideoCall from '../component/VideoCall';
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -124,6 +125,7 @@ const DoctorDashboard = () => {
     { id: 'home', label: 'Home', icon: Home },
     { id: 'profile', label: 'My Profile', icon: User },
     { id: 'patients', label: 'Today\'s Patients', icon: Users },
+    { id: 'live', label: 'Live Chat', icon: Monitor },
   ];
 
   const handleDiagnose = (patient) => {
@@ -373,7 +375,20 @@ const DoctorDashboard = () => {
             </div>
           </div>
         );
-        
+      
+
+      case "live":
+          const userId = 'ghfhgfghfgh';
+          const callId = 'video-consult-003'
+        return (
+          <div className="space-y-6">
+            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
+
+            <VideoCall callId={callId} userId={userId}/>
+              
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -465,7 +480,7 @@ const DoctorDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-900/30 border-b border-gray-700/50 p-4 backdrop-blur-sm">
+        {activeTab === 'home' ? (<header className="bg-gray-900/30 border-b border-gray-700/50 p-4 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white capitalize">
@@ -499,7 +514,7 @@ const DoctorDashboard = () => {
               </div>
             </div>
           </div>
-        </header>
+        </header>) : ""}
 
         {/* Content */}
         <main className="flex-1 p-6 overflow-y-auto">

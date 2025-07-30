@@ -39,7 +39,7 @@ export default function ThemeToggleSwitch() {
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: #f4f4f5;
+          // background-color: #f4f4f5;
           transition: .4s;
           border-radius: 30px;
         }
@@ -58,7 +58,7 @@ export default function ThemeToggleSwitch() {
         }
         
         input:checked + .slider {
-          background-color: #303136;
+          // background-color: #303136;
         }
         
         input:checked + .slider:before {
