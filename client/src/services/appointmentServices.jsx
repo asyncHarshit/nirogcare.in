@@ -14,3 +14,16 @@ export async function getAllApointments(){
     }
 
 }
+export async function getOnlineApointments(){
+    try {
+        const response = await axios.get(`${baseUrl}/api/appointment/online-appointment`, {
+        withCredentials: true,
+      });
+      console.log(response)
+      return response.data;
+        
+    } catch (error) {
+        console.log("Error in fetching online Appointments !!",error)
+    }
+
+}

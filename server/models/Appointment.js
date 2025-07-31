@@ -48,6 +48,12 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mode: {
+      type: String,
+      enum: ["online", "offline"],
+      required : true
+      
+    },
     status: {
       type: String,
       enum: ["booked", "cancelled", "completed"],

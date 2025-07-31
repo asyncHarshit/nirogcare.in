@@ -37,6 +37,8 @@ import {
   PanelLeft,
   Monitor,
   BotMessageSquare,
+  Globe,
+  Globe2,
 } from "lucide-react";
 
 import { getMe } from "../services/getMeServices";
@@ -48,6 +50,8 @@ import MedicalRecordPatient from "../component/MedicalRecordPatient";
 import { getAllLabReport } from "../services/labServices";
 import ThemeToggleSwitch from "../component/ThemeButton";
 import VideoCall from "../component/VideoCall";
+import { getOnlineApointments } from "../services/appointmentServices";
+import LiveComponentPatient from "../component/LiveComponentPatient";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -64,6 +68,7 @@ const PatientDashboard = () => {
   const [vital, setVital] = useState(null);
   const [medicalRecord, setMedicalRecord] = useState([]);
   const [labReports, setLabReport] = useState([]);
+  const [onlineAppointment , setOnlineAppointment] = useState([]);
   
   // Search state for records
   
@@ -103,7 +108,10 @@ const PatientDashboard = () => {
           setUserData(userRes);
           console.log(userRes);
         }
-        if (appointmentRes) setAppointment(appointmentRes?.appointments || []);
+        if (appointmentRes){
+          setAppointment(appointmentRes?.appointments || []);
+          console.log(appointmentRes)
+        }
         if (labAppointmentRes) setLabAppointment(labAppointmentRes || []);
         if (vitalData) setVital(vitalData);
       } catch (error) {
@@ -190,6 +198,29 @@ const PatientDashboard = () => {
       getLabReport();
       console.log(labReports);
       
+    }
+
+  },[activeTab])
+
+
+  const onlineAppointmentPatients = async()=>{
+    try {
+      const response = await getOnlineApointments();
+      if(response){
+        setOnlineAppointment(response?.appointments)
+
+      }
+      
+    } catch (error) {
+      console.log("Error in fetching online appointments")
+      
+    }
+    
+  }
+
+  useEffect(()=>{
+    if(activeTab === 'live'){
+      onlineAppointmentPatients();
     }
 
   },[activeTab])
@@ -322,6 +353,14 @@ const PatientDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
+                                  <div className="flex items-center justify-end gap-2 mb-1">
+                                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20">
+                                      <Globe className="w-4 h-4 text-emerald-400" />
+                                      <span className="text-sm font-semibold text-emerald-300 capitalize">
+                                        {appt.mode}
+                                      </span>
+                                    </div>
+                                  </div>
                         <div className="flex items-center gap-2 justify-end mb-1">
                           <Calendar className="w-4 h-4 text-blue-400" />
                           <p className="text-blue-400 font-medium">
@@ -337,12 +376,14 @@ const PatientDashboard = () => {
                               : "Date"}
                           </p>
                         </div>
+
                         <div className="flex items-center gap-2 justify-end">
                           <Clock className="w-4 h-4 text-slate-400" />
                           <p className="text-slate-300 text-sm">
                             {appt.timeSlot || "Time"}
                           </p>
                         </div>
+                        
                       </div>
                     </div>
                   </div>
@@ -493,11 +534,8 @@ const PatientDashboard = () => {
           const callId = 'video-consult-003'
         return (
           <div className="space-y-6">
-            <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
-
-            <VideoCall callId={callId} userId={userId} name = {userData?.user?.name}/>
-              
-            </div>
+            <LiveComponentPatient onlineAppointment={onlineAppointment} name = {userData?.user?.name}/>
+            
           </div>
         );
       case "ai":

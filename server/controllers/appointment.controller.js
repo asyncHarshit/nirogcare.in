@@ -5,7 +5,7 @@ import {Patient} from "../models/Patient.js"
 export const createAppointment = async (req, res) => {
   try {
     const { type } = req.body.forPatient;
-    const { doctorId, hospitalId, date, timeSlot ,contact , age , gender } = req.body;
+    const { doctorId, hospitalId, date, timeSlot ,contact , age , gender , mode } = req.body;
 
     if (!doctorId || !hospitalId || !date || !timeSlot || !contact || !age || !gender) {
       return res.status(400).json({ error: "All fields are required." });
@@ -29,7 +29,8 @@ export const createAppointment = async (req, res) => {
       timeSlot,
       patientId: patient._id,
       age,
-      gender
+      gender,
+      mode
     });
 
     return res.status(201).json({
@@ -125,3 +126,31 @@ export const cancelAppointment = async (req, res) => {
       .json({ error: "Server error while cancelling appointment." });
   }
 };
+
+
+
+
+export const getMyOnlineAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.find({ bookedBy: req.user.id , mode : 'online' })
+      .populate({
+        path: "doctorId",
+        populate: {
+          path: "userId",
+          select: "name email ",
+        },
+        select: "specialization userId",
+      })
+      .populate("hospitalId", "name address")
+      .populate("gender age")
+      .sort({ date: -1 });
+
+    return res.status(200).json({ appointments });
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error while fetching appointments." });
+  }
+};
+

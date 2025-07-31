@@ -16,7 +16,7 @@ import '@stream-io/video-react-sdk/dist/css/styles.css';
 const baseUrl = import.meta.env.VITE_API_URL
 
 
-const VideoCall = ({ userId, callId ,name}) => {
+const VideoCall = ({userId , callId ,name}) => {
   const [client, setClient] = useState(null);
   const [call, setCall] = useState(null);
 

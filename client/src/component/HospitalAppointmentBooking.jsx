@@ -16,6 +16,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     contact: '',
     age : '',
     gender : '',
+    mode : ''
   });
 
 
@@ -29,6 +30,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     contact: '',
     age : '',
     gender : '',
+    mode : ''
   });
 
   try {
@@ -52,6 +54,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
       contact: '',
       age : '',
       gender : '',
+      mode : ''
     });
   };
 
@@ -88,7 +91,8 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         status: 'booked',
         contact: bookingData.contact,
         age : bookingData.age,
-        gender : bookingData.gender
+        gender : bookingData.gender,
+        mode : bookingData.mode
       };
 
       const response = await createAppointment(appointmentData);
@@ -107,6 +111,7 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
         contact : '',
         age : '',
         gender : '',
+        mode : ''
       });
       
       handleBackToList();
@@ -404,7 +409,32 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
                     <option value="4:00 PM - 4:30 PM">4:00 PM - 4:30 PM</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    <Clock className="w-4 h-4 inline mr-1" />
+                    Mode
+                  </label>
+                  <select 
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                    value={bookingData.mode}
+                    onChange={(e) => handleInputChange('mode', e.target.value)}
+                  >
+                    <option value="">Select Mode</option>
+                    <option value="online">Offline</option>
+                    <option value="offline">Online</option>
+                    
+                  </select>
+                </div>
+          
+
+                
               </div>
+
+
+
+                
+                
               
               <div className="flex gap-4 mt-6">
                 <button 
