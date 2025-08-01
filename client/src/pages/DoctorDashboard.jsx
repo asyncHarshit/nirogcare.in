@@ -378,13 +378,15 @@ const DoctorDashboard = () => {
       
 
       case "live":
-          const userId = '88888888';
-          const callId = '6565656565545'
+
+      const callId = "688b98510dea1cd175d62f9b"
+
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
 
-            <VideoCall callId={callId} userId={userId}/>
+            <VideoCall callId={callId} name ={doctorInfo.name} role = "doctor"/>
+
               
             </div>
           </div>

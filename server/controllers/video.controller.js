@@ -13,7 +13,7 @@ export const tokenProvider = async (req, res) => {
     const client = new StreamClient(apiKey, apiSecret);
 
     const exp = Math.round(Date.now() / 1000) + 60 * 60;
-    const iat = Math.floor(Date.now() / 1000);
+    const iat = Math.floor(Date.now() / 1000) - 60;
 
     const token = client.generateUserToken({
       user_id: user,

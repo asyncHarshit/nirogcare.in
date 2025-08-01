@@ -26,7 +26,6 @@ const LiveComponentPatient = ({ onlineAppointment, name  }) => {
   const handleJoinCall = (appointment) => {
     setActiveCall({
       callId: appointment._id,
-      userId: appointment.bookedBy,
       name : name
     });
   };
@@ -41,9 +40,9 @@ const LiveComponentPatient = ({ onlineAppointment, name  }) => {
         
         <VideoCall 
           // callId={activeCall.callId} 
-          callId="88888888"
-          userId="6565656565545"
+          callId={activeCall.callId}
           name = {name}
+          role = 'patients'
         />
         
       </div>
