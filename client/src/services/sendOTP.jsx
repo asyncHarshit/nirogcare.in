@@ -28,4 +28,24 @@ export const resetPassword = async (email, newPassword) => {
   }
 }
 
+export const verifyOtpForRegisterUser = async (email, otp) => {
+  try {
+    const response = await axios.post(`${baseUrl}/api/auth/verifyOtpForRegister`, { email, otp });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to verify OTP');
+  }
+}
+
+
+export const sendOtpToRegisterUser = async (email) => {
+  try {
+    const response = await axios.post(`${baseUrl}/api/auth/sendOtpForRegister`, { email });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to send OTP');
+  }
+};
+
+
 

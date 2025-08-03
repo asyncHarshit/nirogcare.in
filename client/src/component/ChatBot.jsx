@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, BotIcon, Mic, MessageSquare } from 'lucide-react';
+import { Send, User, Bot, Mic, MessageSquare } from 'lucide-react';
 import { sendChatMessage } from '../services/chatBotService';
 import { Think } from '../assets/think';
 import VapiWidget from "./VapiWidget";
@@ -104,7 +104,7 @@ const ChatBot = ({userData}) => {
   // Voice AI Component - moved outside to prevent recreation
   const renderVoiceAI = () => {
     return (
-      <div className="flex-1 h-screen flex items-center justify-center">
+      <div className="flex-1 pt-20 min-h-0">
         <VapiWidget
           apiKey={apiKey}
           assistantId={assistantId}
@@ -119,7 +119,7 @@ const ChatBot = ({userData}) => {
       <>
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-4 pt-20 space-y-6 scroll-smooth"
+          className="flex-1 overflow-y-auto p-4 pt-20 space-y-6 scroll-smooth min-h-0"
           style={{ scrollBehavior: 'smooth' }}
         >
           {messages.map((message) => (
@@ -136,7 +136,7 @@ const ChatBot = ({userData}) => {
                     : 'bg-gradient-to-r from-green-700 to-blue-700'
                 }`}>
                   {message.isBot ? (
-                    <BotIcon className="w-5 h-5 text-black" />
+                    <Bot className="w-5 h-5 text-black" />
                   ) : (
                     <User className="w-5 h-5 text-gray-300" />
                   )}
@@ -155,8 +155,8 @@ const ChatBot = ({userData}) => {
           ))}
         </div>
 
-        <div className="bg-black/30 backdrop-blur-sm p-4 border-t border-white/10">
-          <form onSubmit={handleSubmit} className="flex items-center gap-3">
+        <div className="bg-black/30 backdrop-blur-sm p-4 border-t border-white/10 flex-shrink-0">
+          <div className="flex items-center gap-3">
             <input
               type="text"
               value={input}
@@ -164,9 +164,15 @@ const ChatBot = ({userData}) => {
               placeholder={isSending ? "Bot is thinking..." : "Type your message..."}
               disabled={isSending}
               className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md text-sm text-gray-100 placeholder-gray-400 border border-white/10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent shadow-md shadow-black/20 disabled:opacity-70 disabled:cursor-not-allowed"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
             />
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={!input.trim() || isSending}
               className="cursor-pointer bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md shadow-emerald-800/30"
             >
@@ -179,7 +185,7 @@ const ChatBot = ({userData}) => {
                 <Send className="w-4 h-4 text-white" />
               )}
             </button>
-          </form>
+          </div>
         </div>
       </>
     );
@@ -188,11 +194,11 @@ const ChatBot = ({userData}) => {
   return (
     <div className="w-full mx-auto h-[770px] flex flex-col bg-black border border-gray-700 rounded-lg shadow-lg overflow-hidden relative">
       
-      {/* Header with Toggle */}
-      <div className="absolute top-0 left-0 w-full z-10 backdrop-blur-md bg-black/30 border-b border-gray-800 p-4 flex items-center justify-between">
+      {/* Header with Toggle - Fixed positioning */}
+      <div className="absolute top-0 left-0 right-0 z-20 backdrop-blur-md bg-black/90 border-b border-gray-800 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center">
-            <BotIcon className="w-5 h-5 text-black" />
+            <Bot className="w-5 h-5 text-black" />
           </div>
           <div>
             <h2 className="text-gray-100 font-medium text-sm">NirogCare Bot</h2>
@@ -204,7 +210,7 @@ const ChatBot = ({userData}) => {
 
         {/* Toggle Switch */}
         <div className="flex items-center gap-2">
-          <MessageSquare className={`w-4 h-4 ${!isVoiceMode ? 'text-emerald-400' : 'text-gray-500'}`} />
+          <MessageSquare className={`w-4 h-4 transition-colors duration-200 ${!isVoiceMode ? 'text-emerald-400' : 'text-gray-500'}`} />
           <button
             onClick={toggleMode}
             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-black ${
@@ -217,7 +223,7 @@ const ChatBot = ({userData}) => {
               }`}
             />
           </button>
-          <Mic className={`w-4 h-4 ${isVoiceMode ? 'text-emerald-400' : 'text-gray-500'}`} />
+          <Mic className={`w-4 h-4 transition-colors duration-200 ${isVoiceMode ? 'text-emerald-400' : 'text-gray-500'}`} />
         </div>
       </div>
 

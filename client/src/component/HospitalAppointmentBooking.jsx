@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Star, Calendar, User, ChevronLeft, Compass, UserCheck, Contact } from 'lucide-react';
+import { MapPin, Clock, Phone, Star, Calendar, User,Loader, ChevronLeft, Compass, UserCheck, Contact } from 'lucide-react';
 import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
 import { createAppointment } from '../services/patientServices';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [doctors, setDoctors] = useState([]);
+  const [loading , setLoading] = useState(true)
 
   const [bookingData, setBookingData] = useState({
     forPatient: '',
@@ -18,6 +19,14 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     gender : '',
     mode : ''
   });
+
+
+  useEffect(() => {
+  if (hospitals.length > 0) {
+    setLoading(false);
+  }
+}, [hospitals]);
+
 
 
   const handleHospitalSelect = async (hospital) => {
@@ -34,12 +43,16 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   });
 
   try {
+    setLoading(true)
     const res = await getAllDoctorsbyHospitals(hospital._id);
     console.log(res)
     setDoctors(res.doctors);
 
   } catch (error) {
     console.error("Error fetching doctors:", error);
+  }
+  finally{
+    setLoading(false)
   }
 };
 
@@ -123,16 +136,28 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   };
 
   // Show message if no hospitals provided
-  if (!hospitals || hospitals.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">No Hospitals Available</h2>
-          <p className="text-gray-300">Please provide hospitals data to display the list.</p>
-        </div>
+if (loading) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="text-center text-white flex flex-col items-center">
+        <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+        <p className="text-lg">Loading nearby hospitals...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+if (!hospitals || hospitals.length === 0) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="text-center text-white">
+        <h2 className="text-2xl font-bold mb-4">No Hospitals Available</h2>
+        <p className="text-gray-300">Please provide hospitals data to display the list.</p>
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <div className="min-h-screen">

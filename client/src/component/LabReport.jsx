@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, FileText, User, Calendar, Building2, ChevronDown, ChevronUp, Eye, Clock, TestTube, X, AlertCircle, MapPin } from 'lucide-react';
+import React, { useState, useMemo , useEffect } from 'react';
+import { Search, Filter, FileText,Loader, User, Calendar, Building2, ChevronDown, ChevronUp, Eye, Clock, TestTube, X, AlertCircle, MapPin } from 'lucide-react';
 
 const LabReportComponent = ({ labReports = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -8,6 +8,15 @@ const LabReportComponent = ({ labReports = [] }) => {
   const [filterTestType, setFilterTestType] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [selectedReport, setSelectedReport] = useState(null);
+  const [loading , setLoading] = useState(true);
+
+
+
+      useEffect(() => {
+    if (labReports.length > 0) {
+      setLoading(false);
+    }
+  }, [labReports]);
 
   const filteredReports = useMemo(() => {
     let reports = [...labReports];
@@ -117,6 +126,18 @@ const LabReportComponent = ({ labReports = [] }) => {
       </div>
     );
   };
+
+
+    if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white flex flex-col items-center">
+          <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+          <p className="text-lg">Loading Labs records...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-950">

@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Calendar, Clock, User, Phone, Video, MapPin } from 'lucide-react';
+import React, { useState , useEffect } from 'react';
+import { Calendar, Clock,Loader, User, Phone, Video, MapPin } from 'lucide-react';
 import VideoCall from './VideoCall';
 
 // VideoCall component placeholder - replace with your actual VideoCall component
@@ -9,9 +9,9 @@ import VideoCall from './VideoCall';
 
 const LiveComponentPatient = ({ onlineAppointment, name  }) => {
   const [activeCall, setActiveCall] = useState(null);
+  const [loading , setLoading] = useState(true);
   
-  console.log(onlineAppointment);
-  console.log(name)
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -23,10 +23,18 @@ const LiveComponentPatient = ({ onlineAppointment, name  }) => {
     });
   };
 
+
+      useEffect(() => {
+    if (onlineAppointment.length > 0) {
+      setLoading(false);
+    }
+  }, [onlineAppointment]);
+
   const handleJoinCall = (appointment) => {
+    console.log(appointment._id)
     setActiveCall({
       callId: appointment._id,
-      name : name
+      name : appointment.bookedBy.name
     });
   };
 
@@ -39,12 +47,24 @@ const LiveComponentPatient = ({ onlineAppointment, name  }) => {
       <div>
         
         <VideoCall 
-          // callId={activeCall.callId} 
           callId={activeCall.callId}
           name = {name}
           role = 'patients'
         />
         
+      </div>
+    );
+  }
+
+
+
+      if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white flex flex-col items-center">
+          <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+          <p className="text-lg">Loading onlineAppointment ...</p>
+        </div>
       </div>
     );
   }

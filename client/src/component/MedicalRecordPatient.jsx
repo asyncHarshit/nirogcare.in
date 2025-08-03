@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, FileText, User, Stethoscope, Calendar, Building2, ChevronDown, ChevronUp, Download, Eye, Clock, Pill, X, AlertCircle } from 'lucide-react';
+import React, { useState,useEffect, useMemo } from 'react';
+import { Search, Filter,Loader, FileText, User, Stethoscope, Calendar, Building2, ChevronDown, ChevronUp, Download, Eye, Clock, Pill, X, AlertCircle } from 'lucide-react';
 
 const MedicalRecordPatient = ({ medicalRecord = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -7,7 +7,17 @@ const MedicalRecordPatient = ({ medicalRecord = [] }) => {
   const [filterType, setFilterType] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("date");
+  const [loading , setLoading]=useState(true)
 
+
+
+
+
+      useEffect(() => {
+      if (medicalRecord.length > 0) {
+        setLoading(false);
+      }
+    }, [medicalRecord]);
   const filteredRecords = useMemo(() => {
     let records = [...medicalRecord];
 
@@ -59,6 +69,20 @@ const MedicalRecordPatient = ({ medicalRecord = [] }) => {
     setFilterType("all");
     setShowFilters(false);
   };
+
+
+  
+    if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white flex flex-col items-center">
+          <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+          <p className="text-lg">Loading Medical records...</p>
+        </div>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="min-h-screen ">

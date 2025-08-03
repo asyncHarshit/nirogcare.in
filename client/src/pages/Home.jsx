@@ -21,13 +21,18 @@ import {
   BotIcon,
 } from "lucide-react";
 import CloudGlobe from "../component/Globe";
+import { useNavigate } from "react-router-dom";
+import Auth from "./Auth";
 
 const HealthcareLandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [formData, setFormData] = useState({});
+
+  const navigate = useNavigate()
+
+
 
   useEffect(() => {
     setIsVisible(true);
@@ -48,8 +53,10 @@ const HealthcareLandingPage = () => {
   }, []);
 
   const handleGetStarted = () => {
-    window.location.href = "/auth";
-  };
+    navigate("/auth")
+  
+};
+
 
   const features = [
     {
@@ -130,6 +137,9 @@ const HealthcareLandingPage = () => {
     { number: "100+", label: "Partner Labs", icon: TestTube },
     { number: "99.9%", label: "Uptime", icon: Shield },
   ];
+
+
+
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-black to-slate-900 text-white min-h-screen overflow-x-hidden">

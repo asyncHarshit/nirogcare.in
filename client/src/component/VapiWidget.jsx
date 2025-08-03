@@ -142,11 +142,11 @@ const VapiWidget = ({ apiKey, assistantId }) => {
         )}
       </div>
 
-      {/* Bottom controls - FIXED */}
-      <div className="bg-black p-4 border-t border-white/20 flex-shrink-0 sticky bottom-0">
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
-          {/* Left indicator */}
-          <div className="flex items-center gap-4">
+      {/* Bottom controls - FIXED with consistent spacing */}
+      <div className="bg-black p-4 border-t border-white/20 flex-shrink-0">
+        <div className="flex items-center justify-between max-w-4xl mx-auto min-h-[60px]">
+          {/* Left indicator - Fixed width container */}
+          <div className="flex items-center gap-4 min-w-[200px]">
             <div className="relative flex items-center">
               <div
                 className={`w-4 h-4 rounded-full ${
@@ -174,8 +174,8 @@ const VapiWidget = ({ apiKey, assistantId }) => {
             </div>
           </div>
 
-          {/* Center microphone indicator */}
-          <div className="flex items-center justify-center">
+          {/* Center microphone indicator - Absolute center */}
+          <div className="flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
             <div className="relative">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                 isSpeaking 
@@ -194,15 +194,17 @@ const VapiWidget = ({ apiKey, assistantId }) => {
             </div>
           </div>
 
-          {/* End call button */}
-          <button
-            onClick={endCall}
-            className="group relative bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg shadow-red-600/30 "
-          >
-            <PhoneOff className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-            <span className="font-medium">End Call</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-500 rounded-xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
-          </button>
+          {/* End call button - Fixed width container */}
+          <div className="flex justify-end min-w-[200px]">
+            <button
+              onClick={endCall}
+              className="group relative bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg shadow-red-600/30"
+            >
+              <PhoneOff className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+              <span className="font-medium">End Call</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-500 rounded-xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

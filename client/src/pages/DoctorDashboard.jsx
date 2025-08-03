@@ -21,12 +21,13 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import UpdateDoctorProfile from '../component/UpdateDoctorProfile';
 import { getMe } from '../services/getMeServices';
-import { getDoctorProfileApi } from '../services/doctorServices';
+import { getDoctorProfileApi, todaysOnlinePatientsApi } from '../services/doctorServices';
 import { UpdatedDoctor } from '../component/UpdatedDoctor';
 import { todaysPatientsApi } from '../services/doctorServices';
 import DiagnosisForm from '../component/DiagnosisForm';
 import { addMedicalRecordAPI } from '../services/medicalRecordServices';
 import VideoCall from '../component/VideoCall';
+import DoctorOnlinePatients from '../component/DoctorOnlinePatients';
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -40,6 +41,7 @@ const DoctorDashboard = () => {
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showDiagnosisForm, setShowDiagnosisForm] = useState(false);
+  const [onlineAppointments , setOnlineAppointments] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,6 +122,28 @@ const DoctorDashboard = () => {
       getTodaysPatient();
     }
   }, [activeTab]);
+
+
+
+  const getOnlinePatientsAppointments = async()=>{
+    try {
+      const response = await todaysOnlinePatientsApi();
+      if(response){
+        setOnlineAppointments(response.appointments)
+      }
+      
+    } catch (error) {
+      console.log("Error in getting online appointments")
+      
+    }
+  }
+
+  useEffect(()=>{
+    if(activeTab === 'live'){
+      getOnlinePatientsAppointments();
+    }
+
+  },[activeTab])
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -379,13 +403,13 @@ const DoctorDashboard = () => {
 
       case "live":
 
-      const callId = "688b98510dea1cd175d62f9b"
-
         return (
           <div className="space-y-6">
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
 
-            <VideoCall callId={callId} name ={doctorInfo.name} role = "doctor"/>
+            <DoctorOnlinePatients onlineAppointments={onlineAppointments} name = {doctorInfo.name}/>
+
+          
 
               
             </div>

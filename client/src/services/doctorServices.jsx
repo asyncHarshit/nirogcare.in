@@ -46,3 +46,21 @@ export async function todaysPatientsApi(){
         console.log("Error in Doctor service !!",error)
     }
 }
+
+
+export async function todaysOnlinePatientsApi(){
+    try {
+        const response = await axios.get(
+            `${baseUrl}/api/doctor/getOnlineAppointments`,
+            { withCredentials: true }
+        );
+      return response.data;
+
+    } catch (error) {
+        console.log("Error in Doctor service !!",error)
+    }
+}
+
+
+
+

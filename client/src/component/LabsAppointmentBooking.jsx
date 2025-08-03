@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Calendar, ChevronLeft, FileText, Compass, User } from 'lucide-react';
+import { MapPin, Clock, Phone, Calendar, ChevronLeft,Loader, FileText, Compass, User } from 'lucide-react';
 import {toast} from "sonner"
 import {createAppointmentLab} from "../services/patientServices"
 
 const LabAppointmentBooking = ({ labs = [], userId }) => {
   const [selectedLab, setSelectedLab] = useState(null);
+  const [loading , setLoading] = useState(true)
   const [formData, setFormData] = useState({
     testName: '',
     testType: '',
@@ -13,6 +14,13 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
     notes: '',
     forPatientType: 'self'
   });
+
+
+    useEffect(() => {
+    if (labs.length > 0) {
+      setLoading(false);
+    }
+  }, [labs]);
 
   const handleLabSelect = (lab) => setSelectedLab(lab);
 
@@ -77,6 +85,17 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
       alert('Failed to book appointment. Please try again.');
     }
   };
+
+  if (loading) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="text-center text-white flex flex-col items-center">
+        <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+        <p className="text-lg">Loading nearby Labs...</p>
+      </div>
+    </div>
+  );
+}
 
   if (!labs || labs.length === 0) {
     return <p className="text-white text-center mt-8">No Labs Available</p>;
