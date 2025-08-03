@@ -37,10 +37,9 @@ export const patientProfile = async (req, res) => {
 // Fetch nearby hospitals within 10km
 export const getNearbyHospitals = async (req, res) => {
   try {
-    const latitude = "25.5548739";
-    const longitude = "84.6702418";
+    const { lat, lng } = req.body;
 
-    if (!latitude || !longitude) {
+    if (!lat || !lng) {
       return res.status(400).json({ error: "Latitude and longitude are required" });
     }
 
@@ -49,11 +48,11 @@ export const getNearbyHospitals = async (req, res) => {
         $geoNear: {
           near: {
             type: "Point",
-            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+            coordinates: [parseFloat(lng), parseFloat(lat)],
           },
           distanceField: "distance", // field added to each doc
           spherical: true,
-          maxDistance: 100000, // 10km in meters
+          maxDistance: 100000000, // 10km in meters
         },
       },
     ]);
@@ -73,10 +72,9 @@ export const getNearbyHospitals = async (req, res) => {
 export const getNearbylabs = async (req, res) => {
   try {
     // For production, use actual req.query values
-    const latitude = "25.5548739";
-    const longitude = "84.6702418";
+   const { lat, lng } = req.body;
 
-    if (!latitude || !longitude) {
+    if (!lat || !lng) {
       return res.status(400).json({ error: "Latitude and longitude are required" });
     }
 
@@ -85,7 +83,7 @@ export const getNearbylabs = async (req, res) => {
         $geoNear: {
           near: {
             type: "Point",
-            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+            coordinates: [parseFloat(lng), parseFloat(lat)],
           },
           distanceField: "distance", // Distance in meters
           spherical: true,

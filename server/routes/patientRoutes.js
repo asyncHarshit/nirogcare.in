@@ -9,8 +9,8 @@ const router = express.Router();
 
 
 router.post("/profile",protect,patientProfile);
-router.get("/near-hospitals",protect,getNearbyHospitals)
-router.get("/near-labs",protect,getNearbylabs)
+router.post("/near-hospitals",protect,getNearbyHospitals)
+router.post("/near-labs",protect,getNearbylabs)
 router.patch("/update-vitals", updateVitalsForUser);
 router.get('/vitals',protect,getVitalsForUser)
 

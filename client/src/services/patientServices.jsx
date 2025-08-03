@@ -20,20 +20,23 @@ export async function updatePatient() {
   }
 }
 
-export async function getAllNearbyHospitals() {
+export async function getAllNearbyHospitals({ lat, lng }) {
   try {
-    const response = await axios.get(`${baseUrl}/api/patient/near-hospitals`, {
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${baseUrl}/api/patient/near-hospitals`,
+      { lat, lng },
+      { withCredentials: true }
+    );
     return response.data;
   } catch (error) {
     console.log("Error in fetching all Nearby hospitals !!", error);
   }
 }
 
-export async function getAllNearbyLabs() {
+
+export async function getAllNearbyLabs({lat,lng}) {
   try {
-    const response = await axios.get(`${baseUrl}/api/patient/near-labs`, {
+    const response = await axios.post(`${baseUrl}/api/patient/near-labs`,{lat,lng}, {
       withCredentials: true,
     });
     return response.data;

@@ -135,13 +135,37 @@ const PatientDashboard = () => {
     }
   };
 
-  const getHospital = async () => {
-    const response = await getAllNearbyHospitals();
-    if (response) {
-      console.log(response);
-      setHospitals(response?.hospitals || []);
+const getHospital = async () => {
+
+
+  if (!navigator.geolocation) {
+    toast.error("Geolocation not supported.");
+    setHospitalLoading(false);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const response = await getAllNearbyHospitals({ lat: latitude, lng: longitude });
+        if (response) {
+          setHospitals(response.hospitals || []);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch hospitals.");
+      } 
+    },
+    (err) => {
+      console.error(err);
+      toast.error("Please allow location access.");
+      
     }
-  };
+  );
+};
+
+
 
   useEffect(() => {
     if (activeTab === "appointment") {
@@ -163,13 +187,32 @@ const PatientDashboard = () => {
     }
   }, [activeTab]);
 
-  const getLabs = async () => {
-    const response = await getAllNearbyLabs();
-    if (response) {
-      console.log(response);
-      setLabs(response?.labs || []);
-    }
-  };
+const getLabs = async () => {
+  try {
+    // Get user's current position
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        
+        const response = await getAllNearbyLabs({ lat : latitude, lng : longitude });
+
+        if (response) {
+          console.log(response);
+          setLabs(response?.labs || []);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        toast.error("Location permission is required to find nearby labs.");
+      }
+    );
+  } catch (error) {
+    console.error("Error in getLabs:", error);
+  }
+};
+
 
   useEffect(() => {
     if (activeTab === "lab") {

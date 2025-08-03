@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Star, Calendar, User,Loader, ChevronLeft, Compass, UserCheck, Contact } from 'lucide-react';
+import { MapPin, Clock, Phone, Star, Calendar, User,Loader, ChevronLeft, Compass, UserCheck, Contact, Search } from 'lucide-react';
 import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
 import { createAppointment } from '../services/patientServices';
 import { toast } from 'sonner';
@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [doctors, setDoctors] = useState([]);
-  const [loading , setLoading] = useState(true)
+  const [loading , setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [bookingData, setBookingData] = useState({
     forPatient: '',
@@ -20,6 +21,11 @@ const HospitalAppointmentBooking = ({ hospitals = [] }) => {
     mode : ''
   });
 
+  // Filter hospitals based on search term
+  const filteredHospitals = hospitals.filter(hospital =>
+    hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    hospital.address.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
   if (hospitals.length > 0) {
@@ -175,10 +181,26 @@ if (!hospitals || hospitals.length === 0) {
               </p>
               <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full mx-auto mt-4" />
             </div>
+
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-emerald-700" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search hospitals by name or address..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-gray-800/40  border border-gray-700/30 rounded-2xl pl-12 pr-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 transition-all duration-300"
+                />
+              </div>
+            </div>
             
             {/* Hospital Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {hospitals.map((hospital) => (
+              {filteredHospitals.map((hospital) => (
                 <div
                   key={hospital._id}
                   className="group relative bg-gradient-to-br from-gray-800/40 to-gray-900/60 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-8 hover:bg-gradient-to-br hover:from-gray-800/60 hover:to-gray-900/80 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:border-emerald-400/50 hover:shadow-2xl hover:shadow-emerald-500/10"
@@ -275,6 +297,17 @@ if (!hospitals || hospitals.length === 0) {
                 </div>
               ))}
             </div>
+
+            {/* No results message */}
+            {searchTerm && filteredHospitals.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl font-semibold mb-2">No hospitals found</h3>
+                  <p>No hospitals match your search for "{searchTerm}"</p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           // Appointment Booking Form

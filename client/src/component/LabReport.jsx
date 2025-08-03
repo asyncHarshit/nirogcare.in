@@ -1,5 +1,5 @@
 import React, { useState, useMemo , useEffect } from 'react';
-import { Search, Filter, FileText,Loader, User, Calendar, Building2, ChevronDown, ChevronUp, Eye, Clock, TestTube, X, AlertCircle, MapPin } from 'lucide-react';
+import { Search, Filter, FileText,Loader, User,Download, Calendar, Building2, ChevronDown, ChevronUp, Eye, Clock, TestTube, X, AlertCircle, MapPin } from 'lucide-react';
 
 const LabReportComponent = ({ labReports = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +17,25 @@ const LabReportComponent = ({ labReports = [] }) => {
       setLoading(false);
     }
   }, [labReports]);
+
+  const handleDownload = async (url) => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobURL = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobURL;
+    link.download = 'report.pdf';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobURL);
+  } catch (error) {
+    console.error('Download failed:', error);
+  }
+};
+
 
   const filteredReports = useMemo(() => {
     let reports = [...labReports];
@@ -320,30 +339,49 @@ const LabReportComponent = ({ labReports = [] }) => {
                     </div>
 
                     {report?.reportPDF && (
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-purple-500/20 rounded-lg">
-                          <FileText className="w-4 h-4 text-purple-400" />
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs uppercase tracking-wide">Report</p>
-                          <div className="flex gap-2 mt-1">
-                            <button
-                              onClick={() => setSelectedReport(report)}
-                              className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors flex items-center gap-1"
-                            >
-                              <Eye className="w-3 h-3" />
-                              View PDF
-                            </button>
-                            <button
-                              onClick={() => openPDF(report.reportPDF)}
-                              className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
-                            >
-                              Open in Tab
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+  <div className="flex items-start gap-4 bg-gray-900/40 p-4 rounded-lg ">
+    {/* Icon Box */}
+    <div className="p-2 bg-purple-500/20 rounded-md">
+      <FileText className="w-5 h-5 text-purple-400" />
+    </div>
+
+    {/* Content Area */}
+    <div className="flex flex-col gap-2">
+      <p className="text-gray-400 text-xs uppercase tracking-wide">Report</p>
+
+      <div className="flex flex-wrap items-center gap-3">
+        {/* View PDF */}
+        <button
+          onClick={() => setSelectedReport(report)}
+          className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-sm transition-colors"
+        >
+          <Eye className="w-4 h-4" />
+          View PDF
+        </button>
+
+        {/* Open in Tab */}
+        <button
+          onClick={() => openPDF(report.reportPDF)}
+          className="flex items-center gap-1 text-gray-400 hover:text-gray-300 text-sm transition-colors"
+        >
+          {/* <ArrowUpRight className="w-4 h-4" /> */}
+          Open in Tab
+        </button>
+
+        {/* Download PDF */}
+                  <button
+            onClick={() => handleDownload(report.reportPDF)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+          >
+            <Download className="w-5 h-5" />
+            Download PDF
+          </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
                   </div>
                 </div>
 

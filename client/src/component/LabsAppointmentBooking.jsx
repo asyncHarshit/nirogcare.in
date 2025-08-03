@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Calendar, ChevronLeft,Loader, FileText, Compass, User } from 'lucide-react';
+import { MapPin, Clock, Phone, Calendar,Search, ChevronLeft,Loader, FileText, Compass, User } from 'lucide-react';
 import {toast} from "sonner"
 import {createAppointmentLab} from "../services/patientServices"
 
-const LabAppointmentBooking = ({ labs = [], userId }) => {
+const LabAppointmentBooking = ({ labs = []}) => {
   const [selectedLab, setSelectedLab] = useState(null);
   const [loading , setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     testName: '',
     testType: '',
@@ -35,6 +36,11 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
       forPatientType: 'self'
     });
   };
+
+    const filteredLabs = labs.filter(lab =>
+    (lab.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (lab.address || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -114,8 +120,22 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full mx-auto mt-4" />
           </div>
+             <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-emerald-700" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search labs by name or address..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-gray-800/40  border border-gray-700/30 rounded-2xl pl-12 pr-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 transition-all duration-300"
+                />
+              </div>
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {labs.map((lab) => (
+            {filteredLabs.map((lab) => (
               <div
                 key={lab._id}
                 className="group relative bg-gradient-to-br from-gray-800/40 to-gray-900/60 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-8 hover:bg-gradient-to-br hover:from-gray-800/60 hover:to-gray-900/80 transition-all duration-500 cursor-pointer transform hover:scale-[1.02] hover:border-emerald-400/50 hover:shadow-2xl hover:shadow-emerald-500/10"
@@ -174,6 +194,17 @@ const LabAppointmentBooking = ({ labs = [], userId }) => {
               </div>
             ))}
           </div>
+
+          {/* No results message */}
+          {searchTerm && filteredLabs.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold mb-2">No labs found</h3>
+                <p>No labs match your search for "{searchTerm}"</p>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
