@@ -116,7 +116,7 @@ export const getReportsForFamilyMember = async (req, res) => {
   }
 };
 
-// Get reports issued by a specific lab (e.g. lab staff dashboard)
+// Get reports issued by a specific lab (lab staff dashboard)
 export const getReportsByLab = async (req, res) => {
   try {
     const { labId } = req.params;
