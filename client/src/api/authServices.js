@@ -18,21 +18,7 @@ export async function callAuthRegisterApi(formdata) {
   }
 }
 
-export async function callAuthLoginApi(email , password){
-   
-    try {
-      const response = await axios.post(
-         `${baseUrl}/api/auth/login`,
-        {email,password},
-        {withCredentials : true}
-      )
 
-      return response.data;
-    
-    } catch (error) {
-      console.error("Login failed:", error)
-    }
-}
 
 export async function callRoleApi(selectedRole, fcmToken) {
   try {

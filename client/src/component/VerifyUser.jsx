@@ -190,4 +190,3 @@ const VerifyUser = ({formData}) => {
 export default VerifyUser;
 
 
-

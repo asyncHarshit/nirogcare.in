@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Eye, EyeOff, User, Mail, Phone, Lock,Loader, ArrowRight, Loader2Icon } from 'lucide-react';
-import { callAuthLoginApi, callAuthRegisterApi } from '../api/authServices';
+// import { callAuthLoginApi, callAuthRegisterApi } from '../api/authServices';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import VerifyUser from '../component/VerifyUser';
-import { sendOtpToRegisterUser, sendOtpToUser } from '../services/sendOTP';
+import { sendOtpToRegisterUser } from '../services/sendOTP';
+import axios from 'axios';
+const baseUrl = import.meta.env.VITE_API_URL
 
 
 const Auth = () => {
@@ -12,6 +14,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [loading , setIsLoading] = useState(false)
+  const [errorMessage,setErrorMessage] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +29,24 @@ const Auth = () => {
     setIsSignup(!isSignup);
     setFormData({ name: '', email: '', phone: '', password: '' });
   };
+
+  async function callAuthLoginApi(email , password){
+   
+    try {
+      const response = await axios.post(
+         `${baseUrl}/api/auth/login`,
+        {email,password},
+        {withCredentials : true}
+      )
+
+      return response?.data;
+    
+    } catch (error) {
+      console.error("Login failed:", error)
+      setErrorMessage(error?.response?.data?.message);
+      console.log(error?.response?.data?.message);
+    }
+}
 
   const handleChange = (e) => {
     setFormData((prev) => ({ 
@@ -191,6 +212,9 @@ const Auth = () => {
                 </button>
               </p>
             )}
+          </div>
+          <div className=' text-red-600 text-center'>
+            {errorMessage}
           </div>
 
           <button
