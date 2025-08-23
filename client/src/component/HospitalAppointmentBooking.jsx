@@ -1,169 +1,238 @@
-import React, { useEffect, useState } from 'react';
-import { MapPin, Clock, Phone, Star, Calendar, User,Loader, ChevronLeft, Compass, UserCheck, Contact, Search } from 'lucide-react';
-import { getAllDoctorsbyHospitals } from '../services/hospitalsServices';
-import { createAppointment } from '../services/patientServices';
-import { toast } from 'sonner';
+import React, { useEffect, useState } from "react";
+import {
+  MapPin,
+  Clock,
+  Phone,
+  Star,
+  Calendar,
+  Loader2,
+  User,
+  Loader,
+  ChevronLeft,
+  Compass,
+  UserCheck,
+  Contact,
+  Search,
+} from "lucide-react";
+import { getAllDoctorsbyHospitals } from "../services/hospitalsServices";
+import { toast } from "sonner";
+import { createOrder, verifyPayment } from "../services/paymentServices";
 
 const HospitalAppointmentBooking = ({ hospitals = [] }) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [doctors, setDoctors] = useState([]);
-  const [loading , setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [booking, setBooking] = useState(false);
+  const [fees , setFees] = useState("");
 
   const [bookingData, setBookingData] = useState({
-    forPatient: '',
-    doctorId: '',
-    date: '',
-    timeSlot: '',
-    contact: '',
-    age : '',
-    gender : '',
-    mode : ''
+    forPatient: "",
+    doctorId: "",
+    date: "",
+    timeSlot: "",
+    contact: "",
+    age: "",
+    gender: "",
+    mode: "",
   });
 
   // Filter hospitals based on search term
-  const filteredHospitals = hospitals.filter(hospital =>
-    hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    hospital.address.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredHospitals = hospitals.filter(
+    (hospital) =>
+      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hospital.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
-  if (hospitals.length > 0) {
-    setLoading(false);
-  }
-}, [hospitals]);
+    if (hospitals.length > 0) {
+      setLoading(false);
+    }
+  }, [hospitals]);
 
+  useEffect(() => {
+  if (bookingData.doctorId) {
+    const selectedDoctor = doctors.find(
+      (doc) => doc.doctorId === bookingData.doctorId
+    );
+    setFees(selectedDoctor?.consultationFee || null);
+  } else {
+    setFees(null);
+  }
+}, [bookingData.doctorId, doctors]);
 
 
   const handleHospitalSelect = async (hospital) => {
-  setSelectedHospital(hospital);
-  setBookingData({
-    forPatient: '',
-    doctorId: '',
-    date: '',
-    timeSlot: '',
-    contact: '',
-    age : '',
-    gender : '',
-    mode : ''
-  });
+    setSelectedHospital(hospital);
+    setBookingData({
+      forPatient: "",
+      doctorId: "",
+      date: "",
+      timeSlot: "",
+      contact: "",
+      age: "",
+      gender: "",
+      mode: "",
+    });
 
-  try {
-    setLoading(true)
-    const res = await getAllDoctorsbyHospitals(hospital._id);
-    console.log(res)
-    setDoctors(res.doctors);
-
-  } catch (error) {
-    console.error("Error fetching doctors:", error);
-  }
-  finally{
-    setLoading(false)
-  }
-};
-
+    try {
+      setLoading(true);
+      const res = await getAllDoctorsbyHospitals(hospital._id);
+      console.log(res);
+      setDoctors(res.doctors);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackToList = () => {
     setSelectedHospital(null);
     setBookingData({
-      forPatient: '',
-      doctorId: '',
-      date: '',
-      timeSlot: '',
-      contact: '',
-      age : '',
-      gender : '',
-      mode : ''
+      forPatient: "",
+      doctorId: "",
+      date: "",
+      timeSlot: "",
+      contact: "",
+      age: "",
+      gender: "",
+      mode: "",
     });
   };
 
-  
   const handleInputChange = (field, value) => {
-    setBookingData(prev => ({
+    setBookingData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-
-
-
   const handleBookAppointment = async () => {
-    try {
+    setBooking(true);
 
-      if (!bookingData.doctorId || !bookingData.date || !bookingData.timeSlot || !bookingData.contact) {
-        alert('Please fill in all required fields');
+    try {
+      if (
+        !bookingData.doctorId ||
+        !bookingData.date ||
+        !bookingData.timeSlot ||
+        !bookingData.contact
+      ) {
+        alert("Please fill in all required fields");
         return;
       }
 
-
-
-
+      // Appointment draft
       const appointmentData = {
-        forPatient: {
-          type: bookingData.forPatient
-        },
-        doctorId: bookingData.doctorId ,
+        forPatient: { type: bookingData.forPatient },
+        doctorId: bookingData.doctorId,
         hospitalId: selectedHospital._id,
         date: bookingData.date,
         timeSlot: bookingData.timeSlot,
-        status: 'booked',
         contact: bookingData.contact,
-        age : bookingData.age,
-        gender : bookingData.gender,
-        mode : bookingData.mode
+        age: bookingData.age,
+        gender: bookingData.gender,
+        mode: bookingData.mode,
       };
 
-      const response = await createAppointment(appointmentData);
-      if(response){
-        console.log(response)
-      }
+      // 1️⃣ Create Razorpay Order
+      const orderRes = await createOrder({ doctorId: bookingData.doctorId });
 
-      toast.success("Appointment Booked Successfully 🩺")
-      
-      // Reset form
-      setBookingData({
-        forPatient: '',
-        doctorId: '',
-        date: '',
-        timeSlot: '',
-        contact : '',
-        age : '',
-        gender : '',
-        mode : ''
-      });
-      
-      handleBackToList();
-      
+      if (!orderRes?.order) throw new Error("Order creation failed");
+
+      const { id: razorpay_order_id, amount, currency } = orderRes.order;
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount,
+        currency,
+        name: "NirogCare",
+        description: "Doctor Appointment Payment",
+        order_id: razorpay_order_id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await verifyPayment({
+              ...response,
+              doctorId: bookingData.doctorId,
+              appointmentData, // pass along appointment draft
+            });
+
+            if (verifyRes.success) {
+              toast.success("Appointment Booked Successfully 🩺");
+
+              // Reset form data
+              setBookingData({
+                forPatient: "",
+                doctorId: "",
+                date: "",
+                timeSlot: "",
+                contact: "",
+                age: "",
+                gender: "",
+                mode: "",
+              });
+
+              // Force page refresh or navigation
+              handleBackToList();
+              // Or force refresh: window.location.reload();
+            } else {
+              console.error("❌ Verification failed:", verifyRes);
+              toast.error("Payment verification failed ❌");
+            }
+          } catch (err) {
+            console.error("❌ Payment Verification Error:", err);
+            console.error("❌ Error Response:", err.response?.data);
+            toast.error("Payment failed. Please try again.");
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("💳 Payment modal dismissed");
+            toast.info("Payment cancelled");
+          },
+        },
+        prefill: {
+          name: "Patient",
+          email: "patient@example.com",
+          contact: bookingData.contact,
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error('Error booking appointment:', error);
-      alert('Failed to book appointment. Please try again.');
+      console.error("❌ Error booking appointment:", error);
+      console.error("❌ Error Details:", error.response?.data);
+      alert("Failed to book appointment. Please try again.");
+    } finally {
+      setBooking(false);
     }
   };
 
-  // Show message if no hospitals provided
-if (loading) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-      <div className="text-center text-white flex flex-col items-center">
-        <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
-        <p className="text-lg">Loading nearby hospitals...</p>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white flex flex-col items-center">
+          <Loader className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+          <p className="text-lg">Loading nearby hospitals...</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-if (!hospitals || hospitals.length === 0) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-      <div className="text-center text-white">
-        <h2 className="text-2xl font-bold mb-4">No Hospitals Available</h2>
-        <p className="text-gray-300">Please provide hospitals data to display the list.</p>
+  if (!hospitals || hospitals.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">No Hospitals Available</h2>
+          <p className="text-gray-300">
+            Please provide hospitals data to display the list.
+          </p>
+        </div>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -177,7 +246,8 @@ if (!hospitals || hospitals.length === 0) {
                 Nearby Hospitals
               </h1>
               <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                Select a hospital to book an appointment and receive quality healthcare
+                Select a hospital to book an appointment and receive quality
+                healthcare
               </p>
               <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full mx-auto mt-4" />
             </div>
@@ -197,7 +267,7 @@ if (!hospitals || hospitals.length === 0) {
                 />
               </div>
             </div>
-            
+
             {/* Hospital Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredHospitals.map((hospital) => (
@@ -213,10 +283,10 @@ if (!hospitals || hospitals.length === 0) {
                       className="w-full h-full object-cover"
                     />
                   </div> */}
-                  
+
                   {/* Gradient overlay for premium effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
+
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Hospital name with premium styling */}
@@ -235,7 +305,9 @@ if (!hospitals || hospitals.length === 0) {
                           <MapPin className="w-5 h-5 text-emerald-400" />
                         </div>
                         <div className="flex-1 pt-2">
-                          <p className="text-sm font-medium leading-relaxed">{hospital.address}</p>
+                          <p className="text-sm font-medium leading-relaxed">
+                            {hospital.address}
+                          </p>
                         </div>
                       </div>
 
@@ -246,7 +318,7 @@ if (!hospitals || hospitals.length === 0) {
                         </div>
                         <div className="flex-1 pt-2">
                           <p className="text-sm font-medium">
-                            {(hospital.distance/1000).toFixed(2)} km away
+                            {(hospital.distance / 1000).toFixed(2)} km away
                           </p>
                         </div>
                       </div>
@@ -257,7 +329,9 @@ if (!hospitals || hospitals.length === 0) {
                           <Phone className="w-5 h-5 text-purple-400" />
                         </div>
                         <div className="flex-1 pt-2">
-                          <p className="text-sm font-medium">{hospital.phone}</p>
+                          <p className="text-sm font-medium">
+                            {hospital.phone}
+                          </p>
                         </div>
                       </div>
 
@@ -271,25 +345,26 @@ if (!hospitals || hospitals.length === 0) {
                         </div>
                       </div> */}
                     </div>
-                    
+
                     {/* Specialties */}
-                    {hospital.specialties && hospital.specialties.length > 0 && (
-                      <div className="mb-6">
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                          Specialties
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {hospital.specialties.map((specialty, index) => (
-                            <span
-                              key={index}
-                              className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-emerald-300 px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/20 group-hover:border-emerald-400/30 transition-all duration-300"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
+                    {hospital.specialties &&
+                      hospital.specialties.length > 0 && (
+                        <div className="mb-6">
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            Specialties
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {hospital.specialties.map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-emerald-300 px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/20 group-hover:border-emerald-400/30 transition-all duration-300"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
 
                   {/* Subtle glow effect */}
@@ -303,7 +378,9 @@ if (!hospitals || hospitals.length === 0) {
               <div className="text-center py-12">
                 <div className="text-gray-400 mb-4">
                   <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-xl font-semibold mb-2">No hospitals found</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    No hospitals found
+                  </h3>
                   <p>No hospitals match your search for "{searchTerm}"</p>
                 </div>
               </div>
@@ -321,7 +398,7 @@ if (!hospitals || hospitals.length === 0) {
                 Back to Hospitals
               </button>
             </div>
-            
+
             <div className="bg-gray-800/30 p-6 rounded-xl border border-gray-700/50">
               <div className="flex items-center mb-6">
                 {/* <div className="w-16 h-16 bg-gray-700/50 rounded-lg overflow-hidden mr-4">
@@ -331,43 +408,57 @@ if (!hospitals || hospitals.length === 0) {
                     className="w-full h-full object-cover"
                   />
                 </div> */}
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{selectedHospital.name}</h2>
-                  <p className="text-gray-300">{selectedHospital.address}</p>
-                </div>
+                
               </div>
-              
-              
-              <h3 className="text-xl font-bold text-blue-400 mb-6">Book an Appointment</h3> 
-              
-              
+                <div className="bg-gray-900 p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl font-bold text-white">
+                    {selectedHospital.name}
+                  </div>
+                  {fees && (
+                    <span className="text-green-400 font-semibold text-lg">
+                      ₹{fees}
+                    </span>
+                  )}
+                </div>
+                <p className="text-gray-300">{selectedHospital.address}</p>
+              </div>
+
+              <h3 className="text-xl font-bold text-blue-400 mb-6">
+                Book an Appointment
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <UserCheck className="w-4 h-4 inline mr-1" />
                     Appointment For
                   </label>
-                  <select 
+                  <select
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.forPatient}
-                    onChange={(e) => handleInputChange('forPatient', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("forPatient", e.target.value)
+                    }
                   >
-
                     <option value="">Type</option>
                     <option value="self">Self</option>
                     <option value="family">Family Member</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <User className="w-4 h-4 inline mr-1" />
                     Select Doctor
                   </label>
-                  <select 
+                  <select
                     className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.doctorId}
-                    onChange={(e) => handleInputChange('doctorId', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("doctorId", e.target.value)
+                      
+                    }
                   >
                     <option value="">Choose a doctor...</option>
                     {doctors.map((doctor) => (
@@ -376,54 +467,52 @@ if (!hospitals || hospitals.length === 0) {
                       </option>
                     ))}
                   </select>
+                   
+
                 </div>
 
                 <div>
+                  {/* Patient Gender */}
+                  <div>
+                    <label className="block text-gray-300 mb-2">Gender</label>
+                    <select
+                      className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
+                      value={bookingData.gender}
+                      onChange={(e) =>
+                        handleInputChange("gender", e.target.value)
+                      }
+                    >
+                      <option value="">Select gender...</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
 
-  {/* Patient Gender */}
                 <div>
-                  <label className="block text-gray-300 mb-2">
-                    Gender
-                  </label>
-                  <select
+                  <label className="block text-gray-300 mb-2">Age</label>
+                  <input
+                    type="number"
+                    min="0"
                     className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
-                    value={bookingData.gender}
-                    onChange={(e) => handleInputChange('gender', e.target.value)}
-                  >
-                    <option value="">Select gender...</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                    placeholder="Enter age"
+                    value={bookingData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
+                  />
                 </div>
-              </div>
 
-                <div>
-                <label className="block text-gray-300 mb-2">
-                  Age
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  className="w-full bg-gray-800 border rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
-                  placeholder="Enter age"
-                  value={bookingData.age}
-                  onChange={(e) => handleInputChange('age', e.target.value)}
-                />
-              </div>
-                            
-                
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <Calendar className="w-4 h-4 inline mr-1" />
                     Preferred Date
                   </label>
-                  <input 
-                    type="date" 
+                  <input
+                    type="date"
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => handleInputChange("date", e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
                   />
                 </div>
 
@@ -432,36 +521,41 @@ if (!hospitals || hospitals.length === 0) {
                     <Contact className="w-4 h-4 inline mr-1" />
                     Contact
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.contact}
                     onChange={(e) => {
                       const value = e.target.value;
                       // Allow only digits and max 10
                       if (/^\d{0,10}$/.test(value)) {
-                        handleInputChange('contact', value);
+                        handleInputChange("contact", value);
                       }
                     }}
                     placeholder="Enter 10-digit number"
                   />
                 </div>
 
-                
                 <div>
                   <label className="block text-gray-300 mb-2">
                     <Clock className="w-4 h-4 inline mr-1" />
                     Time Slot
                   </label>
-                  <select 
+                  <select
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.timeSlot}
-                    onChange={(e) => handleInputChange('timeSlot', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("timeSlot", e.target.value)
+                    }
                   >
                     <option value="">Select time slot...</option>
                     <option value="9:00 AM - 9:30 AM">9:00 AM - 9:30 AM</option>
-                    <option value="10:00 AM - 10:30 AM">10:00 AM - 10:30 AM</option>
-                    <option value="11:00 AM - 11:30 AM">11:00 AM - 11:30 AM</option>
+                    <option value="10:00 AM - 10:30 AM">
+                      10:00 AM - 10:30 AM
+                    </option>
+                    <option value="11:00 AM - 11:30 AM">
+                      11:00 AM - 11:30 AM
+                    </option>
                     <option value="2:00 PM - 2:30 PM">2:00 PM - 2:30 PM</option>
                     <option value="3:00 PM - 3:30 PM">3:00 PM - 3:30 PM</option>
                     <option value="4:00 PM - 4:30 PM">4:00 PM - 4:30 PM</option>
@@ -473,38 +567,40 @@ if (!hospitals || hospitals.length === 0) {
                     <Clock className="w-4 h-4 inline mr-1" />
                     Mode
                   </label>
-                  <select 
+                  <select
                     className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:border-green-500 focus:outline-none"
                     value={bookingData.mode}
-                    onChange={(e) => handleInputChange('mode', e.target.value)}
+                    onChange={(e) => handleInputChange("mode", e.target.value)}
                   >
                     <option value="">Select Mode</option>
                     <option value="online">Offline</option>
                     <option value="offline">Online</option>
-                    
                   </select>
                 </div>
-          
-
-                
               </div>
 
-
-
-                
-                
-              
               <div className="flex gap-4 mt-6">
-                <button 
+                <button
                   onClick={handleBookAppointment}
-                  className="mt-6 flex flex-row bg-gradient-to-r from-green-600 to-green-500 text-black font-bold 
-            px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 border border-green-500/30
-             transition-all duration-300 hover:shadow-green-500/30 hover:scale-105"
+                  disabled={booking}
+                  className="mt-6 cursor-pointer flex items-center justify-center bg-gradient-to-r from-green-600 to-green-500 text-black font-bold 
+                    px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 border border-green-500/30
+                    transition-all duration-300 hover:shadow-green-500/30 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <Calendar className="w-4 h-4 mr-2 mt-1 text-black font-bold" />
-                  Book Appointment
+                  {booking ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      <span>Booking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="w-5 h-5 mr-2" />
+                      <span>Book Appointment</span>
+                    </>
+                  )}
                 </button>
-                <button 
+
+                <button
                   onClick={handleBackToList}
                   className="mt-6  text-black font-bold bg-neutral-600
             px-6 py-3 rounded-lg

@@ -40,7 +40,12 @@ const doctorSchema = new mongoose.Schema(
     },
     education : {
       type : String,
-    }
+    },
+    consultationFee: {
+      type: Number,
+      required: true,
+      default : 1
+    },
   },
   { timestamps: true }
 );

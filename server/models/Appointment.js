@@ -59,10 +59,18 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["booked", "cancelled", "completed"],
       default: "booked",
     },
-    // vitalUpdated:{
-    //   type: Boolean,
-    //   default: false,
-    // }
+    razorpayOrderId: {
+      type: String,
+    },
+    razorpayPaymentId: {
+      type: String,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
+    },
+    
   },
   { timestamps: true }
 );
