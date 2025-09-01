@@ -38,7 +38,7 @@ export const doctorProfile = async (req, res) => {
         doctor: newDoctor,
       });
     } else {
-      // Update fields if provided
+      // Update doctor fields if provided
       doctor.gender = gender || doctor.gender;
       doctor.specialization = specialization || doctor.specialization;
       doctor.experience = experience !== undefined ? experience : doctor.experience;
