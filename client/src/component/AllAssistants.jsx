@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { User, Calendar, CheckCircle, XCircle, Phone, Mail, Search } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  User,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  Phone,
+  Mail,
+  Search,
+} from "lucide-react";
 
 const AllAssistants = ({ data }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,12 +21,12 @@ const AllAssistants = ({ data }) => {
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -65,7 +73,10 @@ const AllAssistants = ({ data }) => {
         ) : (
           <div className="grid gap-6">
             {filteredData.map((assistant, index) => (
-              <div key={assistant._id || index} className="bg-gray-950 rounded-lg shadow-xl p-6 border border-gray-700">
+              <div
+                key={assistant._id || index}
+                className="bg-gray-950 rounded-lg shadow-xl p-6 border border-gray-700"
+              >
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Assistant Info */}
                   <div className="space-y-4">
@@ -80,26 +91,36 @@ const AllAssistants = ({ data }) => {
                         ) : (
                           <XCircle className="h-5 w-5 text-red-500" />
                         )}
-                        <span className={`text-sm font-medium ${assistant.isVerified ? 'text-green-600' : 'text-red-600'}`}>
-                          {assistant.isVerified ? 'Verified' : 'Not Verified'}
+                        <span
+                          className={`text-sm font-medium ${
+                            assistant.isVerified
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {assistant.isVerified ? "Verified" : "Not Verified"}
                         </span>
                       </div>
                     </div>
 
                     <div className="bg-gray-700 p-4 rounded-lg space-y-3">
                       <div>
-                        <p className="font-medium text-white">{assistant.userId?.name || 'N/A'}</p>
-                        <p className="text-sm text-gray-300">Assistant ID: {assistant._id}</p>
+                        <p className="font-medium text-white">
+                          {assistant.userId?.name || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          Assistant ID: {assistant._id}
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-gray-300">
                         <Mail className="h-4 w-4" />
-                        {assistant.userId?.email || 'N/A'}
+                        {assistant.userId?.email || "N/A"}
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-gray-300">
                         <Phone className="h-4 w-4" />
-                        {assistant.userId?.phone || 'N/A'}
+                        {assistant.userId?.phone || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -113,23 +134,35 @@ const AllAssistants = ({ data }) => {
 
                     <div className="bg-gray-700 p-4 rounded-lg space-y-3">
                       <div>
-                        <p className="font-medium text-white">{assistant.doctorId?.userId?.name || 'N/A'}</p>
-                        <p className="text-sm text-gray-300">Doctor ID: {assistant.doctorId?._id}</p>
+                        <p className="font-medium text-white">
+                          {assistant.doctorId?.userId?.name || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          Doctor ID: {assistant.doctorId?._id}
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-gray-300">
                         <Mail className="h-4 w-4" />
-                        {assistant.doctorId?.userId?.email || 'N/A'}
+                        {assistant.doctorId?.userId?.email || "N/A"}
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="font-medium text-gray-200">Gender:</span>
-                          <p className="text-gray-300 capitalize">{assistant.doctorId?.gender || 'N/A'}</p>
+                          <span className="font-medium text-gray-200">
+                            Gender:
+                          </span>
+                          <p className="text-gray-300 capitalize">
+                            {assistant.doctorId?.gender || "N/A"}
+                          </p>
                         </div>
                         <div>
-                          <span className="font-medium text-gray-200">Specialization:</span>
-                          <p className="text-gray-300">{assistant.doctorId?.specialization || 'N/A'}</p>
+                          <span className="font-medium text-gray-200">
+                            Specialization:
+                          </span>
+                          <p className="text-gray-300">
+                            {assistant.doctorId?.specialization || "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>

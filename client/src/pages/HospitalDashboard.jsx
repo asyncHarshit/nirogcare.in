@@ -291,7 +291,6 @@ const HospitalDashboard = () => {
         return (
           <div className="flex items-center justify-center ">
             {/* Profile section */}
-            ... (rest of profile content remains unchanged with comments)
           </div>
         );
 
@@ -303,12 +302,7 @@ const HospitalDashboard = () => {
           return name.includes(query) || phone.includes(query);
         });
 
-        return (
-          <div className="space-y-6">
-            {/* Patients section */}
-            ... (existing patient rendering + comments)
-          </div>
-        );
+        return <div className="space-y-6">{/* Patients section */}</div>;
 
       case "doctors":
         return (
