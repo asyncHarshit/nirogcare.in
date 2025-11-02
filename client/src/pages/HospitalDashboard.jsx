@@ -171,7 +171,6 @@ const HospitalDashboard = () => {
     }
   };
 
-  // Determine which tab's content to render
   const renderContent = () => {
     switch (activeTab) {
       case "home":
@@ -297,7 +296,6 @@ const HospitalDashboard = () => {
         );
 
       case "patients":
-        // Filter patients based on search input
         const filteredPatients = AllPatients.filter((patient) => {
           const name = patient.name?.toLowerCase() || "";
           const phone = patient.phone || "";
@@ -334,11 +332,41 @@ const HospitalDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-800 flex">
       {/* Sidebar */}
-      ... (sidebar code retained with comments)
-      {/* Main content */}
-      ... (main content retained with comments)
+      {toggleSideBar && (
+        <div className="w-64 bg-gray-900/60 border-r border-gray-700/40 p-4 backdrop-blur-lg">
+          <h2 className="text-white text-2xl font-bold mb-6">Dashboard</h2>
+
+          <nav className="space-y-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                  activeTab === item.id
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <button
+            onClick={handleLogout}
+            className="mt-6 w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 p-6 overflow-y-auto">{renderContent()}</div>
     </div>
   );
 };
