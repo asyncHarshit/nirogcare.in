@@ -29,7 +29,7 @@ export const registerUser = async (req, res) => {
       email,
       phone,
       password: hashedPassword,
-      role: null,
+      role: req.body.role || 'patient',
     });
 
     await newUser.save();
