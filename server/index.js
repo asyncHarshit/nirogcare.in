@@ -11,7 +11,8 @@ import doctorRoute from "./routes/doctorRoutes.js"
 import labRoute from "./routes/labRoutes.js"
 import firebaseRoute from "./routes/firebaseRoutes.js"
 import assistantRoute from "./routes/assistantRoutes.js"
-import appointmentRoute from "./routes/appointmentRoutes.js"
+import appointmentRoute from "./routes/appointmentRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js"
 import aiRouter from "./routes/aiRoutes.js"
 import medicalRecordRoutes from "./routes/medicalRecordRoutes.js"
 import videoRoutes from './routes/videoRoutes.js'
