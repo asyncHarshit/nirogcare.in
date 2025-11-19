@@ -21,6 +21,7 @@ const Auth = () => {
     email: '',
     phone: '',
     password: '',
+    role: 'patient',
   });
 
   const navigate = useNavigate();
@@ -160,6 +161,21 @@ const Auth = () => {
                     maxLength={10}
                   />
                 </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Role</label>
+                <div className="relative">
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({...formData, role: e.target.value})}
+                    className="w-full pl-3 pr-4 py-3 bg-gray-80 rounded"
+                  >
+                    <option value="patient">Patient</option>
+                    <option value="hospital">Hospital</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+
               </div>
             </>
           )}
