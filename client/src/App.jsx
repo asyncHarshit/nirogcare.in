@@ -7,6 +7,7 @@ import ProtectedRoute from "./component/protectedRoute";
 import PatientDashboard from "./pages/PatientDashboard";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import AssistantDashboard from "./pages/AssistantDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import LabAdmin from "./pages/LabAdmin";
 import { ProtectRole } from "./component/protect_role";
 import HospitalProfileForm from "./component/HospitalProfile";
