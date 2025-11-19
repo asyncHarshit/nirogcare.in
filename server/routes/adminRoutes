@@ -1,0 +1,20 @@
+import express from 'express';
+import { protect, isAdmin } from '../middlewares/auth.middleware.js';
+const router = express.Router();
+
+router.get('/stats', protect, isAdmin, async (req, res) => {
+  try {
+    // Basic stats - extend as needed
+    return res.json({
+      users: await (await import('../models/User.js')).default.countDocuments(),
+      hospitals: await (await import('../models/Hospital.js')).default.countDocuments(),
+      patients: await (await import('../models/Patient.js')).default.countDocuments(),
+      message: 'Admin stats fetched'
+    });
+  } catch (err) {
+    console.error('Admin stats error', err);
+    return res.status(500).json({ message: 'Failed to fetch admin stats' });
+  }
+});
+
+export default router;
