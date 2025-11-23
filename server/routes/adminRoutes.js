@@ -17,7 +17,6 @@ router.get('/stats', protect, isAdmin, getAdminStats);
 
 // Users management
 router.get('/users/:id', protect, isAdmin, getUserById);
-router.patch('/users/:id/role', protect, isAdmin, updateUserRole);
 router.delete('/users/:id', protect, isAdmin, deleteUser);
 
 // Hospitals management

@@ -52,6 +52,7 @@ app.use('/api/ai',aiRouter)
 app.use('/api/record',medicalRecordRoutes)
 app.use('/api/stream',videoRoutes)
 app.use('/api/payment',paymentRoutes)
+app.use('/api/admin', adminRoutes);
 
 
 
