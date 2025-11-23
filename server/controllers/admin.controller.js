@@ -25,6 +25,32 @@ export const getAdminStats = async (req, res) => {
   }
 };
 
+// GET /api/admin/users/:id
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select('-password').lean();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.json({ user });
+  } catch (err) {
+    console.error('getUserById error', err);
+    return res.status(500).json({ message: 'Failed to fetch user' });
+  }
+};
+
+
+// DELETE /api/admin/users/:id
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.json({ message: 'User deleted', user });
+  } catch (err) {
+    console.error('deleteUser error', err);
+    return res.status(500).json({ message: 'Failed to delete user' });
+  }
+};
 
 // GET /api/admin/hospitals
 export const getAllHospitals = async (req, res) => {
