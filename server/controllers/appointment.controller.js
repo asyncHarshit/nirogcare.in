@@ -1,7 +1,7 @@
 import { Appointment } from "../models/Appointment.js";
 import {Patient} from "../models/Patient.js"
 
-// Create a new appointment
+// Create a new appointments
 export const createAppointment = async (req, res) => {
   try {
     const { type } = req.body.forPatient;

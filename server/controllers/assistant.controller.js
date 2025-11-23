@@ -32,7 +32,7 @@ export const registerAssistant = async (req, res) => {
         .json({ success: false, message: "Hospital or Doctor not found" });
     }
 
-    // Check if already exists
+    // Check if it exists already or not
     let assistant = await Assistant.findOne({ userId });
 
     if (assistant) {
