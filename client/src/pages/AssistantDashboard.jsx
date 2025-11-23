@@ -463,7 +463,7 @@ const AssistantDashboard = () => {
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <h4 className="font-medium text-white text-lg">
-                              {appointment?.bookedBy?.name || "Unknown Patient"}
+                              {appointment?.bookedBy?._id ?? "N/A"}
                             </h4>
                             <span
                               className={`text-xs px-2 py-1 rounded-full bg-green-800`}
