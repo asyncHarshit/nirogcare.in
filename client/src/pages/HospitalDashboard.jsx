@@ -1,5 +1,3 @@
-// Added comprehensive comments throughout the file for clarity and maintainability.
-// Adding descriptive comments to help understand each section and logic
 
 import React, { useState, useEffect } from 'react';
 import {
