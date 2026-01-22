@@ -3,7 +3,6 @@ import { protect, isAdmin } from '../middlewares/auth.middleware.js';
 import {
 	getAdminStats,
 	getUserById,
-	updateUserRole,
 	deleteUser,
 	getAllHospitals,
 	createHospitalForUser,

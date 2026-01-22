@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import Hospital from '../models/Hospital.js';
-import Patient from '../models/Patient.js';
+import { Hospital } from '../models/Hospital.js';
+import { Patient } from '../models/Patient.js';
 
 // GET /api/admin/stats
 // Returns aggregate counts for quick admin overview.
